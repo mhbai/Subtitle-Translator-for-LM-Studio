@@ -83,6 +83,18 @@ body {
   opacity: 0.65;
 }
 
+/* Újrafordítás gomb animáció */
+.btn-loading {
+    position: relative;
+    pointer-events: none;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
 /* Haladásjelző */
 .progress {
   height: 0.75rem;
@@ -98,6 +110,17 @@ body {
 /* Egyéb elemek */
 #fileInfo {
   font-size: 0.9rem;
+}
+
+/* Tooltip egyedi stílusok */
+.tooltip-warning .tooltip-inner {
+    background-color: #ffc107 !important;
+    color: #212529 !important;
+}
+
+.tooltip-warning .tooltip-arrow::before {
+    border-top-color: #ffc107 !important;
+    border-bottom-color: #ffc107 !important;
 }
 
 /* Reszponzív igazítások */

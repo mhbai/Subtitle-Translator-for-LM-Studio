@@ -81,8 +81,10 @@
                             <table class="table table-dark table-striped table-hover">
                                 <thead>
                                     <tr>
-                                        <th width="50%">Eredeti szöveg</th>
-                                        <th width="50%">Fordított szöveg</th>
+                                        <th width="5%">#</th>
+                                        <th width="45%">Eredeti szöveg</th>
+                                        <th width="45%">Fordított szöveg</th>
+                                        <th width="5%">Műveletek</th>
                                     </tr>
                                 </thead>
                                 <tbody id="subtitleTable">
@@ -96,9 +98,14 @@
                         </div>
 
                         <div class="d-flex justify-content-between mt-3">
-                            <button class="btn btn-primary" id="startTranslation" disabled>
-                                <i class="bi bi-translate me-2"></i>Fordítás indítása
-                            </button>
+                            <div>
+                                <button class="btn btn-primary" id="startTranslation" disabled>
+                                    <i class="bi bi-translate me-2"></i>Fordítás indítása
+                                </button>
+                                <button class="btn btn-warning d-none" id="stopTranslation">
+                                    <i class="bi bi-pause-circle me-2"></i>Fordítás megállítása
+                                </button>
+                            </div>
                             <button class="btn btn-success" id="saveTranslation" disabled>
                                 <i class="bi bi-save me-2"></i>Fordítás mentése
                             </button>
