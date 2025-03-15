@@ -3,6 +3,7 @@ let originalSubtitles = []; // Az eredeti feliratokat tárolja
 let translatedSubtitles = []; // A lefordított feliratokat tárolja
 let originalSrtContent = ''; // Az eredeti SRT fájl teljes tartalma
 let fileName = ''; // A betöltött fájl neve
+let translationMemory = {}; // Fordítási memória a konzisztencia érdekében
 
 // DOM elemek
 document.addEventListener('DOMContentLoaded', function() {
@@ -130,6 +131,16 @@ document.addEventListener('DOMContentLoaded', function() {
         const sourceLanguage = sourceLanguageSelect.value;
         const targetLanguage = targetLanguageSelect.value;
         
+        // Fordítási memória törlése új fordítás indításakor, ha a nyelvek változtak
+        if (translationMemory.sourceLanguage !== sourceLanguage || 
+            translationMemory.targetLanguage !== targetLanguage) {
+            translationMemory = {
+                sourceLanguage: sourceLanguage,
+                targetLanguage: targetLanguage,
+                translations: {}
+            };
+        }
+        
         // Gombok letiltása a fordítás idejére
         startTranslationBtn.disabled = true;
         saveTranslationBtn.disabled = true;
@@ -146,16 +157,36 @@ document.addEventListener('DOMContentLoaded', function() {
             progressBar.style.width = `${progress}%`;
             progressBar.setAttribute('aria-valuenow', progress);
             
+            // Ellenőrizzük, hogy a szöveg már szerepel-e a fordítási memóriában
+            const originalText = originalSubtitles[i].text;
+            if (translationMemory.translations && translationMemory.translations[originalText]) {
+                translatedSubtitles[i].text = translationMemory.translations[originalText];
+                
+                // Táblázat frissítése
+                const translatedCell = document.getElementById(`translated-${i}`);
+                if (translatedCell) {
+                    translatedCell.textContent = translationMemory.translations[originalText];
+                }
+                continue; // Ugrás a következő felirathoz
+            }
+            
             // Fordítás kérése az LM Studio API-tól
             try {
-                const translatedText = await translateText(
-                    originalSubtitles[i].text,
+                const translatedText = await translateTextWithContext(
+                    originalSubtitles,
+                    i,
                     sourceLanguage,
                     targetLanguage
                 );
                 
                 // Fordított szöveg mentése
                 translatedSubtitles[i].text = translatedText;
+                
+                // Mentés a fordítási memóriába
+                if (!translationMemory.translations) {
+                    translationMemory.translations = {};
+                }
+                translationMemory.translations[originalText] = translatedText;
                 
                 // Táblázat frissítése
                 const translatedCell = document.getElementById(`translated-${i}`);
@@ -178,14 +209,34 @@ document.addEventListener('DOMContentLoaded', function() {
         saveTranslationBtn.disabled = false;
     }
 
-    // Szöveg fordítása az LM Studio API-val
-    async function translateText(text, sourceLanguage, targetLanguage) {
+    // Szöveg fordítása kontextussal az LM Studio API-val
+    async function translateTextWithContext(subtitles, currentIndex, sourceLanguage, targetLanguage) {
         try {
-            // LM Studio API végpont (alapértelmezetten a localhost:1234/v1 címen fut)
+            // Kontextus összeállítása (előző és következő mondatok)
+            const currentSubtitle = subtitles[currentIndex].text;
+            let context = '';
+            
+            // Előző mondat hozzáadása a kontextushoz (ha van)
+            if (currentIndex > 0) {
+                context += `Előző mondat: "${subtitles[currentIndex - 1].text}"\n`;
+            }
+            
+            // Következő mondat hozzáadása a kontextushoz (ha van)
+            if (currentIndex < subtitles.length - 1) {
+                context += `Következő mondat: "${subtitles[currentIndex + 1].text}"\n`;
+            }
+            
+            // LM Studio API végpont
             const apiUrl = 'http://localhost:1234/v1/completions';
             
-            // Fordítási prompt összeállítása
-            const prompt = `Fordítsd le a következő szöveget ${getLanguageName(sourceLanguage)} nyelvről ${getLanguageName(targetLanguage)} nyelvre. Csak a fordítást add vissza, semmilyen magyarázatot vagy egyéb szöveget ne írj.\n\nSzöveg: "${text}"\n\nFordítás:`;
+            // Fordítási prompt összeállítása kontextussal
+            let prompt = `Te egy professzionális fordító vagy, aki ${getLanguageName(sourceLanguage)} nyelvről ${getLanguageName(targetLanguage)} nyelvre fordít egy filmfeliratot. A fordításnak természetesnek és folyékonynak kell lennie, miközben megőrzi az eredeti jelentést és stílust.\n\n`;
+            
+            if (context) {
+                prompt += `Kontextus a jobb fordításhoz:\n${context}\n`;
+            }
+            
+            prompt += `Fordítandó mondat: "${currentSubtitle}"\n\nFordítás:`;
             
             // Fordítási kérés összeállítása
             const response = await fetch(apiUrl, {
@@ -196,7 +247,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 body: JSON.stringify({
                     prompt: prompt,
                     max_tokens: 500,
-                    temperature: 1.0, // Alacsonyabb hőmérséklet a pontosabb fordításhoz
+                    temperature: 1.0,
                     stream: false
                 })
             });
@@ -209,7 +260,16 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Ellenőrizzük, hogy van-e válasz
             if (data.choices && data.choices.length > 0 && data.choices[0].text) {
-                return data.choices[0].text.trim();
+                // Tisztítjuk a fordítást (eltávolítjuk az idézőjeleket, ha vannak)
+                let translatedText = data.choices[0].text.trim();
+                
+                // Idézőjelek eltávolítása a fordítás elejéről és végéről, ha vannak
+                if ((translatedText.startsWith('"') && translatedText.endsWith('"')) || 
+                    (translatedText.startsWith('"') && translatedText.endsWith('"'))) {
+                    translatedText = translatedText.substring(1, translatedText.length - 1);
+                }
+                
+                return translatedText;
             } else {
                 throw new Error('Nem érkezett fordítási eredmény');
             }
@@ -217,6 +277,16 @@ document.addEventListener('DOMContentLoaded', function() {
             console.error('Fordítási hiba:', error);
             throw new Error(`Fordítási hiba: ${error.message}`);
         }
+    }
+
+    // Szöveg fordítása az LM Studio API-val (régi metódus, megtartva kompatibilitás miatt)
+    async function translateText(text, sourceLanguage, targetLanguage) {
+        return translateTextWithContext(
+            [{ text: text }], // Egyetlen felirat
+            0, // Az első (és egyetlen) elem indexe
+            sourceLanguage,
+            targetLanguage
+        );
     }
 
     // Fordítás mentése
