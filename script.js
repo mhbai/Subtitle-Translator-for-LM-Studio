@@ -16,15 +16,16 @@ document.addEventListener('DOMContentLoaded', function() {
     const srtFileInput = document.getElementById('srtFile');
     const startTranslationBtn = document.getElementById('startTranslation');
     const stopTranslationBtn = document.getElementById('stopTranslation');
+    const resetTranslationBtn = document.getElementById('resetTranslation');
     const saveTranslationBtn = document.getElementById('saveTranslation');
     const subtitleTable = document.getElementById('subtitleTable');
     const fileInfoDiv = document.getElementById('fileInfo');
     const fileNameSpan = document.getElementById('fileName');
     const lineCountSpan = document.getElementById('lineCount');
-    const progressContainer = document.getElementById('progressContainer');
-    const progressBar = document.getElementById('progressBar');
     const sourceLanguageSelect = document.getElementById('sourceLanguage');
     const targetLanguageSelect = document.getElementById('targetLanguage');
+    const progressContainer = document.getElementById('progressContainer');
+    const progressBar = document.getElementById('progressBar');
     const temperatureSlider = document.getElementById('temperatureSlider');
     const temperatureValue = document.getElementById('temperatureValue');
 
@@ -32,6 +33,7 @@ document.addEventListener('DOMContentLoaded', function() {
     srtFileInput.addEventListener('change', handleFileSelect);
     startTranslationBtn.addEventListener('click', handleTranslationControl);
     stopTranslationBtn.addEventListener('click', pauseTranslation);
+    resetTranslationBtn.addEventListener('click', resetTranslation);
     saveTranslationBtn.addEventListener('click', saveTranslation);
     
     // Temperature csúszka eseménykezelő
@@ -64,7 +66,64 @@ document.addEventListener('DOMContentLoaded', function() {
         isTranslationRunning = false;
         startTranslationBtn.innerHTML = '<i class="bi bi-play-circle me-2"></i>Fordítás folytatása';
         startTranslationBtn.disabled = false;
+        startTranslationBtn.classList.remove('d-none');
         stopTranslationBtn.classList.add('d-none');
+        
+        // Reset gomb megjelenítése
+        resetTranslationBtn.classList.remove('d-none');
+    }
+
+    // Fordítás alaphelyzetbe állítása
+    function resetTranslation() {
+        // Fordítás leállítása, ha fut
+        isTranslationPaused = true;
+        isTranslationRunning = false;
+        
+        // Alapállapotba állítás
+        resetAllTranslations();
+        
+        // UI elemek frissítése
+        stopTranslationBtn.classList.add('d-none');
+        resetTranslationBtn.classList.add('d-none');
+        startTranslationBtn.classList.remove('d-none');
+        startTranslationBtn.innerHTML = '<i class="bi bi-translate me-2"></i>Fordítás indítása';
+        progressContainer.classList.add('d-none');
+        saveTranslationBtn.disabled = true;
+        
+        // Táblázat újratöltése csak az eredeti feliratokkal
+        populateTable();
+    }
+    
+    // Minden fordítás és beállítás alaphelyzetbe állítása
+    function resetAllTranslations() {
+        // Csak a fordításokat töröljük, az eredeti feliratokat megtartjuk
+        translatedSubtitles = [];
+        
+        // Ha vannak eredeti feliratok, akkor létrehozzuk az üres fordításokat
+        if (originalSubtitles.length > 0) {
+            for (let i = 0; i < originalSubtitles.length; i++) {
+                translatedSubtitles.push({
+                    number: originalSubtitles[i].number,
+                    timecode: originalSubtitles[i].timecode,
+                    text: ''
+                });
+            }
+        }
+        
+        // Fordítási állapot alaphelyzetbe állítása
+        currentTranslationIndex = 0;
+        isTranslationRunning = false;
+        isTranslationPaused = false;
+        rowsBeingRetranslated.clear();
+        
+        // Fordítási memória törlése
+        translationMemory = {};
+        
+        // Hőmérséklet visszaállítása alapértékre
+        temperature = 1.0;
+        temperatureSlider.value = 1.0;
+        temperatureValue.textContent = "1.0";
+        temperatureValue.className = 'badge bg-primary';
     }
 
     // Fájl kiválasztása eseménykezelő
