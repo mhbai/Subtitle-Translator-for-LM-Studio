@@ -69,10 +69,10 @@ document.addEventListener('DOMContentLoaded', function() {
         startTranslationBtn.classList.remove('d-none');
         stopTranslationBtn.classList.add('d-none');
         
-        // 20 másodperc után jelenítjük meg a Reset gombot
+        // 10 másodperc után jelenítjük meg a Reset gombot
         setTimeout(() => {
             resetTranslationBtn.classList.remove('d-none');
-        }, 20000);
+        }, 10000);
     }
     
     // Fordítás alaphelyzetbe állítása
