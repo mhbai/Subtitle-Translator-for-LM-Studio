@@ -69,10 +69,12 @@ document.addEventListener('DOMContentLoaded', function() {
         startTranslationBtn.classList.remove('d-none');
         stopTranslationBtn.classList.add('d-none');
         
-        // Reset gomb megjelenítése
-        resetTranslationBtn.classList.remove('d-none');
+        // 20 másodperc után jelenítjük meg a Reset gombot
+        setTimeout(() => {
+            resetTranslationBtn.classList.remove('d-none');
+        }, 20000);
     }
-
+    
     // Fordítás alaphelyzetbe állítása
     function resetTranslation() {
         // Fordítás leállítása, ha fut
@@ -128,6 +130,16 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Fájl kiválasztása eseménykezelő
     function handleFileSelect(event) {
+        // Ellenőrizzük, hogy fut-e a fordítás
+        if (isTranslationRunning) {
+            // Töröljük a kiválasztást
+            srtFileInput.value = '';
+            
+            // Figyelmeztetés megjelenítése
+            alert('Kérjük, először állítsa le a fordítást, mielőtt új fájlt töltene be!');
+            return;
+        }
+        
         const file = event.target.files[0];
         if (!file) return;
         
@@ -767,7 +779,27 @@ document.addEventListener('DOMContentLoaded', function() {
             'ar': 'arab',
             'hi': 'hindi',
             'tr': 'török',
-            'pl': 'lengyel'
+            'pl': 'lengyel',
+            'nl': 'holland',
+            'sv': 'svéd',
+            'da': 'dán',
+            'fi': 'finn',
+            'no': 'norvég',
+            'cs': 'cseh',
+            'sk': 'szlovák',
+            'ro': 'román',
+            'bg': 'bolgár',
+            'hr': 'horvát',
+            'sr': 'szerb',
+            'uk': 'ukrán',
+            'el': 'görög',
+            'he': 'héber',
+            'vi': 'vietnámi',
+            'th': 'thai',
+            'id': 'indonéz',
+            'ms': 'maláj',
+            'fa': 'perzsa',
+            'ur': 'urdu'
         };
         
         return languages[languageCode] || languageCode;
