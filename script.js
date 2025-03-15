@@ -8,6 +8,7 @@ let isTranslationPaused = false; // Fordítás szüneteltetése
 let currentTranslationIndex = 0; // Aktuális fordítási index
 let isTranslationRunning = false; // Fordítás folyamatban
 let rowsBeingRetranslated = new Set(); // Újrafordítás alatt álló sorok
+let temperature = 1.0; // Fordítási szabadságfok alapértéke
 
 // DOM elemek
 document.addEventListener('DOMContentLoaded', function() {
@@ -24,12 +25,29 @@ document.addEventListener('DOMContentLoaded', function() {
     const progressBar = document.getElementById('progressBar');
     const sourceLanguageSelect = document.getElementById('sourceLanguage');
     const targetLanguageSelect = document.getElementById('targetLanguage');
+    const temperatureSlider = document.getElementById('temperatureSlider');
+    const temperatureValue = document.getElementById('temperatureValue');
 
     // Eseménykezelők hozzáadása
     srtFileInput.addEventListener('change', handleFileSelect);
     startTranslationBtn.addEventListener('click', handleTranslationControl);
     stopTranslationBtn.addEventListener('click', pauseTranslation);
     saveTranslationBtn.addEventListener('click', saveTranslation);
+    
+    // Temperature csúszka eseménykezelő
+    temperatureSlider.addEventListener('input', function() {
+        temperature = parseFloat(this.value);
+        temperatureValue.textContent = temperature.toFixed(1);
+        
+        // Színátmenet a temperature értékhez
+        if (temperature < 0.7) {
+            temperatureValue.className = 'badge bg-success'; // Pontos
+        } else if (temperature <= 1.3) {
+            temperatureValue.className = 'badge bg-primary'; // Kiegyensúlyozott
+        } else {
+            temperatureValue.className = 'badge bg-warning text-dark'; // Kreatív
+        }
+    });
 
     // Fordítás vezérlése (indítás/folytatás)
     function handleTranslationControl() {
@@ -543,7 +561,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 body: JSON.stringify({
                     prompt: prompt,
                     max_tokens: 500,
-                    temperature: 1.0,
+                    temperature: temperature, // A csúszkával beállított érték használata
                     stream: false
                 })
             });

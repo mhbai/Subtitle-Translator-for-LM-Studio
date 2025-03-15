@@ -124,6 +124,15 @@ body {
     border-bottom-color: #ffc107 !important;
 }
 
+/* Fordítási szabadságfok csúszka */
+.form-range {
+    background-color: transparent;
+}
+
+.text-light small {
+    opacity: 0.9;
+}
+
 /* Reszponzív igazítások */
 @media (max-width: 768px) {
   .container {
@@ -177,9 +186,9 @@ body {
     display: block;
     width: 100%;
     resize: none;
-    background-color: transparent;
+    background-color: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.1);
-    color: var(--text-color);
+    color: var(--text-light);
 }
 
 .table td .editable-content {
