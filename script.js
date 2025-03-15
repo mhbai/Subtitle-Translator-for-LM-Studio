@@ -210,7 +210,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Szöveg fordítása kontextussal az LM Studio API-val
-    async function translateTextWithContext(subtitles, currentIndex, sourceLanguage, targetLanguage) {
+    async function translateTextWithContext(subtitles, currentIndex, sourceLanguage, targetLanguage, retryCount = 0) {
         try {
             // Kontextus összeállítása (előző és következő mondatok)
             const currentSubtitle = subtitles[currentIndex].text;
@@ -230,7 +230,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const apiUrl = 'http://localhost:1234/v1/completions';
             
             // Fordítási prompt összeállítása kontextussal
-            let prompt = `Te egy professzionális fordító vagy, aki ${getLanguageName(sourceLanguage)} nyelvről ${getLanguageName(targetLanguage)} nyelvre fordít egy filmfeliratot. A fordításnak természetesnek és folyékonynak kell lennie, miközben megőrzi az eredeti jelentést és stílust.\n\n`;
+            let prompt = `Te egy professzionális fordító vagy, aki ${getLanguageName(sourceLanguage)} nyelvről ${getLanguageName(targetLanguage)} nyelvre fordít egy filmfeliratot. A fordításnak természetesnek és folyékonynak kell lennie, miközben megőrzi az eredeti jelentést és stílust. Ne használj formázást, kódjelölést vagy idézőjeleket a fordításban.\n\n`;
             
             if (context) {
                 prompt += `Kontextus a jobb fordításhoz:\n${context}\n`;
@@ -260,13 +260,49 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Ellenőrizzük, hogy van-e válasz
             if (data.choices && data.choices.length > 0 && data.choices[0].text) {
-                // Tisztítjuk a fordítást (eltávolítjuk az idézőjeleket, ha vannak)
+                // Tisztítjuk a fordítást
                 let translatedText = data.choices[0].text.trim();
+                
+                // Ellenőrizzük, hogy a fordítás tartalmaz-e hibás formázást vagy kódjelölést
+                if (translatedText.includes('```') || 
+                    translatedText.startsWith('`') || 
+                    translatedText.includes('```')) {
+                    
+                    // Eltávolítjuk a ``` jelöléseket és a köztük lévő nyelvi azonosítót (ha van)
+                    translatedText = translatedText.replace(/```[a-z]*\n?/g, '');
+                    translatedText = translatedText.replace(/```/g, '');
+                    
+                    // Eltávolítjuk az egyszeres ` jeleket is
+                    translatedText = translatedText.replace(/`/g, '');
+                }
                 
                 // Idézőjelek eltávolítása a fordítás elejéről és végéről, ha vannak
                 if ((translatedText.startsWith('"') && translatedText.endsWith('"')) || 
                     (translatedText.startsWith('"') && translatedText.endsWith('"'))) {
                     translatedText = translatedText.substring(1, translatedText.length - 1);
+                }
+                
+                // Ellenőrizzük, hogy a fordítás nem tartalmaz-e hibás vagy értelmetlen szöveget
+                // (pl. hibaüzenet, vagy túl rövid a fordítás az eredetihez képest)
+                const originalLength = currentSubtitle.length;
+                const translatedLength = translatedText.length;
+                const isTranslationSuspicious = 
+                    translatedText.includes("error") || 
+                    translatedText.includes("hiba") || 
+                    translatedText.includes("unexpected") ||
+                    (translatedLength < originalLength * 0.3 && originalLength > 10) || // Túl rövid fordítás
+                    translatedText.includes("API") ||
+                    translatedText.includes("endpoint");
+                
+                // Ha gyanús a fordítás és még nem próbáltuk újra túl sokszor, próbáljuk újra
+                if (isTranslationSuspicious && retryCount < 3) {
+                    console.warn(`Gyanús fordítás, újrapróbálkozás (${retryCount + 1}/3): "${translatedText}"`);
+                    
+                    // Várjunk egy kicsit az újrapróbálkozás előtt
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                    
+                    // Újrapróbálkozás
+                    return translateTextWithContext(subtitles, currentIndex, sourceLanguage, targetLanguage, retryCount + 1);
                 }
                 
                 return translatedText;
@@ -275,7 +311,19 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         } catch (error) {
             console.error('Fordítási hiba:', error);
-            throw new Error(`Fordítási hiba: ${error.message}`);
+            
+            // Újrapróbálkozás hiba esetén, de csak korlátozott számú alkalommal
+            if (retryCount < 3) {
+                console.warn(`Fordítási hiba, újrapróbálkozás (${retryCount + 1}/3): ${error.message}`);
+                
+                // Várjunk egy kicsit az újrapróbálkozás előtt
+                await new Promise(resolve => setTimeout(resolve, 2000));
+                
+                // Újrapróbálkozás
+                return translateTextWithContext(subtitles, currentIndex, sourceLanguage, targetLanguage, retryCount + 1);
+            }
+            
+            throw new Error(`Fordítási hiba (${retryCount} próbálkozás után): ${error.message}`);
         }
     }
 
