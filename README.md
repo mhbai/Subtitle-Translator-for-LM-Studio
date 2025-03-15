@@ -69,10 +69,11 @@ Az alkalmazás számos fejlett fordítási funkciót tartalmaz a pontosabb és k
 
 A fordítás során nem csak az aktuális mondatot küldjük el az AI-nak, hanem kontextust is adunk neki:
 
-- Az aktuális mondat előtti mondatot is elküldjük, ha létezik
-- Az aktuális mondat utáni mondatot is elküldjük, ha létezik
+- Az aktuális mondat előtti 4 mondatot is elküldjük (ha léteznek)
+- Az aktuális mondat utáni 4 mondatot is elküldjük (ha léteznek)
 - Ezek a kontextus mondatok segítenek az AI-nak jobban megérteni a szövegkörnyezetet
 - Különösen hasznos olyan esetekben, amikor a mondat jelentése a kontextustól függ
+- A bővített kontextus jelentősen javítja a fordítás minőségét, különösen hosszabb párbeszédek és összetett jelenetek esetén
 
 ### 2. Fordítási memória
 

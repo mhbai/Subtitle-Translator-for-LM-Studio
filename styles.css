@@ -204,15 +204,16 @@ body {
 }
 
 .editable-content:hover {
-    background-color: rgba(255, 255, 255, 0.1);
+    background-color: rgba(255, 255, 255, 0.15);
     border-color: rgba(255, 255, 255, 0.2);
 }
 
 .editable-content:focus {
-    background-color: rgba(255, 255, 255, 0.15);
+    background-color: rgba(255, 255, 255, 0.3);
     outline: none;
     box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
     border-color: rgba(13, 110, 253, 0.5);
+    color: #212529;
 }
 
 /* Szerkesztett sor kiemelése */

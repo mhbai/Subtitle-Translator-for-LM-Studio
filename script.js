@@ -530,14 +530,18 @@ document.addEventListener('DOMContentLoaded', function() {
             const currentSubtitle = subtitles[currentIndex].text;
             let context = '';
             
-            // Előző mondat hozzáadása a kontextushoz (ha van)
-            if (currentIndex > 0) {
-                context += `Előző mondat: "${subtitles[currentIndex - 1].text}"\n`;
+            // Előző mondatok hozzáadása a kontextushoz (max 4)
+            for (let i = 1; i <= 4; i++) {
+                if (currentIndex - i >= 0) {
+                    context += `Előző mondat ${i}: "${subtitles[currentIndex - i].text}"\n`;
+                }
             }
             
-            // Következő mondat hozzáadása a kontextushoz (ha van)
-            if (currentIndex < subtitles.length - 1) {
-                context += `Következő mondat: "${subtitles[currentIndex + 1].text}"\n`;
+            // Következő mondatok hozzáadása a kontextushoz (max 4)
+            for (let i = 1; i <= 4; i++) {
+                if (currentIndex + i < subtitles.length) {
+                    context += `Következő mondat ${i}: "${subtitles[currentIndex + i].text}"\n`;
+                }
             }
             
             // LM Studio API végpont
