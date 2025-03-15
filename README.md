@@ -13,6 +13,7 @@ Ez az alkalmazás egy egyszerű, de hatékony webes eszköz .srt formátumú fel
 - **Fordítások manuális szerkesztése** közvetlenül a táblázatban
 - **Fordítási szabadságfok (temperature) beállítása** a kreativitás szabályozásához
 - Sorok egyenkénti újrafordítása szükség esetén
+- **Munkafájl mentése és betöltése** a fordítási folyamat későbbi folytatásához
 
 ## Használati útmutató
 
@@ -23,7 +24,7 @@ Ez az alkalmazás egy egyszerű, de hatékony webes eszköz .srt formátumú fel
 
 2. **Feliratfájl betöltése:**
    - Nyisd meg a weboldalt a böngésződben
-   - Kattints a "Tallózás" gombra és válassz ki egy .srt kiterjesztésű feliratfájlt
+   - Kattints a "Tallózás" gombra és válassz ki egy .srt kiterjesztésű feliratfájlt vagy egy korábban mentett .wrk munkafájlt
 
 3. **Fordítási szabadságfok beállítása:**
    - Használd a csúszkát a fordítás kreativitásának beállításához
@@ -54,6 +55,11 @@ Ez az alkalmazás egy egyszerű, de hatékony webes eszköz .srt formátumú fel
 8. **Fordítás mentése:**
    - A fordítás befejezése után kattints a "Fordítás mentése" gombra
    - A böngésző letölti az új feliratfájlt, amelynek neve az eredeti fájlnév és a célnyelv kódjának kombinációja
+
+9. **Munkafájl mentése és betöltése:**
+   - Ha szeretnéd megszakítani a fordítást és később folytatni, kattints a "Munkafájl mentése" gombra
+   - A böngésző letölti a .wrk kiterjesztésű munkafájlt, amely tartalmazza az összes fordítási adatot
+   - Később betöltheted ezt a fájlt a "Tallózás" gombbal, és folytathatod a fordítást onnan, ahol abbahagytad
 
 ## Rendszerkövetelmények
 
@@ -101,7 +107,21 @@ A fordítások manuális szerkesztése lehetővé teszi a finomhangolást:
 - A szerkesztett sorok rövid zöld villanással jelzik a sikeres mentést
 - Nem kell újrafordítanod az egész feliratot egy-egy hiba miatt
 
-### 5. Fejlett fordítási prompt
+### 5. Munkafájl mentése és betöltése
+
+A munkafájl funkció lehetővé teszi a fordítási folyamat megszakítását és későbbi folytatását:
+
+- A munkafájl (.wrk) tartalmazza az összes fordítási adatot:
+  - Eredeti és lefordított feliratok
+  - Aktuális fordítási pozíció
+  - Nyelvi beállítások
+  - Fordítási szabadságfok
+  - Fordítási memória
+- Bármikor elmentheted a munkafájlt és később folytathatod a fordítást
+- Különösen hasznos hosszabb feliratfájlok esetén, vagy ha több részletben szeretnéd elvégezni a fordítást
+- A munkafájl betöltése után pontosan onnan folytathatod, ahol abbahagytad
+
+### 6. Fejlett fordítási prompt
 
 A fordítási prompt-ot úgy terveztük, hogy a lehető legjobb eredményt érje el:
 
@@ -109,7 +129,7 @@ A fordítási prompt-ot úgy terveztük, hogy a lehető legjobb eredményt érje
 - Jelezzük, hogy filmfeliratról van szó, ami segít az AI-nak a megfelelő stílus kiválasztásában
 - Kérjük, hogy a fordítás természetes és folyékony legyen, miközben megőrzi az eredeti jelentést és stílust
 
-### 6. Automatikus szövegtisztítás
+### 7. Automatikus szövegtisztítás
 
 A fordítás során automatikus tisztítási lépéseket alkalmazunk:
 
@@ -122,6 +142,7 @@ A fordítás során automatikus tisztítási lépéseket alkalmazunk:
 - Az alkalmazás tisztán kliens-oldali, nem igényel szervert
 - A fordítás az LM Studio API-ján keresztül történik a `/v1/completions` végponton
 - A program nem küld adatokat külső szerverekre, minden művelet a helyi gépen történik
+- A munkafájlok JSON formátumban tárolódnak, és tartalmazzák az összes szükséges adatot a fordítás folytatásához
 
 ## Hibaelhárítás
 
@@ -130,3 +151,4 @@ A fordítás során automatikus tisztítási lépéseket alkalmazunk:
 - **Lassú fordítás:** A fordítás sebessége függ a használt nyelvi modell méretétől és a számítógép teljesítményétől
 - **Pontatlan fordítás:** Próbálj nagyobb vagy specializáltabb nyelvi modellt használni az LM Studio-ban, vagy állítsd alacsonyabbra a fordítási szabadságfokot
 - **Szerkesztés nem működik:** Ha problémád van a szerkesztéssel, próbáld frissíteni az oldalt, vagy használj más böngészőt
+- **Munkafájl betöltési hiba:** Ellenőrizd, hogy a munkafájl formátuma megfelelő-e, és nem sérült-e a fájl
