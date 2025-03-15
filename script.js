@@ -3,6 +3,7 @@ let originalSubtitles = []; // Az eredeti feliratokat tárolja
 let translatedSubtitles = []; // A lefordított feliratokat tárolja
 let originalSrtContent = ''; // Az eredeti SRT fájl teljes tartalma
 let fileName = ''; // A betöltött fájl neve
+let originalFilePath = ''; // Az eredeti fájl elérési útja
 let translationMemory = {}; // Fordítási memória a konzisztencia érdekében
 let isTranslationPaused = false; // Fordítás szüneteltetése
 let currentTranslationIndex = 0; // Aktuális fordítási index
@@ -18,6 +19,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const stopTranslationBtn = document.getElementById('stopTranslation');
     const resetTranslationBtn = document.getElementById('resetTranslation');
     const saveTranslationBtn = document.getElementById('saveTranslation');
+    const saveWorkFileBtn = document.getElementById('saveWorkFile');
     const subtitleTable = document.getElementById('subtitleTable');
     const fileInfoDiv = document.getElementById('fileInfo');
     const fileNameSpan = document.getElementById('fileName');
@@ -35,6 +37,7 @@ document.addEventListener('DOMContentLoaded', function() {
     stopTranslationBtn.addEventListener('click', pauseTranslation);
     resetTranslationBtn.addEventListener('click', resetTranslation);
     saveTranslationBtn.addEventListener('click', saveTranslation);
+    saveWorkFileBtn.addEventListener('click', saveWorkFile);
     
     // Temperature csúszka eseménykezelő
     temperatureSlider.addEventListener('input', function() {
@@ -91,6 +94,7 @@ document.addEventListener('DOMContentLoaded', function() {
         startTranslationBtn.innerHTML = '<i class="bi bi-translate me-2"></i>Fordítás indítása';
         progressContainer.classList.add('d-none');
         saveTranslationBtn.disabled = true;
+        saveWorkFileBtn.classList.add('d-none');
         
         // Táblázat újratöltése csak az eredeti feliratokkal
         populateTable();
@@ -133,7 +137,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Ellenőrizzük, hogy fut-e a fordítás
         if (isTranslationRunning) {
             // Töröljük a kiválasztást
-            srtFileInput.value = '';
+            event.target.value = '';
             
             // Figyelmeztetés megjelenítése
             alert('Kérjük, először állítsa le a fordítást, mielőtt új fájlt töltene be!');
@@ -144,27 +148,45 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!file) return;
         
         fileName = file.name;
+        originalFilePath = file.path; // Elmentjük az elérési utat
         
-        // Csak .srt fájlokat fogadunk el
-        if (!fileName.toLowerCase().endsWith('.srt')) {
-            alert('Kérjük, csak .srt kiterjesztésű fájlt töltsön fel!');
-            srtFileInput.value = '';
+        // Ellenőrizzük a fájl kiterjesztését
+        if (fileName.toLowerCase().endsWith('.srt')) {
+            // SRT fájl feldolgozása
+            processSrtFile(file);
+        } else if (fileName.toLowerCase().endsWith('.wrk')) {
+            // Munkafájl feldolgozása
+            processWorkFile(file);
+        } else {
+            alert('Csak .srt vagy .wrk kiterjesztésű fájlokat lehet betölteni!');
+            event.target.value = '';
             return;
         }
+    }
 
-        // Fájl beolvasása
+    // SRT fájl feldolgozása
+    function processSrtFile(file) {
         const reader = new FileReader();
+        
         reader.onload = function(e) {
-            originalSrtContent = e.target.result;
-            parseSrtFile(originalSrtContent);
+            // Fájl tartalmának beolvasása
+            const content = e.target.result;
+            originalSrtContent = content;
             
             // Fájl információk megjelenítése
-            fileNameSpan.textContent = fileName;
-            lineCountSpan.textContent = originalSubtitles.length;
             fileInfoDiv.classList.remove('d-none');
+            fileNameSpan.textContent = fileName;
             
-            // Gombok engedélyezése
+            // Feliratok feldolgozása
+            parseSrtFile(content);
+            
+            // Táblázat feltöltése
+            populateTable();
+            
+            // Fordítás gomb engedélyezése
             startTranslationBtn.disabled = false;
+            saveTranslationBtn.disabled = true;
+            saveWorkFileBtn.classList.add('d-none');
             
             // Fordítási állapot alaphelyzetbe állítása
             isTranslationPaused = false;
@@ -172,9 +194,74 @@ document.addEventListener('DOMContentLoaded', function() {
             startTranslationBtn.innerHTML = '<i class="bi bi-translate me-2"></i>Fordítás indítása';
             stopTranslationBtn.classList.add('d-none');
             
-            // Táblázat feltöltése
-            populateTable();
+            // Sor számok frissítése
+            lineCountSpan.textContent = originalSubtitles.length;
         };
+        
+        reader.readAsText(file);
+    }
+    
+    // Munkafájl feldolgozása
+    function processWorkFile(file) {
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+            try {
+                // Munkafájl tartalmának beolvasása és feldolgozása
+                const workData = JSON.parse(e.target.result);
+                
+                // Adatok betöltése a munkafájlból
+                originalSubtitles = workData.subtitles || [];
+                translatedSubtitles = workData.translatedSubtitles || [];
+                currentTranslationIndex = workData.currentIndex || 0;
+                fileName = workData.originalFileName || file.name.replace('.wrk', '.srt');
+                
+                // Nyelvek beállítása
+                if (workData.sourceLanguage) {
+                    sourceLanguageSelect.value = workData.sourceLanguage;
+                }
+                if (workData.targetLanguage) {
+                    targetLanguageSelect.value = workData.targetLanguage;
+                }
+                
+                // Fájl információk megjelenítése
+                fileInfoDiv.classList.remove('d-none');
+                fileNameSpan.textContent = fileName;
+                lineCountSpan.textContent = originalSubtitles.length;
+                
+                // Táblázat feltöltése
+                populateTable();
+                
+                // Újrafordítás gombok megjelenítése a már lefordított sorokhoz
+                translatedSubtitles.forEach((subtitle, index) => {
+                    if (subtitle.text) {
+                        const retranslateBtn = document.getElementById(`retranslate-${index}`);
+                        if (retranslateBtn) {
+                            retranslateBtn.classList.remove('d-none');
+                        }
+                    }
+                });
+                
+                // Folyamatjelző frissítése
+                updateProgressBar(currentTranslationIndex, originalSubtitles.length);
+                
+                // UI frissítése
+                startTranslationBtn.disabled = false;
+                startTranslationBtn.innerHTML = '<i class="bi bi-play-circle me-2"></i>Fordítás folytatása';
+                
+                if (translatedSubtitles.length > 0) {
+                    saveTranslationBtn.disabled = false;
+                    saveWorkFileBtn.classList.remove('d-none');
+                }
+                
+                alert('Munkafájl sikeresen betöltve! A fordítás folytatható.');
+            } catch (error) {
+                console.error('Hiba a munkafájl betöltése során:', error);
+                alert('Hiba történt a munkafájl betöltése során. Ellenőrizze a fájl formátumát!');
+                event.target.value = '';
+            }
+        };
+        
         reader.readAsText(file);
     }
 
@@ -272,6 +359,22 @@ document.addEventListener('DOMContentLoaded', function() {
                             row.classList.remove('edited-row');
                         }, 1000);
                     }
+                    
+                    // Újrafordítás gomb megjelenítése, ha van szöveg
+                    const retranslateBtn = document.getElementById(`retranslate-${editedIndex}`);
+                    if (retranslateBtn) {
+                        if (newText) {
+                            retranslateBtn.classList.remove('d-none');
+                        } else {
+                            retranslateBtn.classList.add('d-none');
+                        }
+                    }
+                    
+                    // Mentés gomb engedélyezése
+                    saveTranslationBtn.disabled = false;
+                    
+                    // Munkafájl mentés gomb megjelenítése
+                    saveWorkFileBtn.classList.remove('d-none');
                 }
             });
             
@@ -288,16 +391,22 @@ document.addEventListener('DOMContentLoaded', function() {
             const actionsCell = document.createElement('td');
             actionsCell.classList.add('text-center');
             
-            // Újrafordítás gomb - kezdetben rejtve
+            // Újrafordítás gomb - kezdetben rejtve, de megjelenik, ha van fordított szöveg
             const retranslateBtn = document.createElement('button');
             retranslateBtn.type = 'button';
-            retranslateBtn.className = 'btn btn-sm btn-info d-none';
+            retranslateBtn.className = 'btn btn-sm btn-info';
             retranslateBtn.dataset.bsToggle = 'tooltip';
             retranslateBtn.dataset.bsPlacement = 'left';
             retranslateBtn.dataset.bsTitle = 'Újrafordítás';
             retranslateBtn.innerHTML = '<i class="bi bi-arrow-repeat"></i>';
             retranslateBtn.id = `retranslate-${index}`;
             retranslateBtn.addEventListener('click', () => retranslateSubtitle(index));
+            
+            // Ha nincs fordított szöveg, elrejtjük a gombot
+            if (!translatedSubtitles[index].text) {
+                retranslateBtn.classList.add('d-none');
+            }
+            
             actionsCell.appendChild(retranslateBtn);
             
             row.appendChild(actionsCell);
@@ -323,275 +432,159 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Egy felirat újrafordítása
     async function retranslateSubtitle(index) {
-        if (index < 0 || index >= originalSubtitles.length) return;
-        
-        // Ellenőrizzük, hogy fut-e a fordítás
-        if (isTranslationRunning) {
-            // Tooltip módosítása figyelmeztetésre
-            const retranslateBtn = document.getElementById(`retranslate-${index}`);
-            if (retranslateBtn) {
-                // Régi tooltip eltávolítása
-                const oldTooltip = bootstrap.Tooltip.getInstance(retranslateBtn);
-                if (oldTooltip) {
-                    oldTooltip.dispose();
-                }
-                
-                // Új figyelmeztető tooltip létrehozása
-                retranslateBtn.dataset.bsTitle = 'Előbb állítsd le a futó fordítást!';
-                new bootstrap.Tooltip(retranslateBtn, {
-                    template: '<div class="tooltip tooltip-warning" role="tooltip"><div class="tooltip-arrow"></div><div class="tooltip-inner bg-warning text-dark"></div></div>'
-                }).show();
-                
-                // Tooltip automatikus elrejtése 3 másodperc után
-                setTimeout(() => {
-                    const tooltip = bootstrap.Tooltip.getInstance(retranslateBtn);
-                    if (tooltip) {
-                        tooltip.hide();
-                    }
-                    
-                    // Visszaállítjuk az eredeti tooltip-et
-                    setTimeout(() => {
-                        if (tooltip) {
-                            tooltip.dispose();
-                        }
-                        retranslateBtn.dataset.bsTitle = 'Újrafordítás';
-                        new bootstrap.Tooltip(retranslateBtn);
-                    }, 300);
-                }, 3000);
-            }
-            return;
-        }
-        
-        // Ellenőrizzük, hogy ez a sor már újrafordítás alatt áll-e
+        // Ellenőrizzük, hogy fut-e már újrafordítás erre a sorra
         if (rowsBeingRetranslated.has(index)) {
             return;
         }
         
+        // Jelezzük, hogy ez a sor újrafordítás alatt áll
+        rowsBeingRetranslated.add(index);
+        
+        // Fordítás gomb állapotának módosítása
+        const retranslateBtn = document.getElementById(`retranslate-${index}`);
+        if (retranslateBtn) {
+            retranslateBtn.disabled = true;
+            retranslateBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>';
+        }
+        
+        // Nyelvi beállítások
+        const sourceLanguage = sourceLanguageSelect.value;
+        const targetLanguage = targetLanguageSelect.value;
+        
+        // Hőmérséklet beállítás
+        const temperature = parseFloat(temperatureSlider.value);
+        
         try {
-            // Jelöljük, hogy ez a sor újrafordítás alatt áll
-            rowsBeingRetranslated.add(index);
-            
-            // Fordítás előkészítése
-            const sourceLanguage = sourceLanguageSelect.value;
-            const targetLanguage = targetLanguageSelect.value;
-            
-            // Gomb állapotának módosítása
-            const retranslateBtn = document.getElementById(`retranslate-${index}`);
-            if (retranslateBtn) {
-                // Régi tooltip eltávolítása
-                const oldTooltip = bootstrap.Tooltip.getInstance(retranslateBtn);
-                if (oldTooltip) {
-                    oldTooltip.dispose();
-                }
-                
-                // Animáció és új tooltip hozzáadása
-                retranslateBtn.innerHTML = '<i class="bi bi-arrow-repeat"></i>';
-                retranslateBtn.classList.add('btn-loading');
-                retranslateBtn.dataset.bsTitle = 'Fordítás folyamatban...';
-                new bootstrap.Tooltip(retranslateBtn).show();
-            }
-            
-            // Fordítás kérése az LM Studio API-tól
+            // Fordítás végrehajtása
             const translatedText = await translateTextWithContext(
                 originalSubtitles,
                 index,
                 sourceLanguage,
-                targetLanguage
+                targetLanguage,
+                0,
+                temperature
             );
             
             // Fordított szöveg mentése
             translatedSubtitles[index].text = translatedText;
+            translatedSubtitles[index].isTranslated = true;
             
-            // Mentés a fordítási memóriába
+            // Táblázat frissítése
+            updateTranslatedText(index, translatedText);
+            
+            // Fordítási memória frissítése
             if (!translationMemory.translations) {
                 translationMemory.translations = {};
             }
             translationMemory.translations[originalSubtitles[index].text] = translatedText;
             
-            // Táblázat frissítése
-            const editableTextarea = document.querySelector(`#translated-${index} textarea`);
-            if (editableTextarea) {
-                editableTextarea.value = translatedText;
-                // Textarea magasságának frissítése
-                editableTextarea.style.height = 'auto';
-                editableTextarea.style.height = (editableTextarea.scrollHeight) + 'px';
-            }
+            // Mentés gomb engedélyezése
+            saveTranslationBtn.disabled = false;
             
-            // Gomb visszaállítása
-            if (retranslateBtn) {
-                // Tooltip elrejtése
-                const tooltip = bootstrap.Tooltip.getInstance(retranslateBtn);
-                if (tooltip) {
-                    tooltip.hide();
-                    
-                    setTimeout(() => {
-                        if (tooltip) {
-                            tooltip.dispose();
-                        }
-                        
-                        // Animáció eltávolítása és eredeti állapot visszaállítása
-                        retranslateBtn.classList.remove('btn-loading');
-                        retranslateBtn.innerHTML = '<i class="bi bi-arrow-repeat"></i>';
-                        retranslateBtn.dataset.bsTitle = 'Újrafordítás';
-                        new bootstrap.Tooltip(retranslateBtn);
-                    }, 300);
-                }
-            }
+            // Munkafájl mentés gomb megjelenítése
+            saveWorkFileBtn.classList.remove('d-none');
+            
         } catch (error) {
-            console.error('Hiba az újrafordítás során:', error);
+            console.error('Újrafordítási hiba:', error);
             alert(`Hiba történt az újrafordítás során: ${error.message}`);
-            
-            // Gomb visszaállítása hiba esetén
-            const retranslateBtn = document.getElementById(`retranslate-${index}`);
-            if (retranslateBtn) {
-                // Tooltip elrejtése
-                const tooltip = bootstrap.Tooltip.getInstance(retranslateBtn);
-                if (tooltip) {
-                    tooltip.hide();
-                    
-                    setTimeout(() => {
-                        if (tooltip) {
-                            tooltip.dispose();
-                        }
-                        
-                        // Animáció eltávolítása és eredeti állapot visszaállítása
-                        retranslateBtn.classList.remove('btn-loading');
-                        retranslateBtn.innerHTML = '<i class="bi bi-arrow-repeat"></i>';
-                        retranslateBtn.dataset.bsTitle = 'Újrafordítás';
-                        new bootstrap.Tooltip(retranslateBtn);
-                    }, 300);
-                }
-            }
         } finally {
-            // Jelöljük, hogy ez a sor már nincs újrafordítás alatt
+            // Fordítás gomb visszaállítása
+            if (retranslateBtn) {
+                retranslateBtn.disabled = false;
+                retranslateBtn.innerHTML = '<i class="bi bi-arrow-repeat"></i>';
+                retranslateBtn.classList.remove('d-none');
+            }
+            
+            // Töröljük a sort az újrafordítás alatt állók közül
             rowsBeingRetranslated.delete(index);
         }
     }
 
     // Fordítás indítása
     async function startTranslation() {
-        // Ellenőrizzük, hogy van-e betöltött felirat
-        if (originalSubtitles.length === 0) {
-            alert('Kérjük, először töltsön be egy feliratfájlt!');
-            return;
-        }
-        
-        // Fordítás előkészítése
-        const sourceLanguage = sourceLanguageSelect.value;
-        const targetLanguage = targetLanguageSelect.value;
-        
-        // Fordítási memória törlése új fordítás indításakor, ha a nyelvek változtak
-        if (translationMemory.sourceLanguage !== sourceLanguage || 
-            translationMemory.targetLanguage !== targetLanguage) {
-            translationMemory = {
-                sourceLanguage: sourceLanguage,
-                targetLanguage: targetLanguage,
-                translations: {}
-            };
-        }
-        
-        // Gombok állapotának beállítása
-        startTranslationBtn.disabled = true;
+        // UI elemek frissítése
+        startTranslationBtn.classList.add('d-none');
         stopTranslationBtn.classList.remove('d-none');
-        saveTranslationBtn.disabled = true;
+        resetTranslationBtn.classList.add('d-none');
+        progressContainer.classList.remove('d-none');
         
         // Fordítás állapotának beállítása
         isTranslationRunning = true;
+        isTranslationPaused = false;
         
-        // Haladásjelző megjelenítése
-        progressContainer.classList.remove('d-none');
+        // Nyelvi beállítások
+        const sourceLanguage = sourceLanguageSelect.value;
+        const targetLanguage = targetLanguageSelect.value;
         
-        // Fordítás végrehajtása soronként
+        // Hőmérséklet beállítás
+        const temperature = parseFloat(temperatureSlider.value);
+        
+        // Ha még nincs lefordított felirat, akkor inicializáljuk
+        if (translatedSubtitles.length === 0) {
+            // Inicializáljuk a lefordított feliratokat
+            translatedSubtitles = originalSubtitles.map(subtitle => ({
+                ...subtitle,
+                text: '',
+                isTranslated: false
+            }));
+        }
+        
+        // Folytatjuk a fordítást az aktuális indextől
         for (let i = currentTranslationIndex; i < originalSubtitles.length; i++) {
-            // Ha a fordítás szüneteltetve van, kilépünk a ciklusból
+            // Ha a fordítás szüneteltetése be van kapcsolva, akkor kilépünk a ciklusból
             if (isTranslationPaused) {
-                currentTranslationIndex = i;
-                isTranslationRunning = false;
-                return;
+                break;
             }
             
-            // Haladásjelző frissítése
-            const progress = Math.round((i / originalSubtitles.length) * 100);
-            progressBar.style.width = `${progress}%`;
-            progressBar.setAttribute('aria-valuenow', progress);
+            currentTranslationIndex = i;
             
-            // Ellenőrizzük, hogy a szöveg már szerepel-e a fordítási memóriában
-            const originalText = originalSubtitles[i].text;
-            if (translationMemory.translations && translationMemory.translations[originalText]) {
-                translatedSubtitles[i].text = translationMemory.translations[originalText];
-                
-                // Táblázat frissítése
-                const editableTextarea = document.querySelector(`#translated-${i} textarea`);
-                if (editableTextarea) {
-                    editableTextarea.value = translationMemory.translations[originalText];
-                }
-                
-                // Újrafordítás gomb megjelenítése
-                const retranslateBtn = document.getElementById(`retranslate-${i}`);
-                if (retranslateBtn) {
-                    retranslateBtn.classList.remove('d-none');
-                }
-                
-                continue; // Ugrás a következő felirathoz
+            // Ellenőrizzük, hogy már le van-e fordítva ez a felirat
+            if (translatedSubtitles[i].isTranslated) {
+                continue; // Átugorjuk a már lefordított feliratokat
             }
             
-            // Fordítás kérése az LM Studio API-tól
+            // Folyamatjelző frissítése
+            updateProgressBar(i, originalSubtitles.length);
+            
             try {
-                const translatedText = await translateTextWithContext(
-                    originalSubtitles,
-                    i,
-                    sourceLanguage,
-                    targetLanguage
-                );
+                // Fordítás végrehajtása
+                const translatedText = await translateTextWithContext(originalSubtitles, i, sourceLanguage, targetLanguage, 0, temperature);
                 
                 // Fordított szöveg mentése
                 translatedSubtitles[i].text = translatedText;
-                
-                // Mentés a fordítási memóriába
-                if (!translationMemory.translations) {
-                    translationMemory.translations = {};
-                }
-                translationMemory.translations[originalText] = translatedText;
+                translatedSubtitles[i].isTranslated = true;
                 
                 // Táblázat frissítése
-                const editableTextarea = document.querySelector(`#translated-${i} textarea`);
-                if (editableTextarea) {
-                    editableTextarea.value = translatedText;
-                }
+                updateTranslatedText(i, translatedText);
                 
                 // Újrafordítás gomb megjelenítése
                 const retranslateBtn = document.getElementById(`retranslate-${i}`);
                 if (retranslateBtn) {
                     retranslateBtn.classList.remove('d-none');
                 }
-            } catch (error) {
-                console.error('Hiba a fordítás során:', error);
-                alert(`Hiba történt a fordítás során: ${error.message}`);
                 
-                // Fordítás szüneteltetése hiba esetén
-                isTranslationPaused = true;
-                currentTranslationIndex = i;
-                startTranslationBtn.innerHTML = '<i class="bi bi-play-circle me-2"></i>Fordítás folytatása';
-                startTranslationBtn.disabled = false;
-                stopTranslationBtn.classList.add('d-none');
-                isTranslationRunning = false;
-                return;
+                // Görgetés az aktuális sorhoz
+                scrollToRow(i);
+                
+                // Mentés gomb engedélyezése
+                saveTranslationBtn.disabled = false;
+                
+                // Munkafájl mentés gomb megjelenítése
+                saveWorkFileBtn.classList.remove('d-none');
+                
+            } catch (error) {
+                console.error('Fordítási hiba:', error);
+                alert(`Hiba történt a fordítás során: ${error.message}`);
+                pauseTranslation();
+                break;
             }
         }
         
-        // Fordítás befejezése
-        currentTranslationIndex = 0;
-        
-        // Haladásjelző 100%-ra állítása
-        progressBar.style.width = '100%';
-        progressBar.setAttribute('aria-valuenow', 100);
-        
-        // Gombok állapotának beállítása
-        startTranslationBtn.innerHTML = '<i class="bi bi-translate me-2"></i>Fordítás indítása';
-        startTranslationBtn.disabled = false;
-        stopTranslationBtn.classList.add('d-none');
-        saveTranslationBtn.disabled = false;
-        isTranslationRunning = false;
+        // Ha végigértünk a feliratokon
+        if (currentTranslationIndex >= originalSubtitles.length - 1 && !isTranslationPaused) {
+            // Fordítás befejezése
+            finishTranslation();
+        }
     }
 
     // Szöveg fordítása kontextussal az LM Studio API-val
@@ -726,6 +719,48 @@ document.addEventListener('DOMContentLoaded', function() {
         );
     }
 
+    // Fordított szöveg frissítése a táblázatban
+    function updateTranslatedText(index, text) {
+        const editableTextarea = document.querySelector(`#translated-${index} textarea`);
+        if (editableTextarea) {
+            editableTextarea.value = text;
+        }
+    }
+    
+    // Görgetés a megadott sorhoz
+    function scrollToRow(index) {
+        const row = document.getElementById(`row-${index}`);
+        if (row) {
+            row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    }
+    
+    // Folyamatjelző frissítése
+    function updateProgressBar(currentIndex, totalCount) {
+        const progress = Math.round((currentIndex / totalCount) * 100);
+        progressBar.style.width = `${progress}%`;
+        progressBar.setAttribute('aria-valuenow', progress);
+    }
+    
+    // Fordítás befejezése
+    function finishTranslation() {
+        // Haladásjelző 100%-ra állítása
+        progressBar.style.width = '100%';
+        progressBar.setAttribute('aria-valuenow', 100);
+        
+        // Gombok állapotának beállítása
+        startTranslationBtn.innerHTML = '<i class="bi bi-translate me-2"></i>Fordítás indítása';
+        startTranslationBtn.disabled = false;
+        startTranslationBtn.classList.remove('d-none');
+        stopTranslationBtn.classList.add('d-none');
+        saveTranslationBtn.disabled = false;
+        saveWorkFileBtn.classList.remove('d-none');
+        isTranslationRunning = false;
+        
+        // Értesítés a fordítás befejezéséről
+        alert('A fordítás sikeresen befejeződött!');
+    }
+
     // Fordítás mentése
     function saveTranslation() {
         // Ellenőrizzük, hogy van-e lefordított felirat
@@ -760,6 +795,49 @@ document.addEventListener('DOMContentLoaded', function() {
         downloadLink.href = URL.createObjectURL(blob);
         downloadLink.download = downloadFileName;
         downloadLink.click();
+    }
+
+    // Munkafájl mentése
+    function saveWorkFile() {
+        // Ellenőrizzük, hogy van-e lefordított felirat
+        if (translatedSubtitles.length === 0) {
+            alert('Nincs lefordított felirat a mentéshez!');
+            return;
+        }
+        
+        // Frissítsük a lefordított feliratokat a szerkesztett szövegekkel
+        translatedSubtitles.forEach((subtitle, index) => {
+            const editableTextarea = document.querySelector(`#translated-${index} textarea`);
+            if (editableTextarea) {
+                translatedSubtitles[index].text = editableTextarea.value.trim();
+            }
+        });
+        
+        // Munkafájl adatainak összegyűjtése
+        const workData = {
+            originalFileName: fileName,
+            originalFilePath: originalFilePath,
+            subtitles: originalSubtitles,
+            translatedSubtitles: translatedSubtitles,
+            currentIndex: currentTranslationIndex,
+            sourceLanguage: sourceLanguageSelect.value,
+            targetLanguage: targetLanguageSelect.value,
+            temperature: temperatureSlider.value,
+            translationMemory: translationMemory,
+            isTranslationPaused: isTranslationPaused,
+            timestamp: new Date().toISOString()
+        };
+        
+        // Fájl létrehozása és letöltése
+        const blob = new Blob([JSON.stringify(workData, null, 2)], { type: 'application/json;charset=utf-8' });
+        const downloadFileName = `${fileName.replace(/\.srt$/, '')}.wrk`;
+        
+        const downloadLink = document.createElement('a');
+        downloadLink.href = URL.createObjectURL(blob);
+        downloadLink.download = downloadFileName;
+        downloadLink.click();
+        
+        alert('Munkafájl sikeresen elmentve!');
     }
     
     // Segédfüggvény a nyelv kódjának névvé alakításához
