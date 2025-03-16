@@ -34,9 +34,13 @@ let uiLanguageMenu;
 let originalHeader;
 let translatedHeader;
 let actionsHeader;
+let cardTitles; // A kártya címeket tároló változó
+let fileInputLabel; // A fájl input labeljét tároló változó
 
 // DOM elemek
 document.addEventListener('DOMContentLoaded', function() {
+    console.log("DOM betöltve, elemek inicializálása");
+    
     // DOM elemek kiválasztása és globális változókhoz rendelése
     srtFileInput = document.getElementById('srtFile');
     startTranslationBtn = document.getElementById('startTranslation');
@@ -59,6 +63,16 @@ document.addEventListener('DOMContentLoaded', function() {
     originalHeader = document.getElementById('originalHeader');
     translatedHeader = document.getElementById('translatedHeader');
     actionsHeader = document.getElementById('actionsHeader');
+    cardTitles = document.querySelectorAll('.card-title'); // Az összes kártya cím kiválasztása
+    fileInputLabel = document.querySelector('label.custom-file-label'); // A fájl input labeljének kiválasztása
+    
+    console.log("DOM elemek betöltve:", {
+        startTranslationBtn: !!startTranslationBtn,
+        cardTitles: cardTitles.length,
+        originalHeader: !!originalHeader,
+        translatedHeader: !!translatedHeader,
+        fileInputLabel: !!fileInputLabel
+    });
 
     // Nyelvválasztó inicializálása
     initLanguageSelector();
@@ -522,7 +536,7 @@ document.addEventListener('DOMContentLoaded', function() {
             retranslateBtn.className = 'btn btn-sm btn-info retranslate-btn';
             retranslateBtn.dataset.bsToggle = 'tooltip';
             retranslateBtn.dataset.bsPlacement = 'left';
-            retranslateBtn.dataset.bsTitle = 'Újrafordítás';
+            retranslateBtn.dataset.bsTitle = uiTranslations[currentLangCode]?.retranslate || 'Újrafordítás';
             
             // A gomb tartalma: ikon + szöveg (a szöveg a nyelvváltáskor frissül)
             const currentLang = currentLangCode;
@@ -1102,12 +1116,19 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             
             // Kártya címek
-            const cardTitles = document.querySelectorAll('.card-title');
-            if (cardTitles.length >= 3) {
-                cardTitles[0].textContent = translations.fileUploadTitle;
-                cardTitles[1].textContent = translations.temperatureTitle;
-                cardTitles[2].textContent = translations.languageTitle;
-            }
+            cardTitles.forEach((cardTitle, index) => {
+                switch (index) {
+                    case 0:
+                        cardTitle.textContent = translations.fileUploadTitle;
+                        break;
+                    case 1:
+                        cardTitle.textContent = translations.temperatureTitle;
+                        break;
+                    case 2:
+                        cardTitle.textContent = translations.languageTitle;
+                        break;
+                }
+            });
             
             // Hőmérséklet címkék
             const tempLabels = document.querySelectorAll('.form-range + div small');
@@ -1188,7 +1209,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             
             // File input label frissítése
-            const fileInputLabel = document.querySelector('label.custom-file-label');
             if (fileInputLabel) {
                 fileInputLabel.textContent = translations.fileInputLabel;
             }
@@ -1197,6 +1217,29 @@ document.addEventListener('DOMContentLoaded', function() {
         } catch (error) {
             console.error("Hiba történt az UI szövegek frissítése során:", error);
         }
+        
+        // Tooltipek inicializálása
+        initTooltips();
+    }
+    
+    // Bootstrap tooltipek inicializálása
+    function initTooltips() {
+        // Meglévő tooltipek eltávolítása
+        const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+        tooltipTriggerList.forEach(tooltipTriggerEl => {
+            const tooltip = bootstrap.Tooltip.getInstance(tooltipTriggerEl);
+            if (tooltip) {
+                tooltip.dispose();
+            }
+        });
+        
+        // Új tooltipek inicializálása
+        const newTooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        newTooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+        
+        console.log("Tooltipek újrainicializálva");
     }
     
     console.log("UI szövegek frissítése befejezve!");
