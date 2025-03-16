@@ -108,11 +108,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Ha vannak eredeti feliratok, akkor létrehozzuk az üres fordításokat
         if (originalSubtitles.length > 0) {
             for (let i = 0; i < originalSubtitles.length; i++) {
-                translatedSubtitles.push({
-                    number: originalSubtitles[i].number,
-                    timecode: originalSubtitles[i].timecode,
-                    text: ''
-                });
+                translatedSubtitles.push('');
             }
         }
         
@@ -157,8 +153,11 @@ document.addEventListener('DOMContentLoaded', function() {
         } else if (fileName.toLowerCase().endsWith('.wrk')) {
             // Munkafájl feldolgozása
             processWorkFile(file);
+        } else if (fileName.toLowerCase().endsWith('.mmm')) {
+            // MMM fájl feldolgozása
+            processMmmFile(file);
         } else {
-            alert('Csak .srt vagy .wrk kiterjesztésű fájlokat lehet betölteni!');
+            alert('Csak .srt, .wrk vagy .mmm kiterjesztésű fájlokat lehet betölteni!');
             event.target.value = '';
             return;
         }
@@ -234,7 +233,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 // Újrafordítás gombok megjelenítése a már lefordított sorokhoz
                 translatedSubtitles.forEach((subtitle, index) => {
-                    if (subtitle.text) {
+                    if (subtitle) {
                         const retranslateBtn = document.getElementById(`retranslate-${index}`);
                         if (retranslateBtn) {
                             retranslateBtn.classList.remove('d-none');
@@ -265,6 +264,39 @@ document.addEventListener('DOMContentLoaded', function() {
         reader.readAsText(file);
     }
 
+    // MMM fájl feldolgozása
+    function processMmmFile(file) {
+        const reader = new FileReader();
+        
+        reader.onload = function(e) {
+            // Fájl tartalmának beolvasása
+            const content = e.target.result;
+            
+            // Fájl információk megjelenítése
+            fileInfoDiv.classList.remove('d-none');
+            fileNameSpan.textContent = fileName;
+            
+            // Ellenőrizzük, hogy van-e már betöltött felirat
+            if (originalSubtitles.length === 0) {
+                alert('Először töltsön be egy .srt fájlt, mielőtt .mmm fájlt töltene be!');
+                return;
+            }
+            
+            // MMM fájl feldolgozása - csak a fordított szövegek frissítése
+            parseMmmFile(content);
+            
+            // Táblázat frissítése
+            populateTable();
+            
+            // Fordítás gomb engedélyezése
+            startTranslationBtn.disabled = false;
+            saveTranslationBtn.disabled = false;
+            saveWorkFileBtn.classList.remove('d-none');
+        };
+        
+        reader.readAsText(file);
+    }
+    
     // SRT fájl feldolgozása
     function parseSrtFile(content) {
         originalSubtitles = [];
@@ -294,12 +326,74 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
                 
                 // Kezdetben üres fordítás
-                translatedSubtitles.push({
-                    number: number,
-                    timecode: timecode,
-                    text: ''
-                });
+                translatedSubtitles.push('');
             }
+        }
+    }
+
+    // MMM fájl tartalmának feldolgozása
+    function parseMmmFile(content) {
+        // Sorok szétválasztása
+        const lines = content.split('\n');
+        
+        let currentText = '';
+        let currentLineNumber = -1;
+        
+        // Sorok feldolgozása
+        for (let i = 0; i < lines.length; i++) {
+            const line = lines[i].trim();
+            
+            // Üres sorok kihagyása
+            if (line === '') continue;
+            
+            // Ellenőrizzük, hogy a sor egy sorszámmal kezdődik-e
+            const match = line.match(/^(\d+)\s+(.*)/);
+            
+            if (match) {
+                // Sorszám és szöveg kinyerése
+                const subtitleNumber = parseInt(match[1]);
+                const text = match[2];
+                
+                // Ha új sorszám, akkor az előző szöveget elmentjük
+                if (currentLineNumber !== -1 && currentLineNumber !== subtitleNumber) {
+                    // Az előző szöveg mentése a megfelelő sorszámú felirathoz
+                    if (currentLineNumber > 0 && currentLineNumber <= originalSubtitles.length) {
+                        translatedSubtitles[currentLineNumber - 1] = currentText;
+                    }
+                    currentText = '';
+                }
+                
+                // Aktuális sorszám és szöveg beállítása
+                currentLineNumber = subtitleNumber;
+                
+                // Ha első sor az adott sorszámnál, akkor beállítjuk a szöveget
+                if (currentText === '') {
+                    currentText = text;
+                } else {
+                    // Ha már van szöveg, akkor hozzáfűzzük
+                    currentText += ' ' + text;
+                }
+            }
+        }
+        
+        // Az utolsó szöveg mentése, ha van
+        if (currentLineNumber !== -1 && currentText !== '') {
+            if (currentLineNumber > 0 && currentLineNumber <= originalSubtitles.length) {
+                translatedSubtitles[currentLineNumber - 1] = currentText;
+            }
+        }
+        
+        // Ellenőrizzük, hogy volt-e érvényes szöveg
+        let foundValidText = false;
+        for (let i = 0; i < translatedSubtitles.length; i++) {
+            if (translatedSubtitles[i] && translatedSubtitles[i].trim && translatedSubtitles[i].trim() !== '') {
+                foundValidText = true;
+                break;
+            }
+        }
+        
+        if (!foundValidText) {
+            alert('A fájl nem tartalmaz érvényes szövegeket vagy a sorszámok nem egyeznek a betöltött feliratokkal!');
         }
     }
 
@@ -330,7 +424,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // Textarea-t használunk div helyett a jobb kompatibilitás érdekében
             const editableTextarea = document.createElement('textarea');
             editableTextarea.className = 'form-control editable-content';
-            editableTextarea.value = translatedSubtitles[index].text || '';
+            editableTextarea.value = translatedSubtitles[index] || '';
             editableTextarea.dataset.originalIndex = index;
             editableTextarea.rows = 2;
             
@@ -340,8 +434,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 const newText = this.value.trim();
                 
                 // Csak akkor mentjük, ha változott a szöveg
-                if (translatedSubtitles[editedIndex].text !== newText) {
-                    translatedSubtitles[editedIndex].text = newText;
+                if (translatedSubtitles[editedIndex] !== newText) {
+                    translatedSubtitles[editedIndex] = newText;
                     
                     // Frissítjük a fordítási memóriát is
                     if (!translationMemory.translations) {
@@ -403,7 +497,7 @@ document.addEventListener('DOMContentLoaded', function() {
             retranslateBtn.addEventListener('click', () => retranslateSubtitle(index));
             
             // Ha nincs fordított szöveg, elrejtjük a gombot
-            if (!translatedSubtitles[index].text) {
+            if (!translatedSubtitles[index]) {
                 retranslateBtn.classList.add('d-none');
             }
             
@@ -466,8 +560,7 @@ document.addEventListener('DOMContentLoaded', function() {
             );
             
             // Fordított szöveg mentése
-            translatedSubtitles[index].text = translatedText;
-            translatedSubtitles[index].isTranslated = true;
+            translatedSubtitles[index] = translatedText;
             
             // Táblázat frissítése
             updateTranslatedText(index, translatedText);
@@ -522,11 +615,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Ha még nincs lefordított felirat, akkor inicializáljuk
         if (translatedSubtitles.length === 0) {
             // Inicializáljuk a lefordított feliratokat
-            translatedSubtitles = originalSubtitles.map(subtitle => ({
-                ...subtitle,
-                text: '',
-                isTranslated: false
-            }));
+            translatedSubtitles = originalSubtitles.map(subtitle => '');
         }
         
         // Folytatjuk a fordítást az aktuális indextől
@@ -539,7 +628,7 @@ document.addEventListener('DOMContentLoaded', function() {
             currentTranslationIndex = i;
             
             // Ellenőrizzük, hogy már le van-e fordítva ez a felirat
-            if (translatedSubtitles[i].isTranslated) {
+            if (translatedSubtitles[i]) {
                 continue; // Átugorjuk a már lefordított feliratokat
             }
             
@@ -551,8 +640,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 const translatedText = await translateTextWithContext(originalSubtitles, i, sourceLanguage, targetLanguage, 0, temperature);
                 
                 // Fordított szöveg mentése
-                translatedSubtitles[i].text = translatedText;
-                translatedSubtitles[i].isTranslated = true;
+                translatedSubtitles[i] = translatedText;
                 
                 // Táblázat frissítése
                 updateTranslatedText(i, translatedText);
@@ -763,81 +851,74 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Fordítás mentése
     function saveTranslation() {
-        // Ellenőrizzük, hogy van-e lefordított felirat
+        // Ellenőrizzük, hogy van-e fordítás
         if (translatedSubtitles.length === 0) {
-            alert('Nincs lefordított felirat a mentéshez!');
+            alert('Nincs mit menteni! Kérjük, először fordítsa le a feliratokat.');
             return;
         }
         
-        // Feliratok összegyűjtése SRT formátumban
+        // SRT formátumú tartalom létrehozása
         let srtContent = '';
         
-        translatedSubtitles.forEach((subtitle, index) => {
-            // Ellenőrizzük, hogy a szerkesztett szöveg van-e a DOM-ban
+        // Fordított feliratok összegyűjtése
+        originalSubtitles.forEach((subtitle, index) => {
+            // Ha a felhasználó éppen szerkeszt egy sort, akkor frissítjük a fordítást
             const editableTextarea = document.querySelector(`#translated-${index} textarea`);
             if (editableTextarea) {
                 // Frissítjük a translatedSubtitles tömböt a legfrissebb szerkesztett szöveggel
-                translatedSubtitles[index].text = editableTextarea.value.trim();
+                translatedSubtitles[index] = editableTextarea.value.trim();
             }
             
-            srtContent += `${index + 1}\n`;
-            srtContent += `${subtitle.startTime} --> ${subtitle.endTime}\n`;
-            srtContent += `${subtitle.text}\n\n`;
+            srtContent += `${subtitle.number}\n`;
+            srtContent += `${subtitle.timecode}\n`;
+            srtContent += `${translatedSubtitles[index] || ''}\n\n`;
         });
         
         // Fájl létrehozása és letöltése
-        const blob = new Blob([srtContent], { type: 'text/plain;charset=utf-8' });
-        const fileNameWithoutExt = fileName.replace(/\.srt$/, '');
-        const targetLanguage = document.getElementById('targetLanguage').value;
-        const downloadFileName = `${fileNameWithoutExt}_${targetLanguage}.srt`;
+        const targetLangCode = targetLanguageSelect.value;
+        const newFileName = fileName.replace('.srt', `-${targetLangCode}.srt`);
         
-        const downloadLink = document.createElement('a');
-        downloadLink.href = URL.createObjectURL(blob);
-        downloadLink.download = downloadFileName;
-        downloadLink.click();
+        // Blob létrehozása és letöltés
+        const blob = new Blob([srtContent], { type: 'text/plain;charset=utf-8' });
+        saveAs(blob, newFileName);
     }
 
     // Munkafájl mentése
     function saveWorkFile() {
-        // Ellenőrizzük, hogy van-e lefordított felirat
-        if (translatedSubtitles.length === 0) {
-            alert('Nincs lefordított felirat a mentéshez!');
+        // Ellenőrizzük, hogy van-e betöltött felirat
+        if (originalSubtitles.length === 0) {
+            alert('Nincs betöltött felirat a mentéshez!');
             return;
         }
         
-        // Frissítsük a lefordított feliratokat a szerkesztett szövegekkel
+        // Frissítjük a fordításokat a szerkesztett mezőkből
         translatedSubtitles.forEach((subtitle, index) => {
             const editableTextarea = document.querySelector(`#translated-${index} textarea`);
             if (editableTextarea) {
-                translatedSubtitles[index].text = editableTextarea.value.trim();
+                translatedSubtitles[index] = editableTextarea.value.trim();
             }
         });
         
-        // Munkafájl adatainak összegyűjtése
+        // Munkafájl adatok összeállítása
         const workData = {
             originalFileName: fileName,
-            originalFilePath: originalFilePath,
             subtitles: originalSubtitles,
             translatedSubtitles: translatedSubtitles,
             currentIndex: currentTranslationIndex,
             sourceLanguage: sourceLanguageSelect.value,
             targetLanguage: targetLanguageSelect.value,
-            temperature: temperatureSlider.value,
-            translationMemory: translationMemory,
-            isTranslationPaused: isTranslationPaused,
-            timestamp: new Date().toISOString()
+            temperature: temperatureSlider.value
         };
         
+        // JSON formátumú tartalom létrehozása
+        const jsonContent = JSON.stringify(workData, null, 2);
+        
         // Fájl létrehozása és letöltése
-        const blob = new Blob([JSON.stringify(workData, null, 2)], { type: 'application/json;charset=utf-8' });
-        const downloadFileName = `${fileName.replace(/\.srt$/, '')}.wrk`;
+        const fileNameWithoutExt = fileName.replace(/\.[^/.]+$/, '');
+        const downloadFileName = `${fileNameWithoutExt}.wrk`;
         
-        const downloadLink = document.createElement('a');
-        downloadLink.href = URL.createObjectURL(blob);
-        downloadLink.download = downloadFileName;
-        downloadLink.click();
-        
-        alert('Munkafájl sikeresen elmentve!');
+        const blob = new Blob([jsonContent], { type: 'application/json;charset=utf-8' });
+        saveAs(blob, downloadFileName);
     }
     
     // Segédfüggvény a nyelv kódjának névvé alakításához
