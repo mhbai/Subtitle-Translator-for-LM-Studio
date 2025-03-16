@@ -10,27 +10,59 @@ let currentTranslationIndex = 0; // Aktuális fordítási index
 let isTranslationRunning = false; // Fordítás folyamatban
 let rowsBeingRetranslated = new Set(); // Újrafordítás alatt álló sorok
 let temperature = 1.0; // Fordítási szabadságfok alapértéke
+let currentLangCode = 'en'; // Aktuális nyelv alapértéke
+
+// Globális DOM elem változók
+let srtFileInput;
+let startTranslationBtn;
+let stopTranslationBtn;
+let resetTranslationBtn;
+let saveTranslationBtn;
+let saveWorkFileBtn;
+let subtitleTable;
+let fileInfoDiv;
+let fileNameSpan;
+let lineCountSpan;
+let sourceLanguageSelect;
+let targetLanguageSelect;
+let progressContainer;
+let progressBar;
+let temperatureSlider;
+let temperatureValue;
+let languageSelector;
+let uiLanguageMenu;
+let originalHeader;
+let translatedHeader;
+let actionsHeader;
 
 // DOM elemek
 document.addEventListener('DOMContentLoaded', function() {
-    // DOM elemek kiválasztása
-    const srtFileInput = document.getElementById('srtFile');
-    const startTranslationBtn = document.getElementById('startTranslation');
-    const stopTranslationBtn = document.getElementById('stopTranslation');
-    const resetTranslationBtn = document.getElementById('resetTranslation');
-    const saveTranslationBtn = document.getElementById('saveTranslation');
-    const saveWorkFileBtn = document.getElementById('saveWorkFile');
-    const subtitleTable = document.getElementById('subtitleTable');
-    const fileInfoDiv = document.getElementById('fileInfo');
-    const fileNameSpan = document.getElementById('fileName');
-    const lineCountSpan = document.getElementById('lineCount');
-    const sourceLanguageSelect = document.getElementById('sourceLanguage');
-    const targetLanguageSelect = document.getElementById('targetLanguage');
-    const progressContainer = document.getElementById('progressContainer');
-    const progressBar = document.getElementById('progressBar');
-    const temperatureSlider = document.getElementById('temperatureSlider');
-    const temperatureValue = document.getElementById('temperatureValue');
+    // DOM elemek kiválasztása és globális változókhoz rendelése
+    srtFileInput = document.getElementById('srtFile');
+    startTranslationBtn = document.getElementById('startTranslation');
+    stopTranslationBtn = document.getElementById('stopTranslation');
+    resetTranslationBtn = document.getElementById('resetTranslation');
+    saveTranslationBtn = document.getElementById('saveTranslation');
+    saveWorkFileBtn = document.getElementById('saveWorkFile');
+    subtitleTable = document.getElementById('subtitleTable');
+    fileInfoDiv = document.getElementById('fileInfo');
+    fileNameSpan = document.getElementById('fileName');
+    lineCountSpan = document.getElementById('lineCount');
+    sourceLanguageSelect = document.getElementById('sourceLanguage');
+    targetLanguageSelect = document.getElementById('targetLanguage');
+    progressContainer = document.getElementById('progressContainer');
+    progressBar = document.getElementById('progressBar');
+    temperatureSlider = document.getElementById('temperatureSlider');
+    temperatureValue = document.getElementById('temperatureValue');
+    languageSelector = document.getElementById('languageSelector');
+    uiLanguageMenu = document.getElementById('uiLanguageMenu');
+    originalHeader = document.getElementById('originalHeader');
+    translatedHeader = document.getElementById('translatedHeader');
+    actionsHeader = document.getElementById('actionsHeader');
 
+    // Nyelvválasztó inicializálása
+    initLanguageSelector();
+    
     // Eseménykezelők hozzáadása
     srtFileInput.addEventListener('change', handleFileSelect);
     startTranslationBtn.addEventListener('click', handleTranslationControl);
@@ -293,7 +325,6 @@ document.addEventListener('DOMContentLoaded', function() {
             saveTranslationBtn.disabled = false;
             saveWorkFileBtn.classList.remove('d-none');
         };
-        
         reader.readAsText(file);
     }
     
@@ -488,11 +519,16 @@ document.addEventListener('DOMContentLoaded', function() {
             // Újrafordítás gomb - kezdetben rejtve, de megjelenik, ha van fordított szöveg
             const retranslateBtn = document.createElement('button');
             retranslateBtn.type = 'button';
-            retranslateBtn.className = 'btn btn-sm btn-info';
+            retranslateBtn.className = 'btn btn-sm btn-info retranslate-btn';
             retranslateBtn.dataset.bsToggle = 'tooltip';
             retranslateBtn.dataset.bsPlacement = 'left';
             retranslateBtn.dataset.bsTitle = 'Újrafordítás';
-            retranslateBtn.innerHTML = '<i class="bi bi-arrow-repeat"></i>';
+            
+            // A gomb tartalma: ikon + szöveg (a szöveg a nyelvváltáskor frissül)
+            const currentLang = currentLangCode;
+            const retranslateText = uiTranslations[currentLang]?.retranslate || 'Újrafordítás';
+            retranslateBtn.innerHTML = `<i class="bi bi-arrow-repeat me-1"></i>${retranslateText}`;
+            
             retranslateBtn.id = `retranslate-${index}`;
             retranslateBtn.addEventListener('click', () => retranslateSubtitle(index));
             
@@ -584,7 +620,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // Fordítás gomb visszaállítása
             if (retranslateBtn) {
                 retranslateBtn.disabled = false;
-                retranslateBtn.innerHTML = '<i class="bi bi-arrow-repeat"></i>';
+                retranslateBtn.innerHTML = `<i class="bi bi-arrow-repeat me-1"></i>${uiTranslations[currentLangCode]?.retranslate || 'Újrafordítás'}`;
                 retranslateBtn.classList.remove('d-none');
             }
             
@@ -963,4 +999,205 @@ document.addEventListener('DOMContentLoaded', function() {
         
         return languages[languageCode] || languageCode;
     }
+
+    // Nyelvválasztó inicializálása
+    function initLanguageSelector() {
+        console.log("Nyelvválasztó inicializálása");
+        
+        // Nyelvválasztó eseménykezelők
+        document.querySelectorAll('#uiLanguageMenu a').forEach(item => {
+            item.addEventListener('click', function(e) {
+                e.preventDefault();
+                const lang = this.getAttribute('data-lang');
+                changeUiLanguage(lang);
+            });
+        });
+
+        // Mentett nyelv betöltése
+        const savedLanguage = localStorage.getItem('uiLanguage');
+        if (savedLanguage && uiTranslations[savedLanguage]) {
+            console.log("Mentett nyelv betöltése: " + savedLanguage);
+            currentLangCode = savedLanguage; // Globális változó frissítése
+            changeUiLanguage(savedLanguage);
+        } else {
+            // Alapértelmezett angol nyelv
+            console.log("Alapértelmezett angol nyelv beállítása");
+            currentLangCode = 'en'; // Globális változó frissítése
+            changeUiLanguage('en');
+        }
+    }
+
+    // Felhasználói felület nyelvének megváltoztatása
+    function changeUiLanguage(lang) {
+        // Aktuális nyelv mentése
+        localStorage.setItem('uiLanguage', lang);
+        // Globális változó frissítése
+        currentLangCode = lang;
+
+        // Nyelvválasztó gomb szövegének frissítése
+        const languageNames = {
+            'en': 'English',
+            'hu': 'Magyar',
+            'de': 'Deutsch',
+            'es': 'Español',
+            'fr': 'Français',
+            'it': 'Italiano',
+            'pt': 'Português',
+            'nl': 'Nederlands',
+            'pl': 'Polski',
+            'ru': 'Русский',
+            'ja': '日本語',
+            'zh': '中文',
+            'ar': 'العربية',
+            'hi': 'हिन्दी',
+            'ko': '한국어',
+            'tr': 'Türkçe',
+            'sv': 'Svenska',
+            'da': 'Dansk',
+            'fi': 'Suomi',
+            'no': 'Norsk',
+            'cs': 'Čeština',
+            'sk': 'Slovenčina',
+            'ro': 'Română',
+            'bg': 'Български',
+            'el': 'Ελληνικά',
+            'uk': 'Українська',
+            'he': 'עברית',
+            'th': 'ไทย',
+            'vi': 'Tiếng Việt',
+            'id': 'Bahasa Indonesia'
+        };
+        
+        document.getElementById('currentUiLanguage').textContent = languageNames[lang] || 'English';
+        
+        // Aktív elem beállítása a menüben
+        document.querySelectorAll('#uiLanguageMenu a').forEach(item => {
+            item.classList.remove('active');
+        });
+        
+        const activeMenuItem = document.querySelector(`#uiLanguageMenu a[data-lang="${lang}"]`);
+        if (activeMenuItem) {
+            activeMenuItem.classList.add('active');
+        }
+
+        // Translations.js fájlból betöltjük a fordításokat
+        if (typeof uiTranslations !== 'undefined' && uiTranslations[lang]) {
+            console.log("Nyelv váltás: " + lang);
+            console.log(uiTranslations[lang]);
+            updateUiTexts(uiTranslations[lang]);
+        } else {
+            console.error("A fordítások nem érhetők el: ", lang);
+        }
+    }
+    
+    // Felhasználói felület szövegeinek frissítése
+    function updateUiTexts(translations) {
+        console.log("UI szövegek frissítése:", translations);
+        
+        try {
+            // Főcím
+            const mainTitle = document.querySelector('h1.display-5');
+            if (mainTitle) {
+                mainTitle.innerHTML = `<i class="bi bi-translate me-2"></i>${translations.appTitle} <small class="fs-6 text-secondary">version 1.0</small>`;
+            }
+            
+            // Kártya címek
+            const cardTitles = document.querySelectorAll('.card-title');
+            if (cardTitles.length >= 3) {
+                cardTitles[0].textContent = translations.fileUploadTitle;
+                cardTitles[1].textContent = translations.temperatureTitle;
+                cardTitles[2].textContent = translations.languageTitle;
+            }
+            
+            // Hőmérséklet címkék
+            const tempLabels = document.querySelectorAll('.form-range + div small');
+            if (tempLabels.length >= 3) {
+                tempLabels[0].textContent = `${translations.temperatureAccurate} (0.1)`;
+                tempLabels[1].textContent = `${translations.temperatureBalanced} (1.0)`;
+                tempLabels[2].textContent = `${translations.temperatureCreative} (2.0)`;
+            }
+            
+            // Nyelvi címkék - ezeket globális változókkal érjük el
+            const sourceLabel = document.querySelector('label[for="sourceLanguage"]');
+            if (sourceLabel) sourceLabel.textContent = translations.sourceLanguage + ':';
+            
+            const targetLabel = document.querySelector('label[for="targetLanguage"]');
+            if (targetLabel) targetLabel.textContent = translations.targetLanguage + ':';
+            
+            // Gombok - ezeket globális változókkal érjük el
+            if (startTranslationBtn) {
+                startTranslationBtn.innerHTML = `<i class="bi bi-translate me-2"></i>${translations.startTranslation}`;
+                console.log("Start gomb szövege frissítve:", translations.startTranslation);
+            }
+            
+            if (stopTranslationBtn) {
+                stopTranslationBtn.innerHTML = `<i class="bi bi-pause-circle me-2"></i>${translations.stopTranslation}`;
+                console.log("Stop gomb szövege frissítve:", translations.stopTranslation);
+            }
+            
+            if (resetTranslationBtn) {
+                resetTranslationBtn.innerHTML = `<i class="bi bi-arrow-counterclockwise me-2"></i>${translations.resetTranslation}`;
+                console.log("Reset gomb szövege frissítve:", translations.resetTranslation);
+            }
+            
+            if (saveTranslationBtn) {
+                saveTranslationBtn.innerHTML = `<i class="bi bi-download me-2"></i>${translations.saveTranslation}`;
+                console.log("Save gomb szövege frissítve:", translations.saveTranslation);
+            }
+            
+            if (saveWorkFileBtn) {
+                saveWorkFileBtn.innerHTML = `<i class="bi bi-file-earmark-text me-2"></i>${translations.saveWorkFile}`;
+                console.log("Save workfile gomb szövege frissítve:", translations.saveWorkFile);
+            }
+            
+            // Táblázat fejlécek
+            if (originalHeader) {
+                originalHeader.textContent = translations.originalSubtitle;
+                console.log("Eredeti fejléc szövege frissítve:", translations.originalSubtitle);
+            }
+            
+            if (translatedHeader) {
+                translatedHeader.textContent = translations.translatedSubtitle;
+                console.log("Fordított fejléc szövege frissítve:", translations.translatedSubtitle);
+            }
+            
+            if (actionsHeader) {
+                actionsHeader.textContent = translations.actions;
+                console.log("Műveletek fejléc szövege frissítve:", translations.actions);
+            }
+            
+            // Fájl információ
+            if (fileNameSpan && fileNameSpan.textContent && fileInfoDiv) {
+                fileInfoDiv.innerHTML = `<span id="fileName">${fileNameSpan.textContent}</span> - <span id="lineCount">${lineCountSpan ? lineCountSpan.textContent : ''}</span> ${translations.fileInfo}`;
+            }
+            
+            // Újrafordítás gombok
+            const retranslateButtons = document.querySelectorAll('.retranslate-btn');
+            retranslateButtons.forEach(btn => {
+                // Frissítjük a gomb tartalmát: ikon + szöveg
+                btn.innerHTML = `<i class="bi bi-arrow-repeat me-1"></i>${translations.retranslate}`;
+                btn.dataset.bsTitle = translations.retranslate;
+                console.log("Újrafordítás gomb szövege frissítve:", translations.retranslate);
+            });
+            
+            // Egyéb helyek, ahol még lehet fordítható szöveg
+            // Footer copyright szöveg
+            const footer = document.querySelector('footer p.text-center');
+            if (footer) {
+                footer.innerHTML = `&copy; 2025 ${translations.appTitle}`;
+            }
+            
+            // File input label frissítése
+            const fileInputLabel = document.querySelector('label.custom-file-label');
+            if (fileInputLabel) {
+                fileInputLabel.textContent = translations.fileInputLabel;
+            }
+            
+            console.log("UI szövegek frissítése befejezve!");
+        } catch (error) {
+            console.error("Hiba történt az UI szövegek frissítése során:", error);
+        }
+    }
+    
+    console.log("UI szövegek frissítése befejezve!");
 });

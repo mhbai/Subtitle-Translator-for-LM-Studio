@@ -13,7 +13,48 @@
 <body class="bg-dark text-light">
     <div class="container py-4">
         <header class="pb-3 mb-4 border-bottom border-secondary">
-            <h1 class="display-5 fw-bold text-primary"><i class="bi bi-translate me-2"></i>SRT Felirat Fordító <small class="fs-6 text-secondary">version 1.0</small></h1>
+            <div class="d-flex justify-content-between align-items-center">
+                <h1 class="display-5 fw-bold text-primary"><i class="bi bi-translate me-2"></i>SRT Felirat Fordító <small class="fs-6 text-secondary">version 1.0</small></h1>
+                
+                <!-- Nyelvválasztó gomb -->
+                <div class="dropdown">
+                    <button class="btn btn-outline-light dropdown-toggle" type="button" id="languageSelector" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-globe me-2"></i><span id="currentUiLanguage">English</span>
+                    </button>
+                    <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end" id="uiLanguageMenu" aria-labelledby="languageSelector">
+                        <li><a class="dropdown-item active" href="#" data-lang="en">English</a></li>
+                        <li><a class="dropdown-item" href="#" data-lang="hu">Magyar</a></li>
+                        <li><a class="dropdown-item" href="#" data-lang="de">Deutsch</a></li>
+                        <li><a class="dropdown-item" href="#" data-lang="es">Español</a></li>
+                        <li><a class="dropdown-item" href="#" data-lang="fr">Français</a></li>
+                        <li><a class="dropdown-item" href="#" data-lang="it">Italiano</a></li>
+                        <li><a class="dropdown-item" href="#" data-lang="pt">Português</a></li>
+                        <li><a class="dropdown-item" href="#" data-lang="nl">Nederlands</a></li>
+                        <li><a class="dropdown-item" href="#" data-lang="pl">Polski</a></li>
+                        <li><a class="dropdown-item" href="#" data-lang="ru">Русский</a></li>
+                        <li><a class="dropdown-item" href="#" data-lang="ja">日本語</a></li>
+                        <li><a class="dropdown-item" href="#" data-lang="zh">中文</a></li>
+                        <li><a class="dropdown-item" href="#" data-lang="ar">العربية</a></li>
+                        <li><a class="dropdown-item" href="#" data-lang="hi">हिन्दी</a></li>
+                        <li><a class="dropdown-item" href="#" data-lang="ko">한국어</a></li>
+                        <li><a class="dropdown-item" href="#" data-lang="tr">Türkçe</a></li>
+                        <li><a class="dropdown-item" href="#" data-lang="sv">Svenska</a></li>
+                        <li><a class="dropdown-item" href="#" data-lang="da">Dansk</a></li>
+                        <li><a class="dropdown-item" href="#" data-lang="fi">Suomi</a></li>
+                        <li><a class="dropdown-item" href="#" data-lang="no">Norsk</a></li>
+                        <li><a class="dropdown-item" href="#" data-lang="cs">Čeština</a></li>
+                        <li><a class="dropdown-item" href="#" data-lang="sk">Slovenčina</a></li>
+                        <li><a class="dropdown-item" href="#" data-lang="ro">Română</a></li>
+                        <li><a class="dropdown-item" href="#" data-lang="bg">Български</a></li>
+                        <li><a class="dropdown-item" href="#" data-lang="el">Ελληνικά</a></li>
+                        <li><a class="dropdown-item" href="#" data-lang="uk">Українська</a></li>
+                        <li><a class="dropdown-item" href="#" data-lang="he">עברית</a></li>
+                        <li><a class="dropdown-item" href="#" data-lang="th">ไทย</a></li>
+                        <li><a class="dropdown-item" href="#" data-lang="vi">Tiếng Việt</a></li>
+                        <li><a class="dropdown-item" href="#" data-lang="id">Bahasa Indonesia</a></li>
+                    </ul>
+                </div>
+            </div>
         </header>
 
         <div class="row g-4">
@@ -157,9 +198,9 @@
                                 <thead>
                                     <tr>
                                         <th width="5%">#</th>
-                                        <th width="45%">Eredeti szöveg</th>
-                                        <th width="45%">Fordított szöveg</th>
-                                        <th width="5%">Műveletek</th>
+                                        <th width="45%" id="originalHeader">Eredeti szöveg</th>
+                                        <th width="45%" id="translatedHeader">Fordított szöveg</th>
+                                        <th width="5%" id="actionsHeader">Műveletek</th>
                                     </tr>
                                 </thead>
                                 <tbody id="subtitleTable">
@@ -181,6 +222,8 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
     <!-- FileSaver.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <!-- Translations -->
+    <script src="translations.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
