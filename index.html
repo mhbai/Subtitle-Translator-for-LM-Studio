@@ -94,6 +94,25 @@
             <div class="col-md-12">
                 <div class="card bg-dark-subtle text-light border-secondary">
                     <div class="card-body">
+                        <h5 class="card-title mb-3">Fordítás módja</h5>
+                        <div class="mb-3">
+                            <select class="form-select bg-dark text-light border-secondary" id="translationMode">
+                                <option value="lm_studio_local" selected>LM Studio local</option>
+                                <option value="chatgpt_4o_mini">ChatGPT-4o mini</option>
+                                <option value="chatgpt_4o">ChatGPT-4o</option>
+                            </select>
+                        </div>
+                        <div class="mb-3 d-none" id="apiKeyContainer">
+                            <label for="apiKey" class="form-label">API kulcs:</label>
+                            <input type="text" class="form-control bg-dark text-light border-secondary" id="apiKey" placeholder="Adja meg az API kulcsot">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-12">
+                <div class="card bg-dark-subtle text-light border-secondary">
+                    <div class="card-body">
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <label for="sourceLanguage" class="form-label">Forrásnyelv:</label>

@@ -36,6 +36,9 @@ let translatedHeader;
 let actionsHeader;
 let cardTitles; // A kártya címeket tároló változó
 let fileInputLabel; // A fájl input labeljét tároló változó
+let translationModeSelect;
+let apiKeyContainer;
+let apiKeyInput;
 
 // DOM elemek
 document.addEventListener('DOMContentLoaded', function() {
@@ -65,6 +68,9 @@ document.addEventListener('DOMContentLoaded', function() {
     actionsHeader = document.getElementById('actionsHeader');
     cardTitles = document.querySelectorAll('.card-title'); // Az összes kártya cím kiválasztása
     fileInputLabel = document.querySelector('label.custom-file-label'); // A fájl input labeljének kiválasztása
+    translationModeSelect = document.getElementById('translationMode');
+    apiKeyContainer = document.getElementById('apiKeyContainer');
+    apiKeyInput = document.getElementById('apiKey');
     
     console.log("DOM elemek betöltve:", {
         startTranslationBtn: !!startTranslationBtn,
@@ -84,6 +90,9 @@ document.addEventListener('DOMContentLoaded', function() {
     resetTranslationBtn.addEventListener('click', resetTranslation);
     saveTranslationBtn.addEventListener('click', saveTranslation);
     saveWorkFileBtn.addEventListener('click', saveWorkFile);
+    
+    // Fordítás módjának eseménykezelője
+    translationModeSelect.addEventListener('change', handleTranslationModeChange);
     
     // Temperature csúszka eseménykezelő
     temperatureSlider.addEventListener('input', function() {
@@ -144,6 +153,15 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Táblázat újratöltése csak az eredeti feliratokkal
         populateTable();
+        
+        // Fordítási állapot alaphelyzetbe állítása
+        isTranslationPaused = false;
+        currentTranslationIndex = 0;
+        startTranslationBtn.innerHTML = '<i class="bi bi-translate me-2"></i>Fordítás indítása';
+        stopTranslationBtn.classList.add('d-none');
+        
+        // Sor számok frissítése
+        lineCountSpan.textContent = originalSubtitles.length;
     }
     
     // Minden fordítás és beállítás alaphelyzetbe állítása
@@ -645,6 +663,17 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Fordítás indítása
     async function startTranslation() {
+        // Fordítási mód ellenőrzése
+        const selectedMode = translationModeSelect.value;
+        const apiKey = apiKeyInput.value;
+
+        if (selectedMode === 'chatgpt_4o_mini' || selectedMode === 'chatgpt_4o') {
+            if (!apiKey) {
+                alert('Kérjük, adja meg az API kulcsot a ChatGPT használatához!');
+                return;
+            }
+        }
+
         // UI elemek frissítése
         startTranslationBtn.classList.add('d-none');
         stopTranslationBtn.classList.remove('d-none');
@@ -668,8 +697,185 @@ document.addEventListener('DOMContentLoaded', function() {
             translatedSubtitles = originalSubtitles.map(subtitle => '');
         }
         
-        // Folytatjuk a fordítást az aktuális indextől
-        for (let i = currentTranslationIndex; i < originalSubtitles.length; i++) {
+        // Szekvenciális fordítás a ChatGPT API-val
+        if (selectedMode === 'chatgpt_4o_mini' || selectedMode === 'chatgpt_4o') {
+            await translateSequentially(currentTranslationIndex, sourceLanguage, targetLanguage, apiKey, selectedMode, temperature);
+        } else {
+            // LM Studio fordítás - eredeti logika
+            await translateWithLmStudio(currentTranslationIndex, sourceLanguage, targetLanguage, temperature);
+        }
+        
+        // Ha végigértünk a feliratokon és nem szüneteltettük a fordítást
+        if (currentTranslationIndex >= originalSubtitles.length - 1 && !isTranslationPaused) {
+            // Fordítás befejezése
+            finishTranslation();
+        }
+    }
+
+    // Szekvenciális fordítás a ChatGPT API-val
+    async function translateSequentially(startIndex, sourceLanguage, targetLanguage, apiKey, mode, temperature) {
+        // ChatGPT API kérések közötti késleltetés (ms) - 0.2 másodperc
+        const API_DELAY = 200;
+        
+        // A megfelelő modell kiválasztása
+        const model = mode === 'chatgpt_4o_mini' ? 'gpt-4o-mini' : 'gpt-4o';
+        
+        // Végigmegyünk a feliratokon egyesével, szekvenciálisan
+        for (let i = startIndex; i < originalSubtitles.length; i++) {
+            // Ha a fordítás szüneteltetése be van kapcsolva, akkor kilépünk a ciklusból
+            if (isTranslationPaused) {
+                break;
+            }
+            
+            currentTranslationIndex = i;
+            
+            // Ellenőrizzük, hogy már le van-e fordítva ez a felirat
+            if (translatedSubtitles[i]) {
+                continue; // Átugorjuk a már lefordított feliratokat
+            }
+            
+            // Folyamatjelző frissítése
+            updateProgressBar(i, originalSubtitles.length);
+            
+            try {
+                // Kontextus összeállítása (előző és következő mondatok)
+                const currentSubtitle = originalSubtitles[i].text;
+                
+                // Előző 4 mondat összegyűjtése (ha van)
+                let previousContext = "";
+                for (let j = Math.max(0, i - 4); j < i; j++) {
+                    if (originalSubtitles[j] && originalSubtitles[j].text) {
+                        previousContext += originalSubtitles[j].text + "\n";
+                    }
+                }
+                
+                // Következő 4 mondat összegyűjtése (ha van)
+                let nextContext = "";
+                for (let j = i + 1; j < Math.min(originalSubtitles.length, i + 5); j++) {
+                    if (originalSubtitles[j] && originalSubtitles[j].text) {
+                        nextContext += originalSubtitles[j].text + "\n";
+                    }
+                }
+                
+                // Egyedi azonosító a fordítandó sorhoz
+                const uniqueMarker = "###FORDÍTANDÓ_SOR###";
+                const endMarker = "###FORDÍTÁS_VÉGE###";
+                
+                // Teljes kontextus összeállítása
+                let contextText = "";
+                if (previousContext) {
+                    contextText += "Előző sorok kontextusként (NEM kell fordítani):\n" + previousContext + "\n";
+                }
+                contextText += uniqueMarker + "\n" + currentSubtitle + "\n" + endMarker + "\n";
+                if (nextContext) {
+                    contextText += "Következő sorok kontextusként (NEM kell fordítani):\n" + nextContext;
+                }
+                
+                // Fordítási utasítás
+                const systemPrompt = `Fordítsd le CSAK a "${uniqueMarker}" és "${endMarker}" közötti szöveget ${getLanguageNameLocal(sourceLanguage)} nyelvről ${getLanguageNameLocal(targetLanguage)} nyelvre. 
+A többi szöveg csak kontextus, azt NE fordítsd le. 
+A fordításodban KIZÁRÓLAG a lefordított szöveget add vissza, semmilyen jelölést, magyarázatot vagy egyéb szöveget NE adj hozzá.
+NE használd a "${uniqueMarker}" vagy "${endMarker}" jelöléseket a válaszodban.`;
+                
+                // Segédfüggvény a nyelv kódjának névvé alakításához
+                function getLanguageNameLocal(languageCode) {
+                    const languages = {
+                        'en': 'angol',
+                        'hu': 'magyar',
+                        'de': 'német',
+                        'fr': 'francia',
+                        'es': 'spanyol',
+                        'it': 'olasz',
+                        'pt': 'portugál',
+                        'ru': 'orosz',
+                        'ja': 'japán',
+                        'zh': 'kínai',
+                        'ko': 'koreai',
+                        'ar': 'arab',
+                        'hi': 'hindi',
+                        'tr': 'török',
+                        'pl': 'lengyel',
+                        'nl': 'holland',
+                        'sv': 'svéd',
+                        'da': 'dán',
+                        'fi': 'finn',
+                        'no': 'norvég',
+                        'cs': 'cseh',
+                        'sk': 'szlovák',
+                        'ro': 'román',
+                        'bg': 'bolgár',
+                        'hr': 'horvát',
+                        'sr': 'szerb',
+                        'uk': 'ukrán',
+                        'el': 'görög',
+                        'he': 'héber',
+                        'vi': 'vietnámi',
+                        'th': 'thai',
+                        'id': 'indonéz',
+                        'ms': 'maláj',
+                        'fa': 'perzsa',
+                        'ur': 'urdu'
+                    };
+                    
+                    return languages[languageCode] || languageCode;
+                }
+                
+                // Fordítás végrehajtása kontextussal és egyedi rendszerüzenettel
+                const translatedText = await translateWithChatGptCustomPrompt(contextText, systemPrompt, apiKey, model, temperature);
+                
+                // Fordított szöveg mentése
+                translatedSubtitles[i] = translatedText.trim();
+                
+                // Táblázat frissítése
+                updateTranslatedText(i, translatedText.trim());
+                
+                // Újrafordítás gomb megjelenítése
+                const retranslateBtn = document.getElementById(`retranslate-${i}`);
+                if (retranslateBtn) {
+                    retranslateBtn.classList.remove('d-none');
+                }
+                
+                // Görgetés az aktuális sorhoz
+                scrollToRow(i);
+                
+                // Mentés gomb engedélyezése
+                saveTranslationBtn.disabled = false;
+                
+                // Munkafájl mentés gomb megjelenítése
+                saveWorkFileBtn.classList.remove('d-none');
+                
+                // Késleltetés a következő API kérés előtt, hogy elkerüljük a sebességkorlát-túllépést
+                if (i < originalSubtitles.length - 1) {
+                    await new Promise(resolve => setTimeout(resolve, API_DELAY));
+                }
+                
+            } catch (error) {
+                console.error('Fordítási hiba:', error);
+                
+                // Ha sebességkorlát-túllépés (429) hiba, akkor várunk egy ideig és újra próbáljuk
+                if (error.message.includes('429')) {
+                    console.log('Sebességkorlát-túllépés (429), várakozás 10 másodpercet...');
+                    alert('Az API sebességkorlát-túllépés miatt várakozunk 10 másodpercet, majd folytatjuk a fordítást.');
+                    
+                    // Várakozás 10 másodpercet
+                    await new Promise(resolve => setTimeout(resolve, 10000));
+                    
+                    // Visszalépünk egy indexet, hogy újra megpróbáljuk ezt a feliratot
+                    i--;
+                    continue;
+                }
+                
+                alert(`Hiba történt a fordítás során: ${error.message}`);
+                pauseTranslation();
+                break;
+            }
+        }
+    }
+
+    // LM Studio fordítás
+    async function translateWithLmStudio(startIndex, sourceLanguage, targetLanguage, temperature) {
+        // Végigmegyünk a feliratokon
+        for (let i = startIndex; i < originalSubtitles.length; i++) {
             // Ha a fordítás szüneteltetése be van kapcsolva, akkor kilépünk a ciklusból
             if (isTranslationPaused) {
                 break;
@@ -717,20 +923,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 break;
             }
         }
-        
-        // Ha végigértünk a feliratokon
-        if (currentTranslationIndex >= originalSubtitles.length - 1 && !isTranslationPaused) {
-            // Fordítás befejezése
-            finishTranslation();
-        }
     }
 
     // Szöveg fordítása kontextussal az LM Studio API-val
-    async function translateTextWithContext(subtitles, currentIndex, sourceLanguage, targetLanguage, retryCount = 0) {
+    async function translateTextWithContext(subtitles, currentIndex, sourceLanguage, targetLanguage, retryCount = 0, temperature) {
         try {
             // Kontextus összeállítása (előző és következő mondatok)
             const currentSubtitle = subtitles[currentIndex].text;
-            let context = '';
             
             // Előző mondatok hozzáadása a kontextushoz (max 4)
             for (let i = 1; i <= 4; i++) {
@@ -822,7 +1021,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     await new Promise(resolve => setTimeout(resolve, 1000));
                     
                     // Újrapróbálkozás
-                    return translateTextWithContext(subtitles, currentIndex, sourceLanguage, targetLanguage, retryCount + 1);
+                    return translateTextWithContext(subtitles, currentIndex, sourceLanguage, targetLanguage, retryCount + 1, temperature);
                 }
                 
                 return translatedText;
@@ -840,7 +1039,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 await new Promise(resolve => setTimeout(resolve, 2000));
                 
                 // Újrapróbálkozás
-                return translateTextWithContext(subtitles, currentIndex, sourceLanguage, targetLanguage, retryCount + 1);
+                return translateTextWithContext(subtitles, currentIndex, sourceLanguage, targetLanguage, retryCount + 1, temperature);
             }
             
             throw new Error(`Fordítási hiba (${retryCount} próbálkozás után): ${error.message}`);
@@ -853,7 +1052,9 @@ document.addEventListener('DOMContentLoaded', function() {
             [{ text: text }], // Egyetlen felirat
             0, // Az első (és egyetlen) elem indexe
             sourceLanguage,
-            targetLanguage
+            targetLanguage,
+            0, // Nincs újrapróbálkozás
+            temperature
         );
     }
 
@@ -1244,3 +1445,277 @@ document.addEventListener('DOMContentLoaded', function() {
     
     console.log("UI szövegek frissítése befejezve!");
 });
+
+// Fordítás módjának kezelése
+function handleTranslationModeChange() {
+    const selectedMode = translationModeSelect.value;
+    if (selectedMode === 'chatgpt_4o_mini' || selectedMode === 'chatgpt_4o') {
+        apiKeyContainer.classList.remove('d-none');
+    } else {
+        apiKeyContainer.classList.add('d-none');
+        apiKeyInput.value = '';
+    }
+}
+
+// Fordítási függvények
+async function translateWithLmStudio(text, sourceLang, targetLang) {
+    // LM Studio fordítási logika
+    console.log('LM Studio fordítás:', text);
+}
+
+async function translateWithChatGpt(subtitle, sourceLang, targetLang, apiKey, model = 'gpt-4o-mini', temperature = 0.7, retryCount = 0) {
+    // Maximum újrapróbálkozások száma
+    const MAX_RETRIES = 3;
+    // Várakozási idő milliszekundumban (exponenciálisan növekszik)
+    const RETRY_DELAY = 2000 * Math.pow(2, retryCount);
+    
+    // Segédfüggvény a nyelv kódjának névvé alakításához
+    function getLanguageNameLocal(languageCode) {
+        const languages = {
+            'en': 'angol',
+            'hu': 'magyar',
+            'de': 'német',
+            'fr': 'francia',
+            'es': 'spanyol',
+            'it': 'olasz',
+            'pt': 'portugál',
+            'ru': 'orosz',
+            'ja': 'japán',
+            'zh': 'kínai',
+            'ko': 'koreai',
+            'ar': 'arab',
+            'hi': 'hindi',
+            'tr': 'török',
+            'pl': 'lengyel',
+            'nl': 'holland',
+            'sv': 'svéd',
+            'da': 'dán',
+            'fi': 'finn',
+            'no': 'norvég',
+            'cs': 'cseh',
+            'sk': 'szlovák',
+            'ro': 'román',
+            'bg': 'bolgár',
+            'hr': 'horvát',
+            'sr': 'szerb',
+            'uk': 'ukrán',
+            'el': 'görög',
+            'he': 'héber',
+            'vi': 'vietnámi',
+            'th': 'thai',
+            'id': 'indonéz',
+            'ms': 'maláj',
+            'fa': 'perzsa',
+            'ur': 'urdu'
+        };
+        
+        return languages[languageCode] || languageCode;
+    }
+
+    // Ellenőrizzük, hogy a subtitle egy objektum-e
+    if (typeof subtitle === 'object' && subtitle !== null) {
+        const textToTranslate = subtitle.text;
+        console.log('ChatGPT fordítás:', textToTranslate, 'API kulcs:', apiKey);
+        
+        try {
+            // ChatGPT API hívás
+            const response = await fetch('https://api.openai.com/v1/chat/completions', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${apiKey}`
+                },
+                body: JSON.stringify({
+                    model: model,
+                    messages: [
+                        {
+                            role: "system",
+                            content: `Fordítsd le a következő szöveget ${getLanguageNameLocal(sourceLang)} nyelvről ${getLanguageNameLocal(targetLang)} nyelvre. Csak a fordítást add vissza, semmilyen egyéb magyarázatot vagy megjegyzést ne fűzz hozzá.`
+                        },
+                        {
+                            role: "user",
+                            content: textToTranslate
+                        }
+                    ],
+                    temperature: temperature
+                })
+            });
+            
+            // Ha 429-es hiba (túl sok kérés), akkor újrapróbálkozunk
+            if (response.status === 429 && retryCount < MAX_RETRIES) {
+                console.log(`429 hiba, újrapróbálkozás ${retryCount + 1}/${MAX_RETRIES} (várakozás: ${RETRY_DELAY}ms)...`);
+                // Várakozás növekvő idővel
+                await new Promise(resolve => setTimeout(resolve, RETRY_DELAY));
+                // Újrapróbálkozás
+                return translateWithChatGpt(subtitle, sourceLang, targetLang, apiKey, model, temperature, retryCount + 1);
+            }
+            
+            if (!response.ok) {
+                throw new Error(`API hiba: ${response.status} ${response.statusText}`);
+            }
+            
+            const data = await response.json();
+            const translatedText = data.choices[0].message.content.trim();
+            console.log('Fordítás eredménye:', translatedText);
+            
+            return translatedText;
+        } catch (error) {
+            console.error('Fordítási hiba:', error);
+            
+            // Ha hálózati hiba vagy egyéb ideiglenes probléma, újrapróbálkozunk
+            if ((error.message.includes('fetch') || error.message.includes('network') || error.message.includes('timeout')) && retryCount < MAX_RETRIES) {
+                console.log(`Hálózati hiba, újrapróbálkozás ${retryCount + 1}/${MAX_RETRIES} (várakozás: ${RETRY_DELAY}ms)...`);
+                // Várakozás növekvő idővel
+                await new Promise(resolve => setTimeout(resolve, RETRY_DELAY));
+                // Újrapróbálkozás
+                return translateWithChatGpt(subtitle, sourceLang, targetLang, apiKey, model, temperature, retryCount + 1);
+            }
+            
+            throw error;
+        }
+    } else {
+        // Ha nem objektum, akkor feltételezzük, hogy szöveg
+        console.log('ChatGPT fordítás (szöveg):', subtitle, 'API kulcs:', apiKey);
+        
+        try {
+            // ChatGPT API hívás
+            const response = await fetch('https://api.openai.com/v1/chat/completions', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${apiKey}`
+                },
+                body: JSON.stringify({
+                    model: model,
+                    messages: [
+                        {
+                            role: "system",
+                            content: `Fordítsd le a következő szöveget ${getLanguageNameLocal(sourceLang)} nyelvről ${getLanguageNameLocal(targetLang)} nyelvre. Csak a fordítást add vissza, semmilyen egyéb magyarázatot vagy megjegyzést ne fűzz hozzá.`
+                        },
+                        {
+                            role: "user",
+                            content: subtitle
+                        }
+                    ],
+                    temperature: temperature
+                })
+            });
+            
+            // Ha 429-es hiba (túl sok kérés), akkor újrapróbálkozunk
+            if (response.status === 429 && retryCount < MAX_RETRIES) {
+                console.log(`429 hiba, újrapróbálkozás ${retryCount + 1}/${MAX_RETRIES} (várakozás: ${RETRY_DELAY}ms)...`);
+                // Várakozás növekvő idővel
+                await new Promise(resolve => setTimeout(resolve, RETRY_DELAY));
+                // Újrapróbálkozás
+                return translateWithChatGpt(subtitle, sourceLang, targetLang, apiKey, model, temperature, retryCount + 1);
+            }
+            
+            if (!response.ok) {
+                throw new Error(`API hiba: ${response.status} ${response.statusText}`);
+            }
+            
+            const data = await response.json();
+            const translatedText = data.choices[0].message.content.trim();
+            console.log('Fordítás eredménye:', translatedText);
+            
+            return translatedText;
+        } catch (error) {
+            console.error('Fordítási hiba:', error);
+            
+            // Ha hálózati hiba vagy egyéb ideiglenes probléma, újrapróbálkozunk
+            if ((error.message.includes('fetch') || error.message.includes('network') || error.message.includes('timeout')) && retryCount < MAX_RETRIES) {
+                console.log(`Hálózati hiba, újrapróbálkozás ${retryCount + 1}/${MAX_RETRIES} (várakozás: ${RETRY_DELAY}ms)...`);
+                // Várakozás növekvő idővel
+                await new Promise(resolve => setTimeout(resolve, RETRY_DELAY));
+                // Újrapróbálkozás
+                return translateWithChatGpt(subtitle, sourceLang, targetLang, apiKey, model, temperature, retryCount + 1);
+            }
+            
+            throw error;
+        }
+    }
+}
+
+function startTranslation() {
+    const selectedMode = translationModeSelect.value;
+    const apiKey = apiKeyInput.value;
+    if (selectedMode === 'lm_studio_local') {
+        // LM Studio fordítás
+        translateWithLmStudio('példa szöveg', 'en', 'hu');
+    } else if (selectedMode === 'chatgpt_4o_mini' && apiKey) {
+        // ChatGPT-4o mini fordítás
+        translateWithChatGpt('példa szöveg', 'en', 'hu', apiKey, 'gpt-4o-mini');
+    } else if (selectedMode === 'chatgpt_4o' && apiKey) {
+        // ChatGPT-4o fordítás
+        translateWithChatGpt('példa szöveg', 'en', 'hu', apiKey, 'gpt-4o');
+    } else {
+        alert('Kérjük, adja meg az API kulcsot a ChatGPT használatához!');
+    }
+}
+
+// Fordítás ChatGPT-vel egyedi rendszerüzenettel
+async function translateWithChatGptCustomPrompt(text, systemPrompt, apiKey, model = 'gpt-4o-mini', temperature = 0.7, retryCount = 0) {
+    // Maximum újrapróbálkozások száma
+    const MAX_RETRIES = 3;
+    // Várakozási idő milliszekundumban (exponenciálisan növekszik)
+    const RETRY_DELAY = 2000 * Math.pow(2, retryCount);
+    
+    console.log('ChatGPT fordítás egyedi prompttal:', text.substring(0, 100) + '...', 'API kulcs:', apiKey);
+    
+    try {
+        // ChatGPT API hívás
+        const response = await fetch('https://api.openai.com/v1/chat/completions', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${apiKey}`
+            },
+            body: JSON.stringify({
+                model: model,
+                messages: [
+                    {
+                        role: "system",
+                        content: systemPrompt
+                    },
+                    {
+                        role: "user",
+                        content: text
+                    }
+                ],
+                temperature: temperature
+            })
+        });
+        
+        // Ha 429-es hiba (túl sok kérés), akkor újrapróbálkozunk
+        if (response.status === 429 && retryCount < MAX_RETRIES) {
+            console.log(`429 hiba, újrapróbálkozás ${retryCount + 1}/${MAX_RETRIES} (várakozás: ${RETRY_DELAY}ms)...`);
+            // Várakozás növekvő idővel
+            await new Promise(resolve => setTimeout(resolve, RETRY_DELAY));
+            // Újrapróbálkozás
+            return translateWithChatGptCustomPrompt(text, systemPrompt, apiKey, model, temperature, retryCount + 1);
+        }
+        
+        if (!response.ok) {
+            throw new Error(`API hiba: ${response.status} ${response.statusText}`);
+        }
+        
+        const data = await response.json();
+        const translatedText = data.choices[0].message.content.trim();
+        console.log('Fordítás eredménye:', translatedText);
+        
+        return translatedText;
+    } catch (error) {
+        console.error('Fordítási hiba:', error);
+        
+        // Ha hálózati hiba vagy egyéb ideiglenes probléma, újrapróbálkozunk
+        if ((error.message.includes('fetch') || error.message.includes('network') || error.message.includes('timeout')) && retryCount < MAX_RETRIES) {
+            console.log(`Hálózati hiba, újrapróbálkozás ${retryCount + 1}/${MAX_RETRIES} (várakozás: ${RETRY_DELAY}ms)...`);
+            // Várakozás növekvő idővel
+            await new Promise(resolve => setTimeout(resolve, RETRY_DELAY));
+            // Újrapróbálkozás
+            return translateWithChatGptCustomPrompt(text, systemPrompt, apiKey, model, temperature, retryCount + 1);
+        }
+        
+        throw error;
+    }
+}
