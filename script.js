@@ -1490,13 +1490,35 @@ NE használd a "${uniqueMarker}" vagy "${endMarker}" jelöléseket a válaszodba
             activeMenuItem.classList.add('active');
         }
 
-        // Translations.js fájlból betöltjük a fordításokat
-        if (typeof uiTranslations !== 'undefined' && uiTranslations[lang]) {
-            console.log("Nyelv váltás: " + lang);
-            console.log(uiTranslations[lang]);
-            updateUiTexts(uiTranslations[lang]);
+        // Nyelvi fájl betöltése a translations.js-ből
+        if (typeof loadLanguage === 'function') {
+            loadLanguage(lang)
+                .then(translations => {
+                    console.log("Nyelv sikeresen betöltve: " + lang);
+                    updateUiTexts(translations);
+                })
+                .catch(error => {
+                    console.error("Hiba a nyelvi fájl betöltése során: ", error);
+                    // Hiba esetén próbáljuk az angol nyelvet betölteni
+                    if (lang !== 'en') {
+                        loadLanguage('en')
+                            .then(translations => {
+                                console.log('Az angol nyelvi fájl sikeresen betöltve');
+                                updateUiTexts(translations);
+                            })
+                            .catch(err => {
+                                console.error('Nem sikerült betölteni az angol nyelvi fájlt sem:', err);
+                            });
+                    }
+                });
         } else {
-            console.error("A fordítások nem érhetők el: ", lang);
+            // Régi módszer, ha a loadLanguage függvény nem elérhető
+            if (typeof uiTranslations !== 'undefined' && uiTranslations[lang]) {
+                console.log("Nyelv váltás (régi módszer): " + lang);
+                updateUiTexts(uiTranslations[lang]);
+            } else {
+                console.error("A fordítások nem érhetők el: ", lang);
+            }
         }
     }
     
