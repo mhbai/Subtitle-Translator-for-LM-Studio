@@ -103,8 +103,13 @@
                             </select>
                         </div>
                         <div class="mb-3 d-none" id="apiKeyContainer">
-                            <label for="apiKey" class="form-label">API kulcs:</label>
-                            <div class="input-group">
+                            <div class="d-flex align-items-center mb-2">
+                                <label for="apiKey" class="form-label mb-0 me-2">API kulcs:</label>
+                                <button class="btn btn-sm btn-outline-secondary d-none" type="button" id="showApiKeyFieldBtn">
+                                    <i class="bi bi-key"></i> Megjelenítés
+                                </button>
+                            </div>
+                            <div class="input-group" id="apiKeyInputGroup">
                                 <input type="password" class="form-control bg-dark text-light border-secondary" id="apiKey" placeholder="Adja meg az API kulcsot">
                                 <button class="btn btn-outline-secondary" type="button" id="toggleApiKeyVisibility" title="API kulcs megjelenítése/elrejtése">
                                     <i class="bi bi-eye" id="apiKeyVisibilityIcon"></i>
@@ -118,6 +123,7 @@
             <div class="col-md-12">
                 <div class="card bg-dark-subtle text-light border-secondary">
                     <div class="card-body">
+                        <h5 class="card-title mb-3">Fordítás beállítások</h5>
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <label for="sourceLanguage" class="form-label">Forrásnyelv:</label>

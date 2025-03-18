@@ -39,6 +39,8 @@ let fileInputLabel; // A fájl input labeljét tároló változó
 let translationModeSelect;
 let apiKeyContainer;
 let apiKeyInput;
+let apiKeyInputGroup; // API kulcs input csoport
+let showApiKeyFieldBtn; // API kulcs mező megjelenítő gomb
 let saveSourceBlockBtn; // Forrás blokkmentése gomb
 let toggleApiKeyVisibilityBtn; // API kulcs láthatóság kapcsoló gomb
 let apiKeyVisibilityIcon; // API kulcs láthatóság ikon
@@ -126,7 +128,9 @@ document.addEventListener('DOMContentLoaded', function() {
     translationModeSelect = document.getElementById('translationMode');
     apiKeyContainer = document.getElementById('apiKeyContainer');
     apiKeyInput = document.getElementById('apiKey');
-    saveSourceBlockBtn = document.getElementById('saveSourceBlockBtn'); // Forrás blokkmentése gomb inicializálása
+    apiKeyInputGroup = document.getElementById('apiKeyInputGroup'); // API kulcs input csoport
+    showApiKeyFieldBtn = document.getElementById('showApiKeyFieldBtn'); // API kulcs mező megjelenítő gomb
+    saveSourceBlockBtn = document.getElementById('saveSourceBlockBtn'); // Forrás blokkmentése gomb
     toggleApiKeyVisibilityBtn = document.getElementById('toggleApiKeyVisibility'); // API kulcs láthatóság kapcsoló gomb
     apiKeyVisibilityIcon = document.getElementById('apiKeyVisibilityIcon'); // API kulcs láthatóság ikon
     
@@ -183,6 +187,11 @@ document.addEventListener('DOMContentLoaded', function() {
     // API kulcs láthatóság kapcsoló gomb eseménykezelője
     if (toggleApiKeyVisibilityBtn) {
         toggleApiKeyVisibilityBtn.addEventListener('click', toggleApiKeyVisibility);
+    }
+    
+    // API kulcs mező megjelenítő gomb eseménykezelője
+    if (showApiKeyFieldBtn) {
+        showApiKeyFieldBtn.addEventListener('click', showApiKeyField);
     }
     
     // Temperature csúszka eseménykezelő
@@ -1578,11 +1587,19 @@ function handleTranslationModeChange() {
     if (selectedMode === 'chatgpt_4o_mini' || selectedMode === 'chatgpt_4o') {
         apiKeyContainer.classList.remove('d-none');
         
-        // Ha van mentett API kulcs, betöltjük
+        // Ha van mentett API kulcs, csak a megjelenítés gombot mutatjuk
         const savedApiKey = loadApiKey();
         if (savedApiKey) {
             apiKeyInput.value = savedApiKey;
             apiKeyInput.type = 'password';
+            
+            // Elrejtjük az input mezőt és megjelenítjük a gombot
+            apiKeyInputGroup.classList.add('d-none');
+            showApiKeyFieldBtn.classList.remove('d-none');
+        } else {
+            // Ha nincs mentett API kulcs, rögtön megjelenítjük az input mezőt
+            apiKeyInputGroup.classList.remove('d-none');
+            showApiKeyFieldBtn.classList.add('d-none');
         }
     } else {
         apiKeyContainer.classList.add('d-none');
@@ -1604,6 +1621,12 @@ function toggleApiKeyVisibility() {
         apiKeyVisibilityIcon.classList.remove('bi-eye-slash');
         apiKeyVisibilityIcon.classList.add('bi-eye');
     }
+}
+
+// API kulcs mező megjelenítése
+function showApiKeyField() {
+    apiKeyInputGroup.classList.remove('d-none');
+    showApiKeyFieldBtn.classList.add('d-none');
 }
 
 // Fordítási függvények
