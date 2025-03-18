@@ -1,4 +1,4 @@
-// Globális változók
+// Global variables
 let originalSubtitles = []; // Az eredeti feliratokat tárolja
 let translatedSubtitles = []; // A lefordított feliratokat tárolja
 let originalSrtContent = ''; // Az eredeti SRT fájl teljes tartalma
@@ -1029,7 +1029,7 @@ NE használd a "${uniqueMarker}" vagy "${endMarker}" jelöléseket a válaszodba
                     continue;
                 }
                 
-                alert(`Hiba történt a fordítás során: ${error.message}`);
+                alert(`Error during translation: ${error.message}`);
                 pauseTranslation();
                 break;
             }

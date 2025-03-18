@@ -1,6 +1,224 @@
+# SRT Subtitle Translator
+
+This application is a simple yet powerful web tool for translating .srt subtitle files. The program uses either the LM Studio artificial intelligence model running on the local machine or the ChatGPT API for translation.
+
+![Running image](Images/Screen01.jpg)
+
+## Features
+
+- Modern, responsive, dark-styled user interface with Bootstrap framework
+- Loading and processing .srt subtitle files
+- Selection of source and target languages from 15 supported languages
+- **Multilingual user interface** in 30 different languages
+- Sentence-by-sentence translation of subtitles using the local LM Studio AI model or ChatGPT API
+- **Translation mode selection**: LM Studio local model or ChatGPT API (GPT-4o or GPT-4o-mini)
+- Visual tracking of the translation process with a progress bar
+- Saving the translated subtitle file with the original timecodes and format
+- **Manual editing of translations** directly in the table
+- **Translation freedom degree (temperature) setting** to control creativity
+- Individual retranslation of lines when needed
+- **Saving and loading work files** to continue the translation process later (.wrk work files)
+- **Source block saving** for saving the text-only content of source subtitles in numbered block format for external text translation
+- **Loading external numbered translated lines** inserts translated lines with numbers from external sources into the corresponding numbered rows in the translation table (.mmm format text files. Can contain translations from source block saving that the program can insert into the workflow.)
+- **API key storage in encrypted form** This is not perfect security, but much better than storage without encryption. Protects against casual inspection: This method protects the API key from casual inspection (e.g., if someone just looks at the localStorage content), but a determined attacker who has access to the code and localStorage can still decrypt it.
+
+## Installation
+
+The application is a client-side web application that doesn't require traditional installation. Follow these steps to get started:
+
+1. **Download the application:**
+   - Clone this repository or download it as a ZIP file
+   - Extract the files to a folder on your computer
+
+2. **Open the application:**
+   - Open the `index.html` file in your web browser
+   - Alternatively, you can use a local web server to serve the files
+
+3. **For LM Studio integration:**
+   - Download and install LM Studio from [lmstudio.ai](https://lmstudio.ai/) or their GitHub repository
+   - Launch LM Studio and load a language model
+   - Start the local server in LM Studio (usually at http://localhost:1234)
+   - If you encounter CORS issues, see the troubleshooting section below
+
+4. **For ChatGPT integration:**
+   - Create an account on [OpenAI](https://openai.com/) if you don't have one
+   - Generate an API key in your OpenAI account
+   - Enter this API key in the application when prompted
+
+5. **Start using the application:**
+   - Select your preferred user interface language
+   - Choose the translation mode (LM Studio or ChatGPT)
+   - Load a subtitle file and start translating
+
+No additional installation or dependencies are required as all necessary libraries are included in the package.
+
+## User Guide
+
+1. **Selecting translation mode:**
+   - Choose the translation mode from the dropdown menu:
+     - **LM Studio (local)**: Use LM Studio model running on the local machine
+     - **ChatGPT (GPT-4o-mini)**: Use OpenAI GPT-4o-mini model
+     - **ChatGPT (GPT-4o)**: Use OpenAI GPT-4o model
+
+2. **Preparing LM Studio (if you selected LM Studio mode):**
+   - Install and start the LM Studio application on your machine
+   - Load an appropriate language model
+   - Start the local server (by default at http://localhost:1234)
+
+3. **Setting up ChatGPT API (if you selected ChatGPT mode):**
+   - Enter your OpenAI API key in the field that appears
+   - The API key is stored encrypted in your browser
+
+4. **Selecting the user interface language:**
+   - Click on the language selector button in the top right corner
+   - Select the desired language from the 30 available languages
+   - The user interface immediately updates in the selected language
+
+5. **Loading a subtitle file:**
+   - Open the webpage in your browser
+   - Click the "Browse" button and select a .srt extension subtitle file or a previously saved .wrk work file
+
+6. **Setting the translation freedom degree:**
+   - Use the slider to set the creativity of the translation
+   - Low value (0.1-0.7): Accurate, literal translation
+   - Medium value (0.7-1.3): Balanced, natural translation
+   - High value (1.3-2.0): Creative, freer translation
+
+7. **Selecting languages:**
+   - Select the source language (the language of the original subtitle)
+   - Select the target language (the desired translation language)
+
+8. **Starting translation:**
+   - Click the "Start Translation" button
+   - Wait for the program to translate all subtitles
+   - The progress is shown by the progress bar
+   - You can stop the translation at any time with the "Stop Translation" button
+
+9. **Editing translations:**
+   - Click on any translated text in the table to edit it
+   - Make the desired changes
+   - The changes are automatically saved when you click elsewhere
+   - Edited rows briefly flash green to indicate successful saving
+
+10. **Retranslating lines:**
+    - If you want to retranslate a line, click on the retranslate icon next to the line
+    - The retranslation is done using the selected translation mode and the set translation freedom degree
+
+11. **Saving the translation:**
+    - After completing the translation, click the "Save Translation" button
+    - The browser will download the new subtitle file, named as a combination of the original filename and the target language code
+
+12. **Saving and loading work files:**
+    - If you want to interrupt the translation and continue later, click the "Save Work File" button
+    - The browser will download a .wrk extension work file that contains all translation data
+    - Later you can load this file with the "Browse" button and continue the translation from where you left off
+
+13. **Saving source block:**
+    - Click the "Save Source Block" button
+    - The browser will download the text content of the source file with line numbers, divided into 50-line blocks
+    - This is a useful feature if you want to highlight or handle certain parts separately, or if you want to translate on other chat interfaces
+
+## System Requirements
+
+- Modern web browser (Chrome, Firefox, Edge, Safari)
+- For LM Studio mode: Running LM Studio application on the local machine (http://localhost:1234)
+- For ChatGPT mode: Valid OpenAI API key
+
+## Advanced Translation Features
+
+The application includes numerous advanced translation features for more accurate and consistent translations:
+
+### 1. Context-based Translation
+
+During translation, we not only send the current sentence to the AI but also provide context:
+
+- We also send the 4 sentences before the current sentence (if they exist)
+- We also send the 4 sentences after the current sentence (if they exist)
+- These context sentences help the AI better understand the textual environment
+- Especially useful in cases where the meaning of the sentence depends on the context
+- The expanded context significantly improves the quality of the translation, especially for longer dialogues and complex scenes
+
+### 2. Translation Memory
+
+The application uses a translation memory system to ensure consistency:
+
+- It stores already translated sentences and their translations
+- If the same sentence appears multiple times in the subtitle, it doesn't translate it again
+- Ensures consistency in the translation, especially for recurring expressions
+- The memory is separated by language pairs, so if we change the source or target language, a new memory is created
+
+### 3. Translation Freedom Degree (Temperature)
+
+Setting the translation freedom degree allows controlling the creativity of the translation:
+
+- **Low value (0.1-0.7)**: More accurate, literal translation with less creativity. Ideal for documents, technical texts.
+- **Medium value (0.7-1.3)**: Balanced translation that preserves the original meaning but uses more natural language.
+- **High value (1.3-2.0)**: More creative, freer translation that better adapts to the idioms of the target language. Ideal for literary texts, dialogues.
+
+### 4. Manual Editing
+
+Manual editing of translations allows for fine-tuning:
+
+- You can edit the translated text directly in the table
+- The changes are automatically saved to the translation memory
+- Edited rows briefly flash green to indicate successful saving
+- You don't need to retranslate the entire subtitle because of a few errors
+
+### 5. Saving and Loading Work Files
+
+The work file feature allows interrupting and later continuing the translation process:
+
+- The work file (.wrk) contains all translation data:
+  - Original and translated subtitles
+  - Current translation position
+  - Language settings
+  - Translation freedom degree
+  - Translation memory
+- You can save the work file at any time and continue the translation later
+- Especially useful for longer subtitle files, or if you want to do the translation in multiple sessions
+- After loading the work file, you can continue exactly where you left off
+
+### 6. Advanced Translation Prompt
+
+The translation prompt is designed to achieve the best possible result:
+
+- We give detailed instructions to the AI regarding the quality of the translation
+- We indicate that it's a movie subtitle, which helps the AI select the appropriate style
+- We request that the translation be natural and fluent while preserving the original meaning and style
+
+### 7. Automatic Text Cleaning
+
+During translation, we apply automatic cleaning steps:
+
+- Removes any quotation marks from the beginning and end of the translation
+- Removes code markings and formatting if the AI would return such
+- Ensures that the translated text is in the proper format for the subtitle file
+
+### 8. Multilingual User Interface
+
+The application's user interface is available in 30 different languages:
+
+- We can switch between languages with the language selector button in the top right corner
+- The selected language is stored in the browser, so it remains for the next visit
+- All functional labels, button texts, and warning messages are automatically updated according to the selected language
+
+## Troubleshooting
+
+- **Connection error to LM Studio:** Make sure LM Studio is running and the local server is started at http://localhost:1234
+- **Connection error to ChatGPT API:** Check that your API key is correct and you have sufficient credits
+- **Translation error:** Check the browser console for detailed error messages
+- **Slow translation:** The translation speed depends on the size of the language model used and the performance of the computer, or the response time of the ChatGPT API
+- **Inaccurate translation:** Try using a larger or more specialized language model, or set the translation freedom degree lower
+- **Editing not working:** If you have problems with editing, try refreshing the page or using a different browser
+- **Work file loading error:** Check that the work file format is correct and the file is not corrupted
+
+---------------------------------------------------------------------------------------------------------------------
+MAGYARNYELVŰ LEÍRÁS:
+
 # SRT Felirat Fordító
 
 Ez az alkalmazás egy egyszerű, de hatékony webes eszköz .srt formátumú feliratfájlok fordítására. A program a helyi gépen futó LM Studio mesterséges intelligencia modellt vagy a ChatGPT API-t használja a fordításhoz.
+
 
 ## Funkciók
 
@@ -19,6 +237,36 @@ Ez az alkalmazás egy egyszerű, de hatékony webes eszköz .srt formátumú fel
 - **Forrás blokk mentése** a forrás feliratok csak szöveges tartalmának sorszámozottblokk formátumban történő mentése külső szöveges fordításhoz.
 - **Külső sorszámozott fordított sorok betöltése** külső forrásból származó és sorszámmal ellátott fordított sorokat beilleszt a fordítás táblázat azonos sorszámú soraiba a program (.mmm formátumú szövegfájlok. A forrás blokkmentés fordításait tartalmazhatja, amit a program be tud illeszteni a munkafolyamatba.)
 - **API kulcs titkosított formában tárolása** Ez nem tökéletes biztonság, de sokkal jobb, mint a titkosítás nélküli tárolás. Véd a felületes vizsgálat ellen: Ez a módszer megvédi az API kulcsot a felületes vizsgálattól (pl. ha valaki csak megnézi a localStorage tartalmát), de egy elszánt támadó, aki hozzáfér a kódhoz és a localStorage-hoz, még mindig visszafejtheti.
+
+## Telepítés
+
+Az alkalmazás egy kliens-oldali webalkalmazás, amely nem igényel hagyományos telepítést. Kövesd ezeket a lépéseket a kezdéshez:
+
+1. **Az alkalmazás letöltése:**
+   - Klónozd ezt a repository-t vagy töltsd le ZIP fájlként
+   - Csomagold ki a fájlokat egy mappába a számítógépeden
+
+2. **Az alkalmazás megnyitása:**
+   - Nyisd meg az `index.html` fájlt a webböngésződben
+   - Alternatívaként használhatsz helyi webszervert a fájlok kiszolgálásához
+
+3. **LM Studio integrációhoz:**
+   - Töltsd le és telepítsd az LM Studio-t a [lmstudio.ai](https://lmstudio.ai/) oldalról vagy a GitHub repository-jukból
+   - Indítsd el az LM Studio-t és tölts be egy nyelvi modellt
+   - Indítsd el a helyi szervert az LM Studio-ban (általában a http://localhost:1234 címen)
+   - Ha CORS problémákba ütközöl, nézd meg a hibaelhárítás részt lentebb
+
+4. **ChatGPT integrációhoz:**
+   - Hozz létre egy fiókot az [OpenAI](https://openai.com/) oldalon, ha még nincs
+   - Generálj egy API kulcsot az OpenAI fiókodban
+   - Add meg ezt az API kulcsot az alkalmazásban, amikor kéri
+
+5. **Az alkalmazás használatának megkezdése:**
+   - Válaszd ki a kívánt felhasználói felület nyelvet
+   - Válaszd ki a fordítási módot (LM Studio vagy ChatGPT)
+   - Tölts be egy feliratfájlt és kezdd el a fordítást
+
+Nincs szükség további telepítésre vagy függőségekre, mivel minden szükséges könyvtár megtalálható a csomagban.
 
 ## Használati útmutató
 
