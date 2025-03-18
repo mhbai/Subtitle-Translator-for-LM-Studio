@@ -28,6 +28,7 @@ const uiTranslations = {
         
         // Gombok
         startTranslation: "Fordítás indítása",
+        continueTranslation: "Fordítás folytatása",
         stopTranslation: "Fordítás megállítása",
         resetTranslation: "Reset",
         saveTranslation: "Fordítás mentése",
@@ -47,6 +48,7 @@ const uiTranslations = {
         
         // Sikeres műveletek
         successTranslation: "A fordítás sikeresen befejeződött!",
+        translationCompleted: "A fordítás sikeresen befejeződött!",
         successLoadWorkFile: "Munkafájl sikeresen betöltve! A fordítás folytatható.",
         successSaveWorkFile: "Munkafájl sikeresen elmentve!",
         
@@ -93,6 +95,7 @@ const uiTranslations = {
         
         // Buttons
         startTranslation: "Start Translation",
+        continueTranslation: "Continue Translation",
         stopTranslation: "Stop Translation",
         resetTranslation: "Reset",
         saveTranslation: "Save Translation",
@@ -111,9 +114,10 @@ const uiTranslations = {
         translationStopped: "Translation Stopped",
         
         // Success messages
-        successTranslation: "Translation completed successfully!",
-        successLoadWorkFile: "Work file loaded successfully! You can continue the translation.",
-        successSaveWorkFile: "Work file saved successfully!",
+        successTranslation: "Translation successfully completed!",
+        translationCompleted: "Translation successfully completed!",
+        successLoadWorkFile: "Work file successfully loaded! You can continue the translation.",
+        successSaveWorkFile: "Work file successfully saved!",
         
         // Error messages
         errorNoFile: "Please select a file!",
@@ -149,10 +153,12 @@ const uiTranslations = {
         sourceLanguage: "Quellsprache",
         targetLanguage: "Zielsprache",
         startTranslation: "Übersetzung starten",
+        continueTranslation: "Übersetzung fortsetzen",
         stopTranslation: "Übersetzung stoppen",
         resetTranslation: "Zurücksetzen",
         saveTranslation: "Übersetzung speichern",
         saveWorkFile: "Arbeitsdatei speichern",
+        saveSourceBlock: "Quellblock speichern",
         originalSubtitle: "Originaler Untertitel",
         translatedSubtitle: "Übersetzter Text",
         actions: "Aktionen",
@@ -160,21 +166,19 @@ const uiTranslations = {
         translationProgress: "Übersetzungsfortschritt",
         translationComplete: "Übersetzung abgeschlossen",
         translationStopped: "Übersetzung gestoppt",
+        translationReset: "Übersetzung zurückgesetzt",
+        translationSaved: "Übersetzung gespeichert",
+        workFileSaved: "Arbeitsdatei gespeichert",
         successTranslation: "Übersetzung erfolgreich abgeschlossen!",
-        successLoadWorkFile: "Arbeitsdatei erfolgreich geladen! Sie können mit der Übersetzung fortfahren.",
+        translationCompleted: "Übersetzung erfolgreich abgeschlossen!",
+        successLoadWorkFile: "Arbeitsdatei erfolgreich geladen! Sie können die Übersetzung fortsetzen.",
         successSaveWorkFile: "Arbeitsdatei erfolgreich gespeichert!",
-        errorNoFile: "Bitte wählen Sie eine Datei aus!",
-        errorTranslationRunning: "Bitte stoppen Sie die Übersetzung, bevor Sie eine neue Datei laden!",
-        errorInvalidFile: "Es können nur .srt, .wrk oder .mmm Dateien geladen werden!",
-        errorNoSubtitles: "Die Datei enthält keine gültigen Untertitel!",
-        errorNoSrtFirst: "Bitte laden Sie zuerst eine .srt-Datei, bevor Sie eine .mmm-Datei laden!",
-        errorNoValidText: "Die Datei enthält keine gültigen Texte oder die Zeilennummern stimmen nicht mit den geladenen Untertiteln überein!",
-        errorNoTranslation: "Nichts zu speichern! Bitte übersetzen Sie zuerst die Untertitel.",
-        errorNoSubtitleToSave: "Keine Untertitel zum Speichern geladen!",
-        errorApiNotAvailable: "LM Studio API ist nicht verfügbar. Bitte überprüfen Sie, ob LM Studio im Hintergrund läuft.",
-        errorTranslation: "Bei der Übersetzung ist ein Fehler aufgetreten!",
-        errorRetranslation: "Bei der Neuübersetzung ist ein Fehler aufgetreten!",
-        errorLoadWorkFile: "Beim Laden der Arbeitsdatei ist ein Fehler aufgetreten. Bitte überprüfen Sie das Dateiformat!"
+        errorFileLoad: "Fehler beim Laden der Datei",
+        errorTranslation: "Fehler während der Übersetzung",
+        errorSave: "Fehler beim Speichern der Datei",
+        errorNoFile: "Bitte wählen Sie zuerst eine Datei aus",
+        errorInvalidFile: "Ungültiges Dateiformat",
+        errorServerConnection: "Verbindung zum LM Studio-Server nicht möglich"
     },
     
     // Español
@@ -189,36 +193,39 @@ const uiTranslations = {
         temperatureAccurate: "Preciso",
         temperatureBalanced: "Equilibrado",
         temperatureCreative: "Creativo",
-        languageTitle: "Idiomas",
+        languageTitle: "Modo de traducción",
+        translationModeTitle: "Modo de traducción",
+        apiKeyLabel: "Clave API",
+        showApiKeyButton: "Mostrar",
         sourceLanguage: "Idioma de origen",
         targetLanguage: "Idioma de destino",
         startTranslation: "Iniciar traducción",
+        continueTranslation: "Continuar traducción",
         stopTranslation: "Parar traducción",
         resetTranslation: "Reiniciar",
         saveTranslation: "Guardar traducción",
         saveWorkFile: "Guardar archivo de trabajo",
+        saveSourceBlock: "Guardar bloque de origen",
         originalSubtitle: "Subtítulo original",
         translatedSubtitle: "Texto traducido",
         actions: "Acciones",
         retranslate: "Retraducir",
-        translationProgress: "Progreso de la traducción",
-        translationComplete: "Traducción concluida",
-        translationStopped: "Traducción interrumpida",
-        successTranslation: "¡Traducción concluida con éxito!",
-        successLoadWorkFile: "¡Archivo de trabajo cargado con éxito! Puede continuar con la traducción.",
+        translationProgress: "Progreso de traducción",
+        translationComplete: "Traducción completada",
+        translationStopped: "Traducción detenida",
+        translationReset: "Traducción reiniciada",
+        translationSaved: "Traducción guardada",
+        workFileSaved: "Archivo de trabajo guardado",
+        successTranslation: "¡Traducción completada con éxito!",
+        translationCompleted: "¡Traducción completada con éxito!",
+        successLoadWorkFile: "¡Archivo de trabajo cargado con éxito! Puede continuar la traducción.",
         successSaveWorkFile: "¡Archivo de trabajo guardado con éxito!",
-        errorNoFile: "¡Por favor, seleccione un archivo!",
-        errorTranslationRunning: "¡Por favor, pare la traducción antes de cargar un nuevo archivo!",
-        errorInvalidFile: "¡Solo se pueden cargar archivos .srt, .wrk o .mmm!",
-        errorNoSubtitles: "¡El archivo no contiene subtítulos válidos!",
-        errorNoSrtFirst: "¡Por favor, cargue primero un archivo .srt antes de cargar un archivo .mmm!",
-        errorNoValidText: "¡El archivo no contiene textos válidos o los números de línea no coinciden con los subtítulos cargados!",
-        errorNoTranslation: "¡Nada que guardar! Por favor, traduzca los subtítulos primero.",
-        errorNoSubtitleToSave: "¡No hay subtítulos cargados para guardar!",
-        errorApiNotAvailable: "La API de LM Studio no está disponible. Por favor, compruebe si LM Studio está ejecutándose en segundo plano.",
-        errorTranslation: "¡Se produjo un error durante la traducción!",
-        errorRetranslation: "¡Se produjo un error durante la retraducción!",
-        errorLoadWorkFile: "¡Se produjo un error al cargar el archivo de trabajo. Por favor, compruebe el formato del archivo!"
+        errorFileLoad: "Error al cargar el archivo",
+        errorTranslation: "Error durante la traducción",
+        errorSave: "Error al guardar el archivo",
+        errorNoFile: "Por favor, seleccione un archivo primero",
+        errorInvalidFile: "Formato de archivo inválido",
+        errorServerConnection: "No se puede conectar al servidor LM Studio"
     },
     
     // Francia fordítás
@@ -284,7 +291,10 @@ const uiTranslations = {
         // Kártya címek
         fileUploadTitle: "Carica file sottotitoli",
         temperatureTitle: "Libertà di traduzione",
-        languageTitle: "Lingue",
+        languageTitle: "Modalità di traduzione",
+        translationModeTitle: "Modalità di traduzione",
+        apiKeyLabel: "Chiave API",
+        showApiKeyButton: "Mostra",
 
         // Hőmérséklet leírások
         temperatureAccurate: "Preciso",
@@ -297,10 +307,12 @@ const uiTranslations = {
 
         // Gombok
         startTranslation: "Avvia traduzione",
+        continueTranslation: "Continua traduzione",
         stopTranslation: "Ferma traduzione",
         resetTranslation: "Reimposta",
         saveTranslation: "Salva traduzione",
         saveWorkFile: "Salva file di lavoro",
+        saveSourceBlock: "Salva blocco di origine",
 
         // Táblázat fejlécek
         originalSubtitle: "Testo originale",
@@ -311,11 +323,16 @@ const uiTranslations = {
         retranslate: "Ritradurre",
 
         // Értesítések
+        translationProgress: "Progresso della traduzione",
         translationComplete: "Traduzione completata",
         translationStopped: "Traduzione interrotta",
         translationReset: "Traduzione reimpostata",
         translationSaved: "Traduzione salvata",
         workFileSaved: "File di lavoro salvato",
+        successTranslation: "Traduzione completata con successo!",
+        translationCompleted: "Traduzione completata con successo!",
+        successLoadWorkFile: "File di lavoro caricato con successo! Puoi continuare la traduzione.",
+        successSaveWorkFile: "File di lavoro salvato con successo!",
 
         // Egyéb üzenetek
         fileInfo: "righe",
