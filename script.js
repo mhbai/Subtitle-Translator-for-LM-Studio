@@ -1579,6 +1579,13 @@ NE használd a "${uniqueMarker}" vagy "${endMarker}" jelöléseket a válaszodba
                 console.log("Save workfile gomb szövege frissítve:", translations.saveWorkFile);
             }
             
+            // Forrás blokkmentése gomb frissítése
+            const saveSourceBlockBtn = document.getElementById('saveSourceBlockBtn');
+            if (saveSourceBlockBtn) {
+                saveSourceBlockBtn.innerHTML = `<i class="bi bi-file-earmark-text me-2"></i>${translations.saveSourceBlock}`;
+                console.log("Forrás blokkmentése gomb szövege frissítve:", translations.saveSourceBlock);
+            }
+            
             // Táblázat fejlécek
             if (originalHeader) {
                 originalHeader.textContent = translations.originalSubtitle;
@@ -1629,7 +1636,7 @@ NE használd a "${uniqueMarker}" vagy "${endMarker}" jelöléseket a válaszodba
         // Tooltipek inicializálása
         initTooltips();
     }
-    
+
     // Bootstrap tooltipek inicializálása
     function initTooltips() {
         // Meglévő tooltipek eltávolítása
