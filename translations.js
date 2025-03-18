@@ -18,8 +18,11 @@ const uiTranslations = {
         temperatureBalanced: "Kiegyensúlyozott",
         temperatureCreative: "Kreatív",
         
-        // Nyelvek
-        languageTitle: "Nyelvek",
+        // Fordítás módja és API kulcs
+        languageTitle: "Fordítás módja",
+        translationModeTitle: "Fordítás módja",
+        apiKeyLabel: "API kulcs",
+        showApiKeyButton: "Megjelenítés",
         sourceLanguage: "Forrásnyelv",
         targetLanguage: "Célnyelv",
         
@@ -80,8 +83,11 @@ const uiTranslations = {
         temperatureBalanced: "Balanced",
         temperatureCreative: "Creative",
         
-        // Languages
-        languageTitle: "Languages",
+        // Translation mode and API key
+        languageTitle: "Translation Mode",
+        translationModeTitle: "Translation Mode",
+        apiKeyLabel: "API Key",
+        showApiKeyButton: "Show",
         sourceLanguage: "Source Language",
         targetLanguage: "Target Language",
         
@@ -136,7 +142,10 @@ const uiTranslations = {
         temperatureAccurate: "Genau",
         temperatureBalanced: "Ausgewogen",
         temperatureCreative: "Kreativ",
-        languageTitle: "Sprachen",
+        languageTitle: "Übersetzungsmodus",
+        translationModeTitle: "Übersetzungsmodus",
+        apiKeyLabel: "API-Schlüssel",
+        showApiKeyButton: "Anzeigen",
         sourceLanguage: "Quellsprache",
         targetLanguage: "Zielsprache",
         startTranslation: "Übersetzung starten",

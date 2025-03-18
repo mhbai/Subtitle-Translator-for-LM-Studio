@@ -1053,6 +1053,20 @@ NE használd a "${uniqueMarker}" vagy "${endMarker}" jelöléseket a válaszodba
                 
             } catch (error) {
                 console.error('Fordítási hiba:', error);
+                
+                // Újrapróbálkozás hiba esetén, de csak korlátozott számú alkalommal
+                if (error.message.includes('429')) {
+                    console.log('Sebességkorlát-túllépés (429), várakozás 10 másodpercet...');
+                    alert('Az API sebességkorlát-túllépés miatt várakozunk 10 másodpercet, majd folytatjuk a fordítást.');
+                    
+                    // Várakozás 10 másodpercet
+                    await new Promise(resolve => setTimeout(resolve, 10000));
+                    
+                    // Visszalépünk egy indexet, hogy újra megpróbáljuk ezt a feliratot
+                    i--;
+                    continue;
+                }
+                
                 alert(`Hiba történt a fordítás során: ${error.message}`);
                 pauseTranslation();
                 break;
@@ -1182,12 +1196,12 @@ NE használd a "${uniqueMarker}" vagy "${endMarker}" jelöléseket a válaszodba
     }
 
     // Szöveg fordítása az LM Studio API-val (régi metódus, megtartva kompatibilitás miatt)
-    async function translateText(text, sourceLanguage, targetLanguage) {
+    async function translateText(text, sourceLang, targetLang) {
         return translateTextWithContext(
             [{ text: text }], // Egyetlen felirat
             0, // Az első (és egyetlen) elem indexe
-            sourceLanguage,
-            targetLanguage,
+            sourceLang,
+            targetLang,
             0, // Nincs újrapróbálkozás
             temperature
         );
@@ -1461,10 +1475,22 @@ NE használd a "${uniqueMarker}" vagy "${endMarker}" jelöléseket a válaszodba
                         cardTitle.textContent = translations.temperatureTitle;
                         break;
                     case 2:
+                        cardTitle.textContent = translations.translationModeTitle || translations.languageTitle;
+                        break;
+                    case 3:
                         cardTitle.textContent = translations.languageTitle;
                         break;
                 }
             });
+            
+            // API kulcs címke és gomb
+            const apiKeyLabel = document.querySelector('label[for="apiKey"]');
+            if (apiKeyLabel) apiKeyLabel.textContent = translations.apiKeyLabel || "API kulcs:";
+            
+            const showApiKeyBtn = document.getElementById('showApiKeyFieldBtn');
+            if (showApiKeyBtn) {
+                showApiKeyBtn.innerHTML = `<i class="bi bi-key"></i> ${translations.showApiKeyButton || "Megjelenítés"}`;
+            }
             
             // Hőmérséklet címkék
             const tempLabels = document.querySelectorAll('.form-range + div small');
