@@ -211,8 +211,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Fordítás vezérlése (indítás/folytatás)
     function handleTranslationControl() {
-        if (startTranslationBtn.textContent.includes('indítása') || 
-            startTranslationBtn.textContent.includes('folytatása')) {
+        // Ellenőrizzük, hogy a fordítás szüneteltetve van-e
+        if (!isTranslationRunning || isTranslationPaused) {
             isTranslationPaused = false;
             startTranslation();
         }
@@ -222,7 +222,14 @@ document.addEventListener('DOMContentLoaded', function() {
     function pauseTranslation() {
         isTranslationPaused = true;
         isTranslationRunning = false;
-        startTranslationBtn.innerHTML = '<i class="bi bi-play-circle me-2"></i>Fordítás folytatása';
+        
+        // A fordítás folytatása gomb szövegének beállítása az aktuális nyelven
+        if (typeof uiTranslations !== 'undefined' && uiTranslations[currentLangCode]) {
+            startTranslationBtn.innerHTML = `<i class="bi bi-play-circle me-2"></i>${uiTranslations[currentLangCode].continueTranslation}`;
+        } else {
+            startTranslationBtn.innerHTML = '<i class="bi bi-play-circle me-2"></i>Continue Translation';
+        }
+        
         startTranslationBtn.disabled = false;
         startTranslationBtn.classList.remove('d-none');
         stopTranslationBtn.classList.add('d-none');
@@ -246,8 +253,19 @@ document.addEventListener('DOMContentLoaded', function() {
         stopTranslationBtn.classList.add('d-none');
         resetTranslationBtn.classList.add('d-none');
         startTranslationBtn.classList.remove('d-none');
-        startTranslationBtn.innerHTML = '<i class="bi bi-translate me-2"></i>Fordítás indítása';
-        progressContainer.classList.add('d-none');
+        
+        // A fordítás indítása gomb szövegének beállítása az aktuális nyelven
+        if (typeof uiTranslations !== 'undefined' && uiTranslations[currentLangCode]) {
+            startTranslationBtn.innerHTML = `<i class="bi bi-translate me-2"></i>${uiTranslations[currentLangCode].startTranslation}`;
+        } else {
+            startTranslationBtn.innerHTML = '<i class="bi bi-translate me-2"></i>Start Translation';
+        }
+        
+        // Haladásjelző visszaállítása
+        progressBar.style.width = '0%';
+        progressBar.setAttribute('aria-valuenow', 0);
+        
+        // Mentés gombok letiltása
         saveTranslationBtn.disabled = true;
         saveWorkFileBtn.classList.add('d-none');
         
@@ -257,8 +275,6 @@ document.addEventListener('DOMContentLoaded', function() {
         // Fordítási állapot alaphelyzetbe állítása
         isTranslationPaused = false;
         currentTranslationIndex = 0;
-        startTranslationBtn.innerHTML = '<i class="bi bi-translate me-2"></i>Fordítás indítása';
-        stopTranslationBtn.classList.add('d-none');
         
         // Sor számok frissítése
         lineCountSpan.textContent = originalSubtitles.length;
@@ -354,7 +370,14 @@ document.addEventListener('DOMContentLoaded', function() {
             // Fordítási állapot alaphelyzetbe állítása
             isTranslationPaused = false;
             currentTranslationIndex = 0;
-            startTranslationBtn.innerHTML = '<i class="bi bi-translate me-2"></i>Fordítás indítása';
+            
+            // A fordítás indítása gomb szövegének beállítása az aktuális nyelven
+            if (typeof uiTranslations !== 'undefined' && uiTranslations[currentLangCode]) {
+                startTranslationBtn.innerHTML = `<i class="bi bi-translate me-2"></i>${uiTranslations[currentLangCode].startTranslation}`;
+            } else {
+                startTranslationBtn.innerHTML = '<i class="bi bi-translate me-2"></i>Start Translation';
+            }
+            
             stopTranslationBtn.classList.add('d-none');
             
             // Sor számok frissítése
@@ -964,6 +987,18 @@ NE használd a "${uniqueMarker}" vagy "${endMarker}" jelöléseket a válaszodba
                 // Táblázat frissítése
                 updateTranslatedText(i, translatedText.trim());
                 
+                // Fordítási memória frissítése
+                if (!translationMemory.translations) {
+                    translationMemory.translations = {};
+                }
+                translationMemory.translations[originalSubtitles[i].text] = translatedText.trim();
+                
+                // Mentés gomb engedélyezése
+                saveTranslationBtn.disabled = false;
+                
+                // Munkafájl mentés gomb megjelenítése
+                saveWorkFileBtn.classList.remove('d-none');
+                
                 // Újrafordítás gomb megjelenítése
                 const retranslateBtn = document.getElementById(`retranslate-${i}`);
                 if (retranslateBtn) {
@@ -972,12 +1007,6 @@ NE használd a "${uniqueMarker}" vagy "${endMarker}" jelöléseket a válaszodba
                 
                 // Görgetés az aktuális sorhoz
                 scrollToRow(i);
-                
-                // Mentés gomb engedélyezése
-                saveTranslationBtn.disabled = false;
-                
-                // Munkafájl mentés gomb megjelenítése
-                saveWorkFileBtn.classList.remove('d-none');
                 
                 // Késleltetés a következő API kérés előtt, hogy elkerüljük a sebességkorlát-túllépést
                 if (i < originalSubtitles.length - 1) {
@@ -1028,7 +1057,14 @@ NE használd a "${uniqueMarker}" vagy "${endMarker}" jelöléseket a válaszodba
             
             try {
                 // Fordítás végrehajtása
-                const translatedText = await translateTextWithContext(originalSubtitles, i, sourceLanguage, targetLanguage, 0, temperature);
+                const translatedText = await translateTextWithContext(
+                    originalSubtitles,
+                    i,
+                    sourceLanguage,
+                    targetLanguage,
+                    0,
+                    temperature
+                );
                 
                 // Fordított szöveg mentése
                 translatedSubtitles[i] = translatedText;
@@ -1054,7 +1090,7 @@ NE használd a "${uniqueMarker}" vagy "${endMarker}" jelöléseket a válaszodba
             } catch (error) {
                 console.error('Fordítási hiba:', error);
                 
-                // Újrapróbálkozás hiba esetén, de csak korlátozott számú alkalommal
+                // Ha sebességkorlát-túllépés (429) hiba, akkor várunk egy ideig és újra próbáljuk
                 if (error.message.includes('429')) {
                     console.log('Sebességkorlát-túllépés (429), várakozás 10 másodpercet...');
                     alert('Az API sebességkorlát-túllépés miatt várakozunk 10 másodpercet, majd folytatjuk a fordítást.');
@@ -1237,7 +1273,13 @@ NE használd a "${uniqueMarker}" vagy "${endMarker}" jelöléseket a válaszodba
         progressBar.setAttribute('aria-valuenow', 100);
         
         // Gombok állapotának beállítása
-        startTranslationBtn.innerHTML = '<i class="bi bi-translate me-2"></i>Fordítás indítása';
+        // A fordítás indítása gomb szövegének beállítása az aktuális nyelven
+        if (typeof uiTranslations !== 'undefined' && uiTranslations[currentLangCode]) {
+            startTranslationBtn.innerHTML = `<i class="bi bi-translate me-2"></i>${uiTranslations[currentLangCode].startTranslation}`;
+        } else {
+            startTranslationBtn.innerHTML = '<i class="bi bi-translate me-2"></i>Start Translation';
+        }
+        
         startTranslationBtn.disabled = false;
         startTranslationBtn.classList.remove('d-none');
         stopTranslationBtn.classList.add('d-none');
@@ -1246,7 +1288,11 @@ NE használd a "${uniqueMarker}" vagy "${endMarker}" jelöléseket a válaszodba
         isTranslationRunning = false;
         
         // Értesítés a fordítás befejezéséről
-        alert('A fordítás sikeresen befejeződött!');
+        if (typeof uiTranslations !== 'undefined' && uiTranslations[currentLangCode]) {
+            alert(uiTranslations[currentLangCode].translationCompleted || 'A fordítás sikeresen befejeződött!');
+        } else {
+            alert('Translation completed successfully!');
+        }
     }
 
     // Fordítás mentése
