@@ -29,6 +29,7 @@ const uiTranslations = {
         resetTranslation: "Reset",
         saveTranslation: "Fordítás mentése",
         saveWorkFile: "Munkafájl mentése",
+        saveSourceBlock: "Forrás blokkmentése",
         
         // Táblázat
         originalSubtitle: "Eredeti felirat",
@@ -90,6 +91,7 @@ const uiTranslations = {
         resetTranslation: "Reset",
         saveTranslation: "Save Translation",
         saveWorkFile: "Save Work File",
+        saveSourceBlock: "Save Source Block",
         
         // Table
         originalSubtitle: "Original Subtitle",

@@ -39,6 +39,7 @@ let fileInputLabel; // A fájl input labeljét tároló változó
 let translationModeSelect;
 let apiKeyContainer;
 let apiKeyInput;
+let saveSourceBlockBtn; // Forrás blokkmentése gomb
 
 // DOM elemek
 document.addEventListener('DOMContentLoaded', function() {
@@ -71,6 +72,7 @@ document.addEventListener('DOMContentLoaded', function() {
     translationModeSelect = document.getElementById('translationMode');
     apiKeyContainer = document.getElementById('apiKeyContainer');
     apiKeyInput = document.getElementById('apiKey');
+    saveSourceBlockBtn = document.getElementById('saveSourceBlockBtn'); // Forrás blokkmentése gomb inicializálása
     
     console.log("DOM elemek betöltve:", {
         startTranslationBtn: !!startTranslationBtn,
@@ -259,6 +261,13 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Sor számok frissítése
             lineCountSpan.textContent = originalSubtitles.length;
+            
+            // Forrás blokkmentése gomb megjelenítése
+            if (saveSourceBlockBtn) {
+                saveSourceBlockBtn.classList.remove('d-none');
+            } else {
+                createSaveSourceBlockButton();
+            }
         };
         
         reader.readAsText(file);
@@ -820,7 +829,7 @@ NE használd a "${uniqueMarker}" vagy "${endMarker}" jelöléseket a válaszodba
                     return languages[languageCode] || languageCode;
                 }
                 
-                // Fordítás végrehajtása kontextussal és egyedi rendszerüzenettel
+                // Fordítás végrehajtása
                 const translatedText = await translateWithChatGptCustomPrompt(contextText, systemPrompt, apiKey, model, temperature);
                 
                 // Fordított szöveg mentése
@@ -1718,4 +1727,74 @@ async function translateWithChatGptCustomPrompt(text, systemPrompt, apiKey, mode
         
         throw error;
     }
+}
+
+// Forrás blokkmentése gomb létrehozása
+function createSaveSourceBlockButton() {
+    const saveTranslationBtn = document.getElementById('saveTranslation');
+    
+    // Ha már létezik a gomb, csak megjelenítjük
+    let saveSourceBlockBtn = document.getElementById('saveSourceBlockBtn');
+    if (saveSourceBlockBtn) {
+        saveSourceBlockBtn.classList.remove('d-none');
+        console.log('Gomb már létezik, megjelenítve.'); // Debug üzenet
+        return saveSourceBlockBtn;
+    }
+    
+    // Különben létrehozzuk a gombot
+    saveSourceBlockBtn = document.createElement('button');
+    saveSourceBlockBtn.id = 'saveSourceBlockBtn';
+    saveSourceBlockBtn.className = 'btn btn-warning me-2';
+    saveSourceBlockBtn.innerHTML = '<i class="bi bi-file-earmark-text me-2"></i>' + (uiTranslations[currentLangCode]?.saveSourceBlock || 'Forrás blokkmentése');
+    saveSourceBlockBtn.onclick = saveSourceBlock;
+    
+    // Beszúrjuk a Fordítás mentése gomb elé
+    if (saveTranslationBtn && saveTranslationBtn.parentNode) {
+        saveTranslationBtn.parentNode.insertBefore(saveSourceBlockBtn, saveTranslationBtn);
+        console.log('Gomb létrehozva és beszúrva a DOM-ba.'); // Debug üzenet
+    } else {
+        console.error('saveTranslation vagy annak szülőeleme nem található!');
+    }
+    
+    return saveSourceBlockBtn;
+}
+
+// Forrás szöveg blokkokba mentése
+function saveSourceBlock() {
+    if (!originalSubtitles || originalSubtitles.length === 0) {
+        alert(uiTranslations[currentLangCode]?.errorNoSubtitleToSave || 'Nincs betöltött felirat a mentéshez!');
+        return;
+    }
+    
+    // Blokkos szöveg összeállítása
+    let blockText = '';
+    for (let i = 0; i < originalSubtitles.length; i++) {
+        // Sorszám és szöveg hozzáadása
+        blockText += (i + 1) + '. ' + originalSubtitles[i].text + '\n';
+        
+        // Minden 50. sor után 5 üres sor
+        if ((i + 1) % 50 === 0) {
+            blockText += '\n\n\n\n\n';
+        }
+    }
+    
+    // Fájl létrehozása és letöltése
+    const newFileName = fileName.replace('.srt', '_block.txt');
+    
+    // Blob létrehozása és letöltés
+    const blob = new Blob([blockText], { type: 'text/plain;charset=utf-8' });
+    downloadTextFile(blockText, newFileName);
+}
+
+// Szövegfájl letöltése
+function downloadTextFile(text, fileName) {
+    const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = fileName;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
 }
