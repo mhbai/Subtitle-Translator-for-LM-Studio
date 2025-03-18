@@ -85,6 +85,25 @@ document.addEventListener('DOMContentLoaded', function() {
     // Nyelvválasztó inicializálása
     initLanguageSelector();
     
+    // Mentett fordítási mód betöltése
+    const savedTranslationMode = localStorage.getItem('translationMode');
+    if (savedTranslationMode && (savedTranslationMode === 'lm_studio_local' || 
+                               savedTranslationMode === 'chatgpt_4o_mini' || 
+                               savedTranslationMode === 'chatgpt_4o')) {
+        translationModeSelect.value = savedTranslationMode;
+        
+        // Ha ChatGPT mód van elmentve, akkor betöltjük az API kulcsot is
+        if (savedTranslationMode === 'chatgpt_4o_mini' || savedTranslationMode === 'chatgpt_4o') {
+            apiKeyContainer.classList.remove('d-none');
+            
+            // Mentett API kulcs betöltése
+            const savedApiKey = localStorage.getItem('apiKey');
+            if (savedApiKey) {
+                apiKeyInput.value = savedApiKey;
+            }
+        }
+    }
+    
     // Eseménykezelők hozzáadása
     srtFileInput.addEventListener('change', handleFileSelect);
     startTranslationBtn.addEventListener('click', handleTranslationControl);
@@ -95,6 +114,15 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Fordítás módjának eseménykezelője
     translationModeSelect.addEventListener('change', handleTranslationModeChange);
+    
+    // API kulcs változásának figyelése és mentése
+    apiKeyInput.addEventListener('change', function() {
+        // API kulcs mentése a localStorage-ba
+        if (apiKeyInput.value.trim() !== '') {
+            localStorage.setItem('apiKey', apiKeyInput.value);
+            console.log('API kulcs elmentve a localStorage-ba');
+        }
+    });
     
     // Temperature csúszka eseménykezelő
     temperatureSlider.addEventListener('input', function() {
@@ -628,7 +656,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Fordítási mód ellenőrzése
         const selectedMode = translationModeSelect.value;
         const apiKey = apiKeyInput.value;
-        
+
         try {
             let translatedText = '';
             
@@ -1488,10 +1516,19 @@ function handleTranslationModeChange() {
     const selectedMode = translationModeSelect.value;
     if (selectedMode === 'chatgpt_4o_mini' || selectedMode === 'chatgpt_4o') {
         apiKeyContainer.classList.remove('d-none');
+        
+        // Ha van mentett API kulcs, betöltjük
+        const savedApiKey = localStorage.getItem('apiKey');
+        if (savedApiKey) {
+            apiKeyInput.value = savedApiKey;
+        }
     } else {
         apiKeyContainer.classList.add('d-none');
         apiKeyInput.value = '';
     }
+    
+    // Mentjük a kiválasztott fordítási módot
+    localStorage.setItem('translationMode', selectedMode);
 }
 
 // Fordítási függvények
