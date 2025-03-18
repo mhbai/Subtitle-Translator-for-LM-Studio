@@ -625,16 +625,44 @@ document.addEventListener('DOMContentLoaded', function() {
         // Hőmérséklet beállítás
         const temperature = parseFloat(temperatureSlider.value);
         
+        // Fordítási mód ellenőrzése
+        const selectedMode = translationModeSelect.value;
+        const apiKey = apiKeyInput.value;
+        
         try {
-            // Fordítás végrehajtása
-            const translatedText = await translateTextWithContext(
-                originalSubtitles,
-                index,
-                sourceLanguage,
-                targetLanguage,
-                0,
-                temperature
-            );
+            let translatedText = '';
+            
+            // A kiválasztott fordítási mód alapján hívjuk meg a megfelelő fordítási függvényt
+            if (selectedMode === 'chatgpt_4o_mini' || selectedMode === 'chatgpt_4o') {
+                // Ellenőrizzük, hogy van-e API kulcs
+                if (!apiKey) {
+                    alert(uiTranslations[currentLangCode]?.errorNoApiKey || 'Kérjük, adja meg az API kulcsot a ChatGPT használatához!');
+                    return;
+                }
+                
+                // ChatGPT modell kiválasztása
+                const model = selectedMode === 'chatgpt_4o_mini' ? 'gpt-4o-mini' : 'gpt-4o';
+                
+                // ChatGPT fordítás
+                translatedText = await translateWithChatGpt(
+                    originalSubtitles[index].text,
+                    sourceLanguage,
+                    targetLanguage,
+                    apiKey,
+                    model,
+                    temperature
+                );
+            } else {
+                // LM Studio fordítás
+                translatedText = await translateTextWithContext(
+                    originalSubtitles,
+                    index,
+                    sourceLanguage,
+                    targetLanguage,
+                    0,
+                    temperature
+                );
+            }
             
             // Fordított szöveg mentése
             translatedSubtitles[index] = translatedText;
