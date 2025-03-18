@@ -41,7 +41,59 @@ let apiKeyContainer;
 let apiKeyInput;
 let saveSourceBlockBtn; // Forrás blokkmentése gomb
 
-// DOM elemek
+// API kulcs titkosítási funkciók
+// Titkosító kulcs (alkalmazás-specifikus konstans)
+const encryptionKey = "SRT_Felirat_Fordito_App_Secret_Key";
+
+// API kulcs titkosítása
+function encryptApiKey(apiKey) {
+    return CryptoJS.AES.encrypt(apiKey, encryptionKey).toString();
+}
+
+// Titkosított API kulcs visszafejtése
+function decryptApiKey(encryptedApiKey) {
+    try {
+        const bytes = CryptoJS.AES.decrypt(encryptedApiKey, encryptionKey);
+        const decryptedKey = bytes.toString(CryptoJS.enc.Utf8);
+        
+        // Ellenőrizzük, hogy sikerült-e a visszafejtés
+        if (decryptedKey) {
+            return decryptedKey;
+        }
+        return null;
+    } catch (error) {
+        console.error('Hiba történt az API kulcs visszafejtése során:', error);
+        return null;
+    }
+}
+
+// API kulcs mentése titkosítva
+function saveApiKey(apiKey) {
+    try {
+        const encryptedKey = encryptApiKey(apiKey);
+        localStorage.setItem('encryptedApiKey', encryptedKey);
+        console.log('API kulcs titkosítva elmentve a localStorage-ba');
+        return true;
+    } catch (error) {
+        console.error('Hiba történt az API kulcs mentése során:', error);
+        return false;
+    }
+}
+
+// Titkosított API kulcs betöltése
+function loadApiKey() {
+    try {
+        const encryptedKey = localStorage.getItem('encryptedApiKey');
+        if (encryptedKey) {
+            return decryptApiKey(encryptedKey);
+        }
+        return null;
+    } catch (error) {
+        console.error('Hiba történt az API kulcs betöltése során:', error);
+        return null;
+    }
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     console.log("DOM betöltve, elemek inicializálása");
     
@@ -97,7 +149,7 @@ document.addEventListener('DOMContentLoaded', function() {
             apiKeyContainer.classList.remove('d-none');
             
             // Mentett API kulcs betöltése
-            const savedApiKey = localStorage.getItem('apiKey');
+            const savedApiKey = loadApiKey();
             if (savedApiKey) {
                 apiKeyInput.value = savedApiKey;
             }
@@ -117,10 +169,10 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // API kulcs változásának figyelése és mentése
     apiKeyInput.addEventListener('change', function() {
-        // API kulcs mentése a localStorage-ba
+        // API kulcs mentése a localStorage-ba titkosítva
         if (apiKeyInput.value.trim() !== '') {
-            localStorage.setItem('apiKey', apiKeyInput.value);
-            console.log('API kulcs elmentve a localStorage-ba');
+            saveApiKey(apiKeyInput.value);
+            console.log('API kulcs titkosítva elmentve a localStorage-ba');
         }
     });
     
@@ -1518,7 +1570,7 @@ function handleTranslationModeChange() {
         apiKeyContainer.classList.remove('d-none');
         
         // Ha van mentett API kulcs, betöltjük
-        const savedApiKey = localStorage.getItem('apiKey');
+        const savedApiKey = loadApiKey();
         if (savedApiKey) {
             apiKeyInput.value = savedApiKey;
         }
