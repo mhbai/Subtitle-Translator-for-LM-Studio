@@ -104,7 +104,12 @@
                         </div>
                         <div class="mb-3 d-none" id="apiKeyContainer">
                             <label for="apiKey" class="form-label">API kulcs:</label>
-                            <input type="text" class="form-control bg-dark text-light border-secondary" id="apiKey" placeholder="Adja meg az API kulcsot">
+                            <div class="input-group">
+                                <input type="password" class="form-control bg-dark text-light border-secondary" id="apiKey" placeholder="Adja meg az API kulcsot">
+                                <button class="btn btn-outline-secondary" type="button" id="toggleApiKeyVisibility" title="API kulcs megjelenítése/elrejtése">
+                                    <i class="bi bi-eye" id="apiKeyVisibilityIcon"></i>
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>

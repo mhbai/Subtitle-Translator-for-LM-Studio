@@ -40,6 +40,8 @@ let translationModeSelect;
 let apiKeyContainer;
 let apiKeyInput;
 let saveSourceBlockBtn; // Forrás blokkmentése gomb
+let toggleApiKeyVisibilityBtn; // API kulcs láthatóság kapcsoló gomb
+let apiKeyVisibilityIcon; // API kulcs láthatóság ikon
 
 // API kulcs titkosítási funkciók
 // Titkosító kulcs (alkalmazás-specifikus konstans)
@@ -125,6 +127,8 @@ document.addEventListener('DOMContentLoaded', function() {
     apiKeyContainer = document.getElementById('apiKeyContainer');
     apiKeyInput = document.getElementById('apiKey');
     saveSourceBlockBtn = document.getElementById('saveSourceBlockBtn'); // Forrás blokkmentése gomb inicializálása
+    toggleApiKeyVisibilityBtn = document.getElementById('toggleApiKeyVisibility'); // API kulcs láthatóság kapcsoló gomb
+    apiKeyVisibilityIcon = document.getElementById('apiKeyVisibilityIcon'); // API kulcs láthatóság ikon
     
     console.log("DOM elemek betöltve:", {
         startTranslationBtn: !!startTranslationBtn,
@@ -175,6 +179,11 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log('API kulcs titkosítva elmentve a localStorage-ba');
         }
     });
+    
+    // API kulcs láthatóság kapcsoló gomb eseménykezelője
+    if (toggleApiKeyVisibilityBtn) {
+        toggleApiKeyVisibilityBtn.addEventListener('click', toggleApiKeyVisibility);
+    }
     
     // Temperature csúszka eseménykezelő
     temperatureSlider.addEventListener('input', function() {
@@ -1573,6 +1582,7 @@ function handleTranslationModeChange() {
         const savedApiKey = loadApiKey();
         if (savedApiKey) {
             apiKeyInput.value = savedApiKey;
+            apiKeyInput.type = 'password';
         }
     } else {
         apiKeyContainer.classList.add('d-none');
@@ -1581,6 +1591,19 @@ function handleTranslationModeChange() {
     
     // Mentjük a kiválasztott fordítási módot
     localStorage.setItem('translationMode', selectedMode);
+}
+
+// API kulcs láthatóság kapcsolása
+function toggleApiKeyVisibility() {
+    if (apiKeyInput.type === 'password') {
+        apiKeyInput.type = 'text';
+        apiKeyVisibilityIcon.classList.remove('bi-eye');
+        apiKeyVisibilityIcon.classList.add('bi-eye-slash');
+    } else {
+        apiKeyInput.type = 'password';
+        apiKeyVisibilityIcon.classList.remove('bi-eye-slash');
+        apiKeyVisibilityIcon.classList.add('bi-eye');
+    }
 }
 
 // Fordítási függvények
