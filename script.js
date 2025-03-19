@@ -540,12 +540,13 @@ document.addEventListener('DOMContentLoaded', function() {
             if (line === '') continue;
             
             // Ellenőrizzük, hogy a sor egy sorszámmal kezdődik-e
-            const match = line.match(/^(\d+)\s+(.*)/);
+            // Módosított regex, ami kezeli a sorszám utáni pontot is (opcionális)
+            const match = line.match(/^(\d+)(?:\.|\s+)(.*)/);
             
             if (match) {
                 // Sorszám és szöveg kinyerése
                 const subtitleNumber = parseInt(match[1]);
-                const text = match[2];
+                const text = match[2].trim(); // Trimeljük a szöveget, hogy eltávolítsuk a felesleges szóközöket
                 
                 // Ha új sorszám, akkor az előző szöveget elmentjük
                 if (currentLineNumber !== -1 && currentLineNumber !== subtitleNumber) {
