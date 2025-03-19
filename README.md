@@ -213,7 +213,7 @@ The application's user interface is available in 30 different languages:
 - **Work file loading error:** Check that the work file format is correct and the file is not corrupted
 
 ---------------------------------------------------------------------------------------------------------------------
-MAGYARNYELVŰ LEÍRÁS:
+MAGYAR NYELVŰ LEÍRÁS:
 
 # SRT Felirat Fordító
 
