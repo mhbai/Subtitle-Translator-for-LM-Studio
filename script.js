@@ -1116,6 +1116,9 @@ NE használd a "${uniqueMarker}" vagy "${endMarker}" jelöléseket a válaszodba
             // Kontextus összeállítása (előző és következő mondatok)
             const currentSubtitle = subtitles[currentIndex].text;
             
+            // Kontextus változó inicializálása
+            let context = "";
+            
             // Előző mondatok hozzáadása a kontextushoz (max 4)
             for (let i = 1; i <= 4; i++) {
                 if (currentIndex - i >= 0) {
