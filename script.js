@@ -1326,7 +1326,17 @@ NE használd a "${uniqueMarker}" vagy "${endMarker}" jelöléseket a válaszodba
         
         // Fájl létrehozása és letöltése
         const targetLangCode = targetLanguageSelect.value;
-        const newFileName = fileName.replace('.srt', `-${targetLangCode}.srt`);
+let newFileName;
+
+// Ellenőrizzük a fájl kiterjesztését
+if (fileName.toLowerCase().endsWith('.wrk') || fileName.toLowerCase().endsWith('.mmm')) {
+    // .wrk vagy .mmm fájlok esetén: "Translated subtitles" + célnyelv kódja + .srt
+    newFileName = `Translated subtitles-${targetLangCode}.srt`;
+} else {
+    // .srt fájlok esetén marad az eredeti logika: Eredeti fájlnév + célnyelv kódja + .srt
+    newFileName = fileName.replace('.srt', `-${targetLangCode}.srt`);
+}
+        
         
         // Blob létrehozása és letöltés
         const blob = new Blob([srtContent], { type: 'text/plain;charset=utf-8' });
