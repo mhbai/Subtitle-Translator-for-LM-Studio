@@ -17,7 +17,7 @@ const ko = {
     temperatureCreative: "창의적",
     
     // Translation mode and API key
-    languageTitle: "번역 모드",
+    languageTitle: "번역",
     translationModeTitle: "번역 모드",
     apiKeyLabel: "API 키",
     showApiKeyButton: "표시",

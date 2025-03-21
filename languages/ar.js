@@ -17,8 +17,8 @@ const ar = {
     temperatureCreative: "إبداعية",
     
     // Translation mode and API key
-    languageTitle: "طريقة الترجمة",
-    translationModeTitle: "طريقة الترجمة",
+    languageTitle: "الترجمة",
+    translationModeTitle: "وضع الترجمة",
     apiKeyLabel: "مفتاح API",
     showApiKeyButton: "عرض",
     sourceLanguage: "اللغة المصدر",

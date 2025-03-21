@@ -17,8 +17,8 @@ const uk = {
     temperatureCreative: "Творчий",
     
     // Translation mode and API key
-    languageTitle: "Спосіб перекладу",
-    translationModeTitle: "Спосіб перекладу",
+    languageTitle: "Переклад",
+    translationModeTitle: "Режим перекладу",
     apiKeyLabel: "API ключ",
     showApiKeyButton: "Показати",
     sourceLanguage: "Вихідна мова",

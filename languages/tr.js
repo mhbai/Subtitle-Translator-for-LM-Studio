@@ -17,8 +17,8 @@ const tr = {
     temperatureCreative: "Yaratıcı",
     
     // Translation mode and API key
-    languageTitle: "Çeviri Modu",
-    translationModeTitle: "Çeviri Modu",
+    languageTitle: "Çeviri",
+    translationModeTitle: "Çeviri modu",
     apiKeyLabel: "API Anahtarı",
     showApiKeyButton: "Göster",
     sourceLanguage: "Kaynak Dil",

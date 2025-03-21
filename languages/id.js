@@ -17,7 +17,7 @@ const id = {
     temperatureCreative: "Kreatif",
     
     // Translation mode and API key
-    languageTitle: "Mode Terjemahan",
+    languageTitle: "Terjemahan",
     translationModeTitle: "Mode Terjemahan",
     apiKeyLabel: "Kunci API",
     showApiKeyButton: "Tampilkan",

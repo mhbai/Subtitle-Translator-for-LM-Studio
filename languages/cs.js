@@ -17,8 +17,8 @@ const cs = {
     temperatureCreative: "Kreativní",
     
     // Translation mode and API key
-    languageTitle: "Způsob překladu",
-    translationModeTitle: "Způsob překladu",
+    languageTitle: "Překlad",
+    translationModeTitle: "Režim překladu",
     apiKeyLabel: "API klíč",
     showApiKeyButton: "Zobrazit",
     sourceLanguage: "Zdrojový jazyk",

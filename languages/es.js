@@ -17,7 +17,7 @@ const es = {
     temperatureCreative: "Creativo",
     
     // Translation mode and API key
-    languageTitle: "Modo de traducción",
+    languageTitle: "Traducción",
     translationModeTitle: "Modo de traducción",
     apiKeyLabel: "Clave API",
     showApiKeyButton: "Mostrar",

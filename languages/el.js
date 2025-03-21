@@ -17,8 +17,8 @@ const el = {
     temperatureCreative: "Δημιουργική",
     
     // Translation mode and API key
-    languageTitle: "Τρόπος μετάφρασης",
-    translationModeTitle: "Τρόπος μετάφρασης",
+    languageTitle: "Μετάφραση",
+    translationModeTitle: "Λειτουργία μετάφρασης",
     apiKeyLabel: "Κλειδί API",
     showApiKeyButton: "Εμφάνιση",
     sourceLanguage: "Γλώσσα προέλευσης",

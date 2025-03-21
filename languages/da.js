@@ -17,7 +17,7 @@ const da = {
     temperatureCreative: "Kreativ",
     
     // Translation mode and API key
-    languageTitle: "Oversættelsestilstand",
+    languageTitle: "Oversættelse",
     translationModeTitle: "Oversættelsestilstand",
     apiKeyLabel: "API-nøgle",
     showApiKeyButton: "Vis",

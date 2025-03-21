@@ -17,7 +17,7 @@ const sv = {
     temperatureCreative: "Kreativ",
     
     // Translation mode and API key
-    languageTitle: "Översättningsläge",
+    languageTitle: "Översättning",
     translationModeTitle: "Översättningsläge",
     apiKeyLabel: "API-nyckel",
     showApiKeyButton: "Visa",

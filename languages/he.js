@@ -17,8 +17,8 @@ const he = {
     temperatureCreative: "יצירתי",
     
     // Translation mode and API key
-    languageTitle: "אופן תרגום",
-    translationModeTitle: "אופן תרגום",
+    languageTitle: "תרגום",
+    translationModeTitle: "מצב תרגום",
     apiKeyLabel: "מפתח API",
     showApiKeyButton: "הצג",
     sourceLanguage: "שפת מקור",

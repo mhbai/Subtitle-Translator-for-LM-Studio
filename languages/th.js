@@ -17,7 +17,7 @@ const th = {
     temperatureCreative: "สร้างสรรค์",
     
     // Translation mode and API key
-    languageTitle: "โหมดการแปล",
+    languageTitle: "การแปล",
     translationModeTitle: "โหมดการแปล",
     apiKeyLabel: "คีย์ API",
     showApiKeyButton: "แสดง",

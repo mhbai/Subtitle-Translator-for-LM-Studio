@@ -17,7 +17,7 @@ const ja = {
     temperatureCreative: "創造的",
     
     // Translation mode and API key
-    languageTitle: "翻訳モード",
+    languageTitle: "翻訳",
     translationModeTitle: "翻訳モード",
     apiKeyLabel: "APIキー",
     showApiKeyButton: "表示",

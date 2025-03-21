@@ -17,7 +17,7 @@ const zh = {
     temperatureCreative: "创意",
     
     // Translation mode and API key
-    languageTitle: "翻译模式",
+    languageTitle: "翻译",
     translationModeTitle: "翻译模式",
     apiKeyLabel: "API密钥",
     showApiKeyButton: "显示",

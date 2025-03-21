@@ -17,7 +17,7 @@ const nl = {
     temperatureCreative: "Creatief",
     
     // Translation mode and API key
-    languageTitle: "Vertaalmodus",
+    languageTitle: "Vertaling",
     translationModeTitle: "Vertaalmodus",
     apiKeyLabel: "API-sleutel",
     showApiKeyButton: "Tonen",

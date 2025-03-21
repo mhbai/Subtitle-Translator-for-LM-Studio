@@ -17,7 +17,7 @@ const bg = {
     temperatureCreative: "Творчески",
     
     // Translation mode and API key
-    languageTitle: "Начин на превод",
+    languageTitle: "Превод",
     translationModeTitle: "Начин на превод",
     apiKeyLabel: "API ключ",
     showApiKeyButton: "Покажи",

@@ -17,7 +17,7 @@ const fi = {
     temperatureCreative: "Luova",
     
     // Translation mode and API key
-    languageTitle: "Käännöstila",
+    languageTitle: "Käännös",
     translationModeTitle: "Käännöstila",
     apiKeyLabel: "API-avain",
     showApiKeyButton: "Näytä",

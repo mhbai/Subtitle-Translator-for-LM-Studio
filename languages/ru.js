@@ -17,7 +17,7 @@ const ru = {
     temperatureCreative: "Творческий",
     
     // Translation mode and API key
-    languageTitle: "Режим перевода",
+    languageTitle: "Перевод",
     translationModeTitle: "Режим перевода",
     apiKeyLabel: "API ключ",
     showApiKeyButton: "Показать",

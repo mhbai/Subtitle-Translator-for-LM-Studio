@@ -17,7 +17,7 @@ const vi = {
     temperatureCreative: "Sáng tạo",
     
     // Translation mode and API key
-    languageTitle: "Chế độ dịch",
+    languageTitle: "Dịch thuật",
     translationModeTitle: "Chế độ dịch",
     apiKeyLabel: "Khóa API",
     showApiKeyButton: "Hiển thị",

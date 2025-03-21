@@ -17,7 +17,7 @@ const hu = {
     temperatureCreative: "Kreatív",
     
     // Fordítás módja és API kulcs
-    languageTitle: "Fordítás módja",
+    languageTitle: "Fordítás",
     translationModeTitle: "Fordítás módja",
     apiKeyLabel: "API kulcs",
     showApiKeyButton: "Megjelenítés",

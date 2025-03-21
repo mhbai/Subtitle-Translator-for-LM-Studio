@@ -17,7 +17,7 @@ const ro = {
     temperatureCreative: "Creativă",
     
     // Translation mode and API key
-    languageTitle: "Modul de traducere",
+    languageTitle: "Traducere",
     translationModeTitle: "Modul de traducere",
     apiKeyLabel: "Cheie API",
     showApiKeyButton: "Arată",

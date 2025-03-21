@@ -17,7 +17,7 @@ const no = {
     temperatureCreative: "Kreativ",
     
     // Translation mode and API key
-    languageTitle: "Oversettelsesmodus",
+    languageTitle: "Oversettelse",
     translationModeTitle: "Oversettelsesmodus",
     apiKeyLabel: "API-nøkkel",
     showApiKeyButton: "Vis",

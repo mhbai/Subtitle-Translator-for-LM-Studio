@@ -17,8 +17,8 @@ const hi = {
     temperatureCreative: "रचनात्मक",
     
     // Translation mode and API key
-    languageTitle: "अनुवाद का तरीका",
-    translationModeTitle: "अनुवाद का तरीका",
+    languageTitle: "अनुवाद",
+    translationModeTitle: "अनुवाद मोड",
     apiKeyLabel: "API कुंजी",
     showApiKeyButton: "दिखाएँ",
     sourceLanguage: "स्रोत भाषा",
