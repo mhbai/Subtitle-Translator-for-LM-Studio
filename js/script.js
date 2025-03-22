@@ -1405,7 +1405,7 @@ if (fileName.toLowerCase().endsWith('.wrk') || fileName.toLowerCase().endsWith('
             // Főcím
             const mainTitle = document.querySelector('h1.display-5');
             if (mainTitle) {
-                mainTitle.innerHTML = `<i class="bi bi-translate me-2"></i>${translations.appTitle} <small class="fs-6 text-secondary">version 1.0</small>`;
+                mainTitle.innerHTML = `<i class="bi bi-translate me-2"></i>${translations.appTitle} <small class="fs-6 text-secondary">version 1.1</small>`;
             }
             
             // Kártya címek
