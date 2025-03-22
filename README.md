@@ -4,6 +4,17 @@ This application is a simple yet powerful web tool for translating .srt subtitle
 
 ![Running image](Images/Screen01.jpg)
 
+## Version 1.1 Update
+
+The latest update brings exciting new features to enhance your translation experience:
+
+- **OpenRouter.ai API Integration**: Added support for OpenRouter.ai API, allowing access to more AI models
+- **New Translation Models**:
+  - **Gemma 3 27B (free)**: High-quality free model from Google via OpenRouter.ai
+  - **Gemini Flash 2.0**: Premium model from Google with faster processing and higher quality translations
+- **Improved Error Handling**: Enhanced error handling and response processing for more reliable translations
+- **API Response Format Flexibility**: Added support for various API response formats to ensure compatibility with different models
+
 ## Features
 
 - Modern, responsive, dark-styled user interface with Bootstrap framework
@@ -220,6 +231,17 @@ MAGYAR NYELVŰ LEÍRÁS:
 Ez az alkalmazás egy egyszerű, de hatékony webes eszköz .srt formátumú feliratfájlok fordítására. A program a helyi gépen futó LM Studio mesterséges intelligencia modellt vagy a ChatGPT API-t használja a fordításhoz.
 
 
+## 1.1-es verzió frissítés
+
+A legújabb frissítés izgalmas új funkciókat kínál a fordítási élmény javítására:
+
+- **OpenRouter.ai API integráció**: Az OpenRouter.ai API támogatása, amely több AI modellhez biztosít hozzáférést
+- **Új fordítási modellek**:
+  - **Gemma 3 27B (ingyenes)**: Kiváló minőségű ingyenes modell a Google-tól az OpenRouter.ai-n keresztül
+  - **Gemini Flash 2.0**: Prémium modell a Google-tól gyorsabb feldolgozással és jobb minőségű fordításokkal
+- **Javított hibakezelés**: Továbbfejlesztett hibakezelés és válasz feldolgozás a megbízhatóbb fordításokért
+- **API válasz formátum rugalmasság**: Különböző API válasz formátumok támogatása a különböző modellekkel való kompatibilitás biztosítása érdekében
+
 ## Funkciók
 
 - Modern, reszponzív, dark stílusú felhasználói felület Bootstrap keretrendszerrel
@@ -236,7 +258,7 @@ Ez az alkalmazás egy egyszerű, de hatékony webes eszköz .srt formátumú fel
 - **Munkafájl mentése és betöltése** a fordítási folyamat későbbi folytatásához (.wrk munkafájlok)
 - **Forrás blokk mentése** a forrás feliratok csak szöveges tartalmának sorszámozottblokk formátumban történő mentése külső szöveges fordításhoz.
 - **Külső sorszámozott fordított sorok betöltése** külső forrásból származó és sorszámmal ellátott fordított sorokat beilleszt a fordítás táblázat azonos sorszámú soraiba a program (.mmm formátumú szövegfájlok. A forrás blokkmentés fordításait tartalmazhatja, amit a program be tud illeszteni a munkafolyamatba.)
-- **API kulcs titkosított formában tárolása** Ez nem tökéletes biztonság, de sokkal jobb, mint a titkosítás nélküli tárolás. Véd a felületes vizsgálat ellen: Ez a módszer megvédi az API kulcsot a felületes vizsgálattól (pl. ha valaki csak megnézi a localStorage tartalmát), de egy elszánt támadó, aki hozzáfér a kódhoz és a localStorage-hoz, még mindig visszafejtheti.
+- **API kulcs titkosított formában tárolása** Ez nem tökéletes biztonság, de sokkal jobb, mint a titkosítás nélküli tárolás. Véd a felületes vizsgálat ellen: Ez a módszer megvédi az API kulcsot a felületes vizsgálattól (pl. ha valaki csak megnézi a localStorage tartalmát), de egy elszánt támadó, aki hozzáfér a kódhoz és localStorage-hoz, még mindig visszafejtheti.
 
 ## Telepítés
 
