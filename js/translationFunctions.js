@@ -451,19 +451,175 @@ NE használd a "${uniqueMarker}" vagy "${endMarker}" jelöléseket a válaszodba
     return lastProcessedIndex;
 }
 
+// Szekvenciális fordítás az OpenRouter API-val Gemini Flash 2.0 modellel
+async function translateSequentiallyWithOpenRouterGeminiFlash(startIndex, sourceLanguage, targetLanguage, apiKey, temperature, {
+    originalSubtitles,
+    translatedSubtitles,
+    isTranslationPausedRef,
+    currentTranslationIndex,
+    updateProgressBar,
+    updateTranslatedText,
+    translationMemory,
+    saveTranslationBtn,
+    saveWorkFileBtn,
+    scrollToRow,
+    pauseTranslation
+}) {
+    // API kérések közötti késleltetés (ms) - 0.2 másodperc
+    const API_DELAY = 200;
+    
+    // Az utolsó feldolgozott index nyomon követése
+    let lastProcessedIndex = startIndex;
+    
+    // Végigmegyünk a feliratokon egyesével, szekvenciálisan
+    for (let i = startIndex; i < originalSubtitles.length; i++) {
+        // Ha a fordítás szüneteltetése be van kapcsolva, akkor kilépünk a ciklusból
+        if (isTranslationPausedRef.value) {
+            break;
+        }
+        
+        // Aktuális fordítási index frissítése
+        lastProcessedIndex = i;
+        
+        // Ellenőrizzük, hogy már le van-e fordítva ez a felirat
+        if (translatedSubtitles[i]) {
+            continue; // Átugorjuk a már lefordított feliratokat
+        }
+        
+        // Folyamatjelző frissítése
+        updateProgressBar(i, originalSubtitles.length);
+        
+        try {
+            // Kontextus összeállítása (előző és következő mondatok)
+            const currentSubtitle = originalSubtitles[i].text;
+            
+            // Előző 4 mondat összegyűjtése (ha van)
+            let previousContext = "";
+            for (let j = Math.max(0, i - 4); j < i; j++) {
+                if (originalSubtitles[j] && originalSubtitles[j].text) {
+                    previousContext += originalSubtitles[j].text + "\n";
+                }
+            }
+            
+            // Következő 4 mondat összegyűjtése (ha van)
+            let nextContext = "";
+            for (let j = i + 1; j < Math.min(originalSubtitles.length, i + 5); j++) {
+                if (originalSubtitles[j] && originalSubtitles[j].text) {
+                    nextContext += originalSubtitles[j].text + "\n";
+                }
+            }
+            
+            // Egyedi azonosító a fordítandó sorhoz
+            const uniqueMarker = "###FORDÍTANDÓ_SOR###";
+            const endMarker = "###FORDÍTÁS_VÉGE###";
+            
+            // Teljes kontextus összeállítása
+            let contextText = "";
+            if (previousContext) {
+                contextText += "Előző sorok kontextusként (NEM kell fordítani):\n" + previousContext + "\n";
+            }
+            contextText += uniqueMarker + "\n" + currentSubtitle + "\n" + endMarker + "\n";
+            if (nextContext) {
+                contextText += "Következő sorok kontextusként (NEM kell fordítani):\n" + nextContext;
+            }
+            
+            // Fordítási utasítás
+            const systemPrompt = `Fordítsd le CSAK a "${uniqueMarker}" és "${endMarker}" közötti szöveget ${getLanguageNameLocal(sourceLanguage)} nyelvről ${getLanguageNameLocal(targetLanguage)} nyelvre. 
+A többi szöveg csak kontextus, azt NE fordítsd le. 
+A fordításodban KIZÁRÓLAG a lefordított szöveget add vissza, semmilyen jelölést, magyarázatot vagy egyéb szöveget NE adj hozzá.
+NE használd a "${uniqueMarker}" vagy "${endMarker}" jelöléseket a válaszodban.`;
+            
+            // Fordítás végrehajtása az OpenRouter API-val Gemini Flash 2.0 modellel
+            let translatedText;
+            try {
+                translatedText = await translateWithOpenRouterApi(
+                    contextText,
+                    systemPrompt,
+                    apiKey,
+                    temperature,
+                    0,
+                    'google/gemini-2.0-flash-001' // Gemini Flash modell azonosító
+                );
+            } catch (error) {
+                console.error('OpenRouter API hiba (Gemini Flash):', error);
+                // Részletes hibaüzenet megjelenítése
+                alert(`OpenRouter API hiba (Gemini Flash): ${error.message}`);
+                pauseTranslation();
+                break;
+            }
+            
+            // Fordítás tisztítása
+            translatedText = cleanTranslation(translatedText, uniqueMarker, endMarker);
+            
+            // Fordított szöveg mentése
+            translatedSubtitles[i] = translatedText;
+            
+            // Táblázat frissítése
+            updateTranslatedText(i, translatedText);
+            
+            // Újrafordítás gomb megjelenítése
+            const retranslateBtn = document.getElementById(`retranslate-${i}`);
+            if (retranslateBtn) {
+                retranslateBtn.classList.remove('d-none');
+            }
+            
+            // Görgetés az aktuális sorhoz
+            scrollToRow(i);
+            
+            // Fordítási memória frissítése
+            if (!translationMemory.translations) {
+                translationMemory.translations = {};
+            }
+            translationMemory.translations[originalSubtitles[i].text] = translatedText;
+            
+            // Mentés gomb engedélyezése
+            saveTranslationBtn.disabled = false;
+            
+            // Munkafájl mentés gomb megjelenítése
+            saveWorkFileBtn.classList.remove('d-none');
+            
+            // Kis szünet a következő API kérés előtt a sebességkorlát elkerülése érdekében
+            await new Promise(resolve => setTimeout(resolve, API_DELAY));
+            
+        } catch (error) {
+            console.error('Fordítási hiba (Gemini Flash):', error);
+            
+            // Ha sebességkorlát-túllépés (429) hiba, akkor várunk egy ideig és újra próbáljuk
+            if (error.message.includes('429')) {
+                console.log('Sebességkorlát-túllépés (429), várakozás 10 másodpercet...');
+                alert('We wait 10 seconds for the API speed limit to be exceeded and then continue translating.');
+                
+                // Várakozás 10 másodpercet
+                await new Promise(resolve => setTimeout(resolve, 10000));
+                
+                // Visszalépünk egy indexet, hogy újra megpróbáljuk ezt a feliratot
+                i--;
+                continue;
+            }
+            
+            alert(`An error occurred during translation with Gemini Flash: ${error.message}`);
+            pauseTranslation();
+            break;
+        }
+    }
+    
+    // Visszaadjuk az utolsó feldolgozott indexet
+    return lastProcessedIndex;
+}
+
 // Fordítás az OpenRouter API-val
-async function translateWithOpenRouterApi(text, systemPrompt, apiKey, temperature = 1.0, retryCount = 0) {
+async function translateWithOpenRouterApi(text, systemPrompt, apiKey, temperature = 1.0, retryCount = 0, modelId = 'google/gemma-3-27b-it:free') {
     // Maximum újrapróbálkozások száma
     const MAX_RETRIES = 3;
     // Várakozási idő milliszekundumban (exponenciálisan növekszik)
     const RETRY_DELAY = 2000 * Math.pow(2, retryCount);
     
-    console.log('OpenRouter fordítás:', text.substring(0, 100) + '...', 'API kulcs:', apiKey ? 'Megadva' : 'Hiányzik');
+    console.log('OpenRouter fordítás:', text.substring(0, 100) + '...', 'API kulcs:', apiKey ? 'Megadva' : 'Hiányzik', 'Model:', modelId);
     
     try {
         // OpenRouter API hívás
         const requestBody = {
-            model: 'google/gemma-3-27b-it:free',  // Gemma 3 27B modell - ingyenes verzió
+            model: modelId,  // Használjuk a paraméterként kapott modell azonosítót
             messages: [
                 {
                     role: "system",
@@ -496,7 +652,7 @@ async function translateWithOpenRouterApi(text, systemPrompt, apiKey, temperatur
             // Várakozás növekvő idővel
             await new Promise(resolve => setTimeout(resolve, RETRY_DELAY));
             // Újrapróbálkozás
-            return translateWithOpenRouterApi(text, systemPrompt, apiKey, temperature, retryCount + 1);
+            return translateWithOpenRouterApi(text, systemPrompt, apiKey, temperature, retryCount + 1, modelId);
         }
         
         // Válasz szöveg ellenőrzése
@@ -595,7 +751,7 @@ async function translateWithOpenRouterApi(text, systemPrompt, apiKey, temperatur
             // Várakozás növekvő idővel
             await new Promise(resolve => setTimeout(resolve, RETRY_DELAY));
             // Újrapróbálkozás
-            return translateWithOpenRouterApi(text, systemPrompt, apiKey, temperature, retryCount + 1);
+            return translateWithOpenRouterApi(text, systemPrompt, apiKey, temperature, retryCount + 1, modelId);
         }
         
         throw error;
@@ -677,12 +833,11 @@ function getLanguageNameLocal(languageCode) {
         'bg': 'bolgár',
         'hr': 'horvát',
         'sr': 'szerb',
-        'sl': 'szlovén',
         'uk': 'ukrán',
         'el': 'görög',
         'he': 'héber',
-        'th': 'thai',
         'vi': 'vietnámi',
+        'th': 'thai',
         'id': 'indonéz',
         'ms': 'maláj',
         'fa': 'perzsa',
@@ -697,4 +852,5 @@ function getLanguageNameLocal(languageCode) {
 window.retranslateSubtitle = retranslateSubtitle;
 window.translateSequentially = translateSequentially;
 window.translateSequentiallyWithOpenRouter = translateSequentiallyWithOpenRouter;
+window.translateSequentiallyWithOpenRouterGeminiFlash = translateSequentiallyWithOpenRouterGeminiFlash;
 window.translateWithOpenRouterApi = translateWithOpenRouterApi;

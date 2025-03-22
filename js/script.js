@@ -177,7 +177,8 @@ document.addEventListener('DOMContentLoaded', function() {
     if (savedTranslationMode && (savedTranslationMode === 'lm_studio_local' || 
                                savedTranslationMode === 'chatgpt_4o_mini' || 
                                savedTranslationMode === 'chatgpt_4o' || 
-                               savedTranslationMode === 'openrouter_gemma_27b')) {
+                               savedTranslationMode === 'openrouter_gemma_27b' ||
+                               savedTranslationMode === 'openrouter_gemini_flash')) {
         translationModeSelect.value = savedTranslationMode;
         
         // Ha ChatGPT mód van elmentve, akkor betöltjük az API kulcsot is
@@ -189,7 +190,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (savedApiKey) {
                 apiKeyInput.value = savedApiKey;
             }
-        } else if (savedTranslationMode === 'openrouter_gemma_27b') {
+        } else if (savedTranslationMode === 'openrouter_gemma_27b' || savedTranslationMode === 'openrouter_gemini_flash') {
             apiKeyContainer.classList.remove('d-none');
             
             // Mentett OpenRouter API kulcs betöltése
@@ -221,7 +222,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (selectedMode === 'chatgpt_4o_mini' || selectedMode === 'chatgpt_4o') {
                 saveApiKey(apiKeyInput.value);
                 console.log('ChatGPT API kulcs titkosítva elmentve a localStorage-ba');
-            } else if (selectedMode === 'openrouter_gemma_27b') {
+            } else if (selectedMode === 'openrouter_gemma_27b' || selectedMode === 'openrouter_gemini_flash') {
                 saveOpenRouterApiKey(apiKeyInput.value);
                 console.log('OpenRouter API kulcs titkosítva elmentve a localStorage-ba');
             }
@@ -789,22 +790,31 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Fordítás indítása
     async function startTranslation() {
+        // Ellenőrizzük, hogy van-e betöltött felirat
+        if (!originalSubtitles || originalSubtitles.length === 0) {
+            alert('Please load a subtitle file first!');
+            return;
+        }
+        
         // Fordítási mód ellenőrzése
         const selectedMode = translationModeSelect.value;
-        const apiKey = apiKeyInput.value;
-
+        
+        // API kulcs ellenőrzése
+        const apiKey = apiKeyInput.value.trim();
+        
+        // API kulcs ellenőrzése ChatGPT módban
         if (selectedMode === 'chatgpt_4o_mini' || selectedMode === 'chatgpt_4o') {
             if (!apiKey) {
                 alert('Please enter the API key to use ChatGPT!');
                 return;
             }
-        } else if (selectedMode === 'openrouter_gemma_27b') {
+        } else if (selectedMode === 'openrouter_gemma_27b' || selectedMode === 'openrouter_gemini_flash') {
             if (!apiKey) {
-                alert('Please enter the OpenRouter API key to use Gemma 3 27B!');
+                alert('Please enter the OpenRouter API key to use the selected model!');
                 return;
             }
         }
-
+        
         // UI elemek frissítése
         startTranslationBtn.classList.add('d-none');
         stopTranslationBtn.classList.remove('d-none');
@@ -849,6 +859,21 @@ document.addEventListener('DOMContentLoaded', function() {
         } else if (selectedMode === 'openrouter_gemma_27b') {
             // Szekvenciális fordítás az OpenRouter API-val
             await window.translateSequentiallyWithOpenRouter(currentTranslationIndex, sourceLanguage, targetLanguage, apiKey, temperature, {
+                originalSubtitles,
+                translatedSubtitles,
+                isTranslationPausedRef, // Globális referencia objektum átadása
+                currentTranslationIndex,
+                updateProgressBar,
+                updateTranslatedText,
+                translationMemory,
+                saveTranslationBtn,
+                saveWorkFileBtn,
+                scrollToRow,
+                pauseTranslation
+            });
+        } else if (selectedMode === 'openrouter_gemini_flash') {
+            // Szekvenciális fordítás az OpenRouter API-val (Gemini Flash 2.0)
+            await window.translateSequentiallyWithOpenRouterGeminiFlash(currentTranslationIndex, sourceLanguage, targetLanguage, apiKey, temperature, {
                 originalSubtitles,
                 translatedSubtitles,
                 isTranslationPausedRef, // Globális referencia objektum átadása
@@ -1555,7 +1580,7 @@ function handleTranslationModeChange() {
         
         // API kulcs címke frissítése
         document.querySelector('label[for="apiKey"]').textContent = 'API kulcs:';
-    } else if (selectedMode === 'openrouter_gemma_27b') {
+    } else if (selectedMode === 'openrouter_gemma_27b' || selectedMode === 'openrouter_gemini_flash') {
         apiKeyContainer.classList.remove('d-none');
         
         // Ha van mentett OpenRouter API kulcs, csak a megjelenítés gombot mutatjuk
