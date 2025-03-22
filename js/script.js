@@ -98,6 +98,33 @@ function loadApiKey() {
     }
 }
 
+// OpenRouter API kulcs mentése titkosítva
+function saveOpenRouterApiKey(apiKey) {
+    try {
+        const encryptedKey = encryptApiKey(apiKey);
+        localStorage.setItem('encryptedOpenRouterApiKey', encryptedKey);
+        console.log('OpenRouter API kulcs titkosítva elmentve a localStorage-ba');
+        return true;
+    } catch (error) {
+        console.error('Hiba történt az OpenRouter API kulcs mentése során:', error);
+        return false;
+    }
+}
+
+// Titkosított OpenRouter API kulcs betöltése
+function loadOpenRouterApiKey() {
+    try {
+        const encryptedKey = localStorage.getItem('encryptedOpenRouterApiKey');
+        if (encryptedKey) {
+            return decryptApiKey(encryptedKey);
+        }
+        return null;
+    } catch (error) {
+        console.error('Hiba történt az OpenRouter API kulcs betöltése során:', error);
+        return null;
+    }
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     console.log("DOM betöltve, elemek inicializálása");
     
@@ -149,7 +176,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const savedTranslationMode = localStorage.getItem('translationMode');
     if (savedTranslationMode && (savedTranslationMode === 'lm_studio_local' || 
                                savedTranslationMode === 'chatgpt_4o_mini' || 
-                               savedTranslationMode === 'chatgpt_4o')) {
+                               savedTranslationMode === 'chatgpt_4o' || 
+                               savedTranslationMode === 'openrouter_gemma_27b')) {
         translationModeSelect.value = savedTranslationMode;
         
         // Ha ChatGPT mód van elmentve, akkor betöltjük az API kulcsot is
@@ -160,6 +188,14 @@ document.addEventListener('DOMContentLoaded', function() {
             const savedApiKey = loadApiKey();
             if (savedApiKey) {
                 apiKeyInput.value = savedApiKey;
+            }
+        } else if (savedTranslationMode === 'openrouter_gemma_27b') {
+            apiKeyContainer.classList.remove('d-none');
+            
+            // Mentett OpenRouter API kulcs betöltése
+            const savedOpenRouterApiKey = loadOpenRouterApiKey();
+            if (savedOpenRouterApiKey) {
+                apiKeyInput.value = savedOpenRouterApiKey;
             }
         }
     }
@@ -179,8 +215,16 @@ document.addEventListener('DOMContentLoaded', function() {
     apiKeyInput.addEventListener('change', function() {
         // API kulcs mentése a localStorage-ba titkosítva
         if (apiKeyInput.value.trim() !== '') {
-            saveApiKey(apiKeyInput.value);
-            console.log('API kulcs titkosítva elmentve a localStorage-ba');
+            const selectedMode = translationModeSelect.value;
+            
+            // A megfelelő helyre mentjük az API kulcsot a fordítási mód alapján
+            if (selectedMode === 'chatgpt_4o_mini' || selectedMode === 'chatgpt_4o') {
+                saveApiKey(apiKeyInput.value);
+                console.log('ChatGPT API kulcs titkosítva elmentve a localStorage-ba');
+            } else if (selectedMode === 'openrouter_gemma_27b') {
+                saveOpenRouterApiKey(apiKeyInput.value);
+                console.log('OpenRouter API kulcs titkosítva elmentve a localStorage-ba');
+            }
         }
     });
     
@@ -754,6 +798,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 alert('Please enter the API key to use ChatGPT!');
                 return;
             }
+        } else if (selectedMode === 'openrouter_gemma_27b') {
+            if (!apiKey) {
+                alert('Please enter the OpenRouter API key to use Gemma 3 27B!');
+                return;
+            }
         }
 
         // UI elemek frissítése
@@ -796,6 +845,21 @@ document.addEventListener('DOMContentLoaded', function() {
                 scrollToRow,
                 pauseTranslation,
                 translateWithChatGptCustomPrompt
+            });
+        } else if (selectedMode === 'openrouter_gemma_27b') {
+            // Szekvenciális fordítás az OpenRouter API-val
+            await window.translateSequentiallyWithOpenRouter(currentTranslationIndex, sourceLanguage, targetLanguage, apiKey, temperature, {
+                originalSubtitles,
+                translatedSubtitles,
+                isTranslationPausedRef, // Globális referencia objektum átadása
+                currentTranslationIndex,
+                updateProgressBar,
+                updateTranslatedText,
+                translationMemory,
+                saveTranslationBtn,
+                saveWorkFileBtn,
+                scrollToRow,
+                pauseTranslation
             });
         } else {
             // LM Studio fordítás - eredeti logika
@@ -982,7 +1046,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     
                     // Várjunk egy kicsit az újrapróbálkozás előtt
                     await new Promise(resolve => setTimeout(resolve, 1000));
-                    
                     // Újrapróbálkozás
                     return translateTextWithContext(subtitles, currentIndex, sourceLanguage, targetLanguage, retryCount + 1, temperature);
                 }
@@ -1489,6 +1552,29 @@ function handleTranslationModeChange() {
             apiKeyInputGroup.classList.remove('d-none');
             showApiKeyFieldBtn.classList.add('d-none');
         }
+        
+        // API kulcs címke frissítése
+        document.querySelector('label[for="apiKey"]').textContent = 'API kulcs:';
+    } else if (selectedMode === 'openrouter_gemma_27b') {
+        apiKeyContainer.classList.remove('d-none');
+        
+        // Ha van mentett OpenRouter API kulcs, csak a megjelenítés gombot mutatjuk
+        const savedOpenRouterApiKey = loadOpenRouterApiKey();
+        if (savedOpenRouterApiKey) {
+            apiKeyInput.value = savedOpenRouterApiKey;
+            apiKeyInput.type = 'password';
+            
+            // Elrejtjük az input mezőt és megjelenítjük a gombot
+            apiKeyInputGroup.classList.add('d-none');
+            showApiKeyFieldBtn.classList.remove('d-none');
+        } else {
+            // Ha nincs mentett OpenRouter API kulcs, rögtön megjelenítjük az input mezőt
+            apiKeyInputGroup.classList.remove('d-none');
+            showApiKeyFieldBtn.classList.add('d-none');
+        }
+        
+        // API kulcs címke frissítése
+        document.querySelector('label[for="apiKey"]').textContent = 'OpenRouter API kulcs:';
     } else {
         apiKeyContainer.classList.add('d-none');
         apiKeyInput.value = '';
