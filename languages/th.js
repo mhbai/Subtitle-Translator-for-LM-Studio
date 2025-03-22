@@ -68,7 +68,26 @@ const th = {
     errorApiNotAvailable: "API ของ LM Studio ไม่พร้อมใช้งาน กรุณาตรวจสอบว่า LM Studio กำลังทำงานอยู่เบื้องหลัง",
     errorRetranslation: "เกิดข้อผิดพลาดระหว่างการแปลใหม่!",
     errorLoadWorkFile: "เกิดข้อผิดพลาดขณะโหลดไฟล์งาน กรุณาตรวจสอบรูปแบบไฟล์!",
-    errorServerConnection: "ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ LM Studio ได้"
+    errorServerConnection: "ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ LM Studio ได้",
+    
+    // ข้อความแสดงการโหลด
+    loadingGeneral: "กำลังโหลด...",
+    loadingFileProcessing: "กำลังประมวลผลไฟล์...",
+    loadingTablePopulation: "กำลังเติมข้อมูลตาราง...",
+    loadingWorkFileProcessing: "กำลังประมวลผลไฟล์งาน...",
+    loadingMmmFileProcessing: "กำลังประมวลผลไฟล์ MMM...",
+    loadingTranslation: "กำลังแปล...",
+    loadingClickToClose: "คลิกที่ใดก็ได้ด้านนอกเพื่อปิด",
+    loadingBatchTranslation: "กำลังแปลแบบกลุ่ม...",
+    
+    // ข้อความแสดงข้อผิดพลาดสำหรับโหมดแปลแบบกลุ่ม
+    errorNumberingRetry: "ข้อผิดพลาดในการกำหนดหมายเลข กำลังลองใหม่ ({0}/{1})...",
+    errorRateLimitExceeded: "เกินขีดจำกัดอัตราการใช้ API กำลังรอ 10 วินาที...",
+    errorTranslationRetry: "ข้อผิดพลาดในการแปล กำลังลองใหม่ ({0}/{1})...",
+    errorTranslationFailed: "การแปลล้มเหลวหลังจากพยายาม {0} ครั้ง กำลังดำเนินการต่อ...",
+    
+    // โหมดแปลพิเศษ
+    batchModeLabel: "โหมดแปลบริบทขนาดใหญ่พิเศษ"
 };
 
 // Export the language object

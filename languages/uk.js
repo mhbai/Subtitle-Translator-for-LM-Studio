@@ -68,7 +68,26 @@ const uk = {
     errorApiNotAvailable: "API LM Studio недоступний. Перевірте, чи працює LM Studio у фоновому режимі.",
     errorRetranslation: "Під час повторного перекладу сталася помилка!",
     errorLoadWorkFile: "Під час завантаження робочого файлу сталася помилка. Перевірте формат файлу!",
-    errorServerConnection: "Не вдалося підключитися до сервера LM Studio"
+    errorServerConnection: "Не вдалося підключитися до сервера LM Studio",
+    
+    // Тексти анімації завантаження
+    loadingGeneral: "Завантаження...",
+    loadingFileProcessing: "Обробка файлу...",
+    loadingTablePopulation: "Заповнення таблиці...",
+    loadingWorkFileProcessing: "Обробка робочого файлу...",
+    loadingMmmFileProcessing: "Обробка MMM файлу...",
+    loadingTranslation: "Переклад...",
+    loadingClickToClose: "Клацніть будь-де зовні, щоб закрити",
+    loadingBatchTranslation: "Пакетний переклад в процесі...",
+    
+    // Повідомлення про помилки в режимі пакетного перекладу
+    errorNumberingRetry: "Помилка нумерації, повторна спроба ({0}/{1})...",
+    errorRateLimitExceeded: "Перевищено ліміт швидкості API, очікування 10 секунд...",
+    errorTranslationRetry: "Помилка перекладу, повторна спроба ({0}/{1})...",
+    errorTranslationFailed: "Переклад не вдався після {0} спроб, продовжуємо...",
+    
+    // Спеціальний режим перекладу
+    batchModeLabel: "Спеціальний режим перекладу з великим контекстом"
 };
 
 // Export the language object

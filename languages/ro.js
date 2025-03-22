@@ -68,7 +68,26 @@ const ro = {
     errorApiNotAvailable: "API-ul LM Studio nu este disponibil. Vă rugăm să verificați dacă LM Studio rulează în fundal.",
     errorRetranslation: "A apărut o eroare în timpul retraducerii!",
     errorLoadWorkFile: "A apărut o eroare la încărcarea fișierului de lucru. Vă rugăm să verificați formatul fișierului!",
-    errorServerConnection: "Nu s-a putut conecta la serverul LM Studio"
+    errorServerConnection: "Nu s-a putut conecta la serverul LM Studio",
+    
+    // Texte pentru animația de încărcare
+    loadingGeneral: "Se încarcă...",
+    loadingFileProcessing: "Se procesează fișierul...",
+    loadingTablePopulation: "Se completează tabelul...",
+    loadingWorkFileProcessing: "Se procesează fișierul de lucru...",
+    loadingMmmFileProcessing: "Se procesează fișierul MMM...",
+    loadingTranslation: "Se traduce...",
+    loadingClickToClose: "Faceți clic oriunde în exterior pentru a închide",
+    loadingBatchTranslation: "Traducere în lot în curs...",
+    
+    // Mesaje de eroare pentru modul de traducere în lot
+    errorNumberingRetry: "Eroare de numerotare, se încearcă din nou ({0}/{1})...",
+    errorRateLimitExceeded: "Limita de rată API depășită, se așteaptă 10 secunde...",
+    errorTranslationRetry: "Eroare de traducere, se încearcă din nou ({0}/{1})...",
+    errorTranslationFailed: "Traducerea a eșuat după {0} încercări, se continuă...",
+    
+    // Mod special de traducere
+    batchModeLabel: "Mod special de traducere cu context mare"
 };
 
 // Export the language object

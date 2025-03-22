@@ -68,7 +68,26 @@ const ko = {
     errorApiNotAvailable: "LM Studio API를 사용할 수 없습니다. LM Studio가 백그라운드에서 실행 중인지 확인해 주세요.",
     errorRetranslation: "다시 번역하는 동안 오류가 발생했습니다!",
     errorLoadWorkFile: "작업 파일을 로드하는 동안 오류가 발생했습니다. 파일 형식을 확인해 주세요!",
-    errorServerConnection: "LM Studio 서버에 연결할 수 없습니다"
+    errorServerConnection: "LM Studio 서버에 연결할 수 없습니다",
+    
+    // 로딩 애니메이션 텍스트
+    loadingGeneral: "로딩 중...",
+    loadingFileProcessing: "파일 처리 중...",
+    loadingTablePopulation: "테이블 채우는 중...",
+    loadingWorkFileProcessing: "작업 파일 처리 중...",
+    loadingMmmFileProcessing: "MMM 파일 처리 중...",
+    loadingTranslation: "번역 중...",
+    loadingClickToClose: "외부 아무 곳이나 클릭하여 닫기",
+    loadingBatchTranslation: "일괄 번역 진행 중...",
+    
+    // 일괄 번역 모드 오류 메시지
+    errorNumberingRetry: "번호 매기기 오류, 재시도 중 ({0}/{1})...",
+    errorRateLimitExceeded: "API 속도 제한 초과, 10초 대기 중...",
+    errorTranslationRetry: "번역 오류, 재시도 중 ({0}/{1})...",
+    errorTranslationFailed: "{0}번 시도 후 번역 실패, 계속 진행 중...",
+    
+    // 특수 번역 모드
+    batchModeLabel: "특수 대규모 컨텍스트 번역 모드"
 };
 
 // Export the language object

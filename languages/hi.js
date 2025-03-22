@@ -68,7 +68,26 @@ const hi = {
     errorApiNotAvailable: "LM Studio API उपलब्ध नहीं है। कृपया जाँचें कि LM Studio पृष्ठभूमि में चल रहा है या नहीं।",
     errorRetranslation: "पुनः अनुवाद के दौरान त्रुटि हुई!",
     errorLoadWorkFile: "कार्य फ़ाइल लोड करते समय त्रुटि हुई। कृपया फ़ाइल प्रारूप की जाँच करें!",
-    errorServerConnection: "LM Studio सर्वर से कनेक्ट नहीं हो सका"
+    errorServerConnection: "LM Studio सर्वर से कनेक्ट नहीं हो सका",
+    
+    // लोडिंग एनिमेशन टेक्स्ट
+    loadingGeneral: "लोड हो रहा है...",
+    loadingFileProcessing: "फ़ाइल प्रोसेसिंग हो रही है...",
+    loadingTablePopulation: "तालिका भरी जा रही है...",
+    loadingWorkFileProcessing: "कार्य फ़ाइल प्रोसेसिंग हो रही है...",
+    loadingMmmFileProcessing: "MMM फ़ाइल प्रोसेसिंग हो रही है...",
+    loadingTranslation: "अनुवाद हो रहा है...",
+    loadingClickToClose: "बंद करने के लिए बाहर कहीं भी क्लिक करें",
+    loadingBatchTranslation: "बैच अनुवाद प्रगति पर है...",
+    
+    // बैच अनुवाद मोड त्रुटि संदेश
+    errorNumberingRetry: "नंबरिंग त्रुटि, पुनः प्रयास किया जा रहा है ({0}/{1})...",
+    errorRateLimitExceeded: "API दर सीमा पार हो गई, 10 सेकंड प्रतीक्षा कर रहा है...",
+    errorTranslationRetry: "अनुवाद त्रुटि, पुनः प्रयास किया जा रहा है ({0}/{1})...",
+    errorTranslationFailed: "{0} प्रयासों के बाद अनुवाद विफल, जारी रख रहा है...",
+    
+    // विशेष अनुवाद मोड
+    batchModeLabel: "विशेष बड़े संदर्भ अनुवाद मोड"
 };
 
 // Export the language object

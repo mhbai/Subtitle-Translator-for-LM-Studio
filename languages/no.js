@@ -68,7 +68,26 @@ const no = {
     errorApiNotAvailable: "LM Studio API er ikke tilgjengelig. Vennligst sjekk at LM Studio kjører i bakgrunnen.",
     errorRetranslation: "Det oppstod en feil under ny oversettelse!",
     errorLoadWorkFile: "Det oppstod en feil under lasting av arbeidsfilen. Vennligst sjekk filformatet!",
-    errorServerConnection: "Kunne ikke koble til LM Studio-serveren"
+    errorServerConnection: "Kunne ikke koble til LM Studio-serveren",
+    
+    // Lastingsanimasjonstekster
+    loadingGeneral: "Laster...",
+    loadingFileProcessing: "Behandler fil...",
+    loadingTablePopulation: "Fyller tabell...",
+    loadingWorkFileProcessing: "Behandler arbeidsfil...",
+    loadingMmmFileProcessing: "Behandler MMM-fil...",
+    loadingTranslation: "Oversetter...",
+    loadingClickToClose: "Klikk hvor som helst utenfor for å lukke",
+    loadingBatchTranslation: "Batchoversettelse pågår...",
+    
+    // Feilmeldinger for batchoversettelsesmodus
+    errorNumberingRetry: "Nummereringsfeil, prøver igjen ({0}/{1})...",
+    errorRateLimitExceeded: "API-hastighetsgrense overskredet, venter 10 sekunder...",
+    errorTranslationRetry: "Oversettelsesfeil, prøver igjen ({0}/{1})...",
+    errorTranslationFailed: "Oversettelse mislyktes etter {0} forsøk, fortsetter...",
+    
+    // Spesiell oversettelsesmodus
+    batchModeLabel: "Spesiell oversettelsesmodus med stor kontekst"
 };
 
 // Export the language object

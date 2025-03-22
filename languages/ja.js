@@ -68,7 +68,26 @@ const ja = {
     errorApiNotAvailable: "LM Studio APIが利用できません。LM Studioがバックグラウンドで実行されているか確認してください。",
     errorRetranslation: "再翻訳中にエラーが発生しました！",
     errorLoadWorkFile: "作業ファイルの読み込み中にエラーが発生しました。ファイル形式を確認してください！",
-    errorServerConnection: "LM Studioサーバーに接続できませんでした"
+    errorServerConnection: "LM Studioサーバーに接続できませんでした",
+    
+    // 読み込みアニメーションテキスト
+    loadingGeneral: "読み込み中...",
+    loadingFileProcessing: "ファイル処理中...",
+    loadingTablePopulation: "テーブル作成中...",
+    loadingWorkFileProcessing: "作業ファイル処理中...",
+    loadingMmmFileProcessing: "MMMファイル処理中...",
+    loadingTranslation: "翻訳中...",
+    loadingClickToClose: "外側をクリックして閉じる",
+    loadingBatchTranslation: "バッチ翻訳処理中...",
+    
+    // バッチ翻訳モードのエラーメッセージ
+    errorNumberingRetry: "番号付けエラー、再試行中 ({0}/{1})...",
+    errorRateLimitExceeded: "APIレート制限を超えました、10秒待機中...",
+    errorTranslationRetry: "翻訳エラー、再試行中 ({0}/{1})...",
+    errorTranslationFailed: "{0}回の試行後に翻訳に失敗しました、続行中...",
+    
+    // 特殊翻訳モード
+    batchModeLabel: "特殊な大規模コンテキスト翻訳モード"
 };
 
 // Export the language object

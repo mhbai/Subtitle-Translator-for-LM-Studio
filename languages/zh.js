@@ -68,7 +68,26 @@ const zh = {
     errorApiNotAvailable: "LM Studio API不可用。请检查LM Studio是否在后台运行。",
     errorRetranslation: "重新翻译过程中发生错误！",
     errorLoadWorkFile: "加载工作文件时发生错误。请检查文件格式！",
-    errorServerConnection: "无法连接到LM Studio服务器"
+    errorServerConnection: "无法连接到LM Studio服务器",
+    
+    // 加载动画文本
+    loadingGeneral: "加载中...",
+    loadingFileProcessing: "文件处理中...",
+    loadingTablePopulation: "填充表格中...",
+    loadingWorkFileProcessing: "工作文件处理中...",
+    loadingMmmFileProcessing: "MMM文件处理中...",
+    loadingTranslation: "翻译中...",
+    loadingClickToClose: "点击外部任意位置关闭",
+    loadingBatchTranslation: "批量翻译进行中...",
+    
+    // 批量翻译模式错误消息
+    errorNumberingRetry: "编号错误，重试中 ({0}/{1})...",
+    errorRateLimitExceeded: "API速率限制超出，等待10秒...",
+    errorTranslationRetry: "翻译错误，重试中 ({0}/{1})...",
+    errorTranslationFailed: "经过{0}次尝试后翻译失败，继续进行...",
+    
+    // 特殊翻译模式
+    batchModeLabel: "特殊大上下文翻译模式"
 };
 
 // Export the language object

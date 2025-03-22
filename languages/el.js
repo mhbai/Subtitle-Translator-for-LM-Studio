@@ -68,7 +68,26 @@ const el = {
     errorApiNotAvailable: "Το API του LM Studio δεν είναι διαθέσιμο. Παρακαλώ ελέγξτε αν το LM Studio εκτελείται στο παρασκήνιο.",
     errorRetranslation: "Παρουσιάστηκε σφάλμα κατά την επαναμετάφραση!",
     errorLoadWorkFile: "Παρουσιάστηκε σφάλμα κατά τη φόρτωση του αρχείου εργασίας. Παρακαλώ ελέγξτε τη μορφή του αρχείου!",
-    errorServerConnection: "Δεν είναι δυνατή η σύνδεση με τον διακομιστή LM Studio"
+    errorServerConnection: "Δεν είναι δυνατή η σύνδεση με τον διακομιστή LM Studio",
+    
+    // Κείμενα κινούμενης εικόνας φόρτωσης
+    loadingGeneral: "Φόρτωση...",
+    loadingFileProcessing: "Επεξεργασία αρχείου...",
+    loadingTablePopulation: "Συμπλήρωση πίνακα...",
+    loadingWorkFileProcessing: "Επεξεργασία αρχείου εργασίας...",
+    loadingMmmFileProcessing: "Επεξεργασία αρχείου MMM...",
+    loadingTranslation: "Μετάφραση...",
+    loadingClickToClose: "Κάντε κλικ οπουδήποτε έξω για να κλείσετε",
+    loadingBatchTranslation: "Μαζική μετάφραση σε εξέλιξη...",
+    
+    // Μηνύματα σφάλματος για λειτουργία μαζικής μετάφρασης
+    errorNumberingRetry: "Σφάλμα αρίθμησης, επανάληψη προσπάθειας ({0}/{1})...",
+    errorRateLimitExceeded: "Υπέρβαση ορίου ρυθμού API, αναμονή 10 δευτερολέπτων...",
+    errorTranslationRetry: "Σφάλμα μετάφρασης, επανάληψη προσπάθειας ({0}/{1})...",
+    errorTranslationFailed: "Η μετάφραση απέτυχε μετά από {0} προσπάθειες, συνέχεια...",
+    
+    // Ειδική λειτουργία μετάφρασης
+    batchModeLabel: "Ειδική λειτουργία μετάφρασης μεγάλου πλαισίου"
 };
 
 // Export the language object

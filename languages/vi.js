@@ -68,7 +68,26 @@ const vi = {
     errorApiNotAvailable: "API LM Studio không khả dụng. Vui lòng kiểm tra xem LM Studio có đang chạy trong nền không.",
     errorRetranslation: "Đã xảy ra lỗi trong quá trình dịch lại!",
     errorLoadWorkFile: "Đã xảy ra lỗi khi tải tệp công việc. Vui lòng kiểm tra định dạng tệp!",
-    errorServerConnection: "Không thể kết nối đến máy chủ LM Studio"
+    errorServerConnection: "Không thể kết nối đến máy chủ LM Studio",
+    
+    // Văn bản hoạt ảnh đang tải
+    loadingGeneral: "Đang tải...",
+    loadingFileProcessing: "Đang xử lý tệp...",
+    loadingTablePopulation: "Đang điền bảng...",
+    loadingWorkFileProcessing: "Đang xử lý tệp công việc...",
+    loadingMmmFileProcessing: "Đang xử lý tệp MMM...",
+    loadingTranslation: "Đang dịch...",
+    loadingClickToClose: "Nhấp vào bất kỳ đâu bên ngoài để đóng",
+    loadingBatchTranslation: "Đang tiến hành dịch hàng loạt...",
+    
+    // Thông báo lỗi cho chế độ dịch hàng loạt
+    errorNumberingRetry: "Lỗi đánh số, đang thử lại ({0}/{1})...",
+    errorRateLimitExceeded: "Vượt quá giới hạn tốc độ API, đang đợi 10 giây...",
+    errorTranslationRetry: "Lỗi dịch, đang thử lại ({0}/{1})...",
+    errorTranslationFailed: "Dịch thất bại sau {0} lần thử, đang tiếp tục...",
+    
+    // Chế độ dịch đặc biệt
+    batchModeLabel: "Chế độ dịch ngữ cảnh lớn đặc biệt"
 };
 
 // Export the language object

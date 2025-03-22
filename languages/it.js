@@ -68,7 +68,26 @@ const it = {
     errorApiNotAvailable: "L'API di LM Studio non è disponibile. Verifica che LM Studio sia in esecuzione in background.",
     errorRetranslation: "Si è verificato un errore durante la ritraduzione!",
     errorLoadWorkFile: "Si è verificato un errore durante il caricamento del file di lavoro. Controlla il formato del file!",
-    errorServerConnection: "Impossibile connettersi al server LM Studio"
+    errorServerConnection: "Impossibile connettersi al server LM Studio",
+    
+    // Testi di animazione di caricamento
+    loadingGeneral: "Caricamento in corso...",
+    loadingFileProcessing: "Elaborazione del file in corso...",
+    loadingTablePopulation: "Compilazione della tabella in corso...",
+    loadingWorkFileProcessing: "Elaborazione del file di lavoro in corso...",
+    loadingMmmFileProcessing: "Elaborazione del file MMM in corso...",
+    loadingTranslation: "Traduzione in corso...",
+    loadingClickToClose: "Clicca ovunque all'esterno per chiudere",
+    loadingBatchTranslation: "Traduzione in batch in corso...",
+    
+    // Messaggi di errore della modalità di traduzione in batch
+    errorNumberingRetry: "Errore di numerazione, nuovo tentativo ({0}/{1})...",
+    errorRateLimitExceeded: "Limite di velocità API superato, attesa di 10 secondi...",
+    errorTranslationRetry: "Errore di traduzione, nuovo tentativo ({0}/{1})...",
+    errorTranslationFailed: "Traduzione fallita dopo {0} tentativi, proseguimento...",
+    
+    // Modalità di traduzione speciale
+    batchModeLabel: "Modalità di traduzione speciale con contesto ampio"
 };
 
 // Export the language object

@@ -68,7 +68,26 @@ const nl = {
     errorApiNotAvailable: "LM Studio API is niet beschikbaar. Controleer of LM Studio op de achtergrond draait.",
     errorRetranslation: "Er is een fout opgetreden tijdens het opnieuw vertalen!",
     errorLoadWorkFile: "Er is een fout opgetreden bij het laden van het werkbestand. Controleer het bestandsformaat!",
-    errorServerConnection: "Kan geen verbinding maken met de LM Studio-server"
+    errorServerConnection: "Kan geen verbinding maken met de LM Studio-server",
+    
+    // Laadanimatieteksten
+    loadingGeneral: "Laden...",
+    loadingFileProcessing: "Bestand verwerken...",
+    loadingTablePopulation: "Tabel vullen...",
+    loadingWorkFileProcessing: "Werkbestand verwerken...",
+    loadingMmmFileProcessing: "MMM-bestand verwerken...",
+    loadingTranslation: "Vertalen...",
+    loadingClickToClose: "Klik ergens buiten om te sluiten",
+    loadingBatchTranslation: "Batchvertaling bezig...",
+    
+    // Foutmeldingen voor batchvertaalmodus
+    errorNumberingRetry: "Nummeringsfout, opnieuw proberen ({0}/{1})...",
+    errorRateLimitExceeded: "API-snelheidslimiet overschreden, 10 seconden wachten...",
+    errorTranslationRetry: "Vertaalfout, opnieuw proberen ({0}/{1})...",
+    errorTranslationFailed: "Vertaling mislukt na {0} pogingen, doorgaan...",
+    
+    // Speciale vertaalmodus
+    batchModeLabel: "Speciale vertaalmodus met grote context"
 };
 
 // Export the language object

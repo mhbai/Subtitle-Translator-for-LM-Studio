@@ -68,7 +68,26 @@ const tr = {
     errorApiNotAvailable: "LM Studio API kullanılamıyor. Lütfen LM Studio'nun arka planda çalıştığını kontrol edin.",
     errorRetranslation: "Yeniden çeviri sırasında bir hata oluştu!",
     errorLoadWorkFile: "Çalışma dosyası yüklenirken bir hata oluştu. Lütfen dosya formatını kontrol edin!",
-    errorServerConnection: "LM Studio sunucusuna bağlanılamadı"
+    errorServerConnection: "LM Studio sunucusuna bağlanılamadı",
+    
+    // Yükleme animasyonu metinleri
+    loadingGeneral: "Yükleniyor...",
+    loadingFileProcessing: "Dosya işleniyor...",
+    loadingTablePopulation: "Tablo dolduruluyor...",
+    loadingWorkFileProcessing: "Çalışma dosyası işleniyor...",
+    loadingMmmFileProcessing: "MMM dosyası işleniyor...",
+    loadingTranslation: "Çeviri yapılıyor...",
+    loadingClickToClose: "Kapatmak için dışarıdaki herhangi bir yere tıklayın",
+    loadingBatchTranslation: "Toplu çeviri devam ediyor...",
+    
+    // Toplu çeviri modu hata mesajları
+    errorNumberingRetry: "Numaralandırma hatası, yeniden deneniyor ({0}/{1})...",
+    errorRateLimitExceeded: "API hız sınırı aşıldı, 10 saniye bekleniyor...",
+    errorTranslationRetry: "Çeviri hatası, yeniden deneniyor ({0}/{1})...",
+    errorTranslationFailed: "{0} denemeden sonra çeviri başarısız oldu, devam ediliyor...",
+    
+    // Özel çeviri modu
+    batchModeLabel: "Özel geniş bağlam çeviri modu"
 };
 
 // Export the language object

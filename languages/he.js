@@ -68,7 +68,26 @@ const he = {
     errorApiNotAvailable: "ה-API של LM Studio אינו זמין. אנא בדוק אם LM Studio פועל ברקע.",
     errorRetranslation: "אירעה שגיאה במהלך התרגום מחדש!",
     errorLoadWorkFile: "אירעה שגיאה בטעינת קובץ העבודה. אנא בדוק את פורמט הקובץ!",
-    errorServerConnection: "לא ניתן להתחבר לשרת LM Studio"
+    errorServerConnection: "לא ניתן להתחבר לשרת LM Studio",
+    
+    // טקסטים של אנימציית טעינה
+    loadingGeneral: "טוען...",
+    loadingFileProcessing: "מעבד קובץ...",
+    loadingTablePopulation: "ממלא טבלה...",
+    loadingWorkFileProcessing: "מעבד קובץ עבודה...",
+    loadingMmmFileProcessing: "מעבד קובץ MMM...",
+    loadingTranslation: "מתרגם...",
+    loadingClickToClose: "לחץ בכל מקום מחוץ כדי לסגור",
+    loadingBatchTranslation: "תרגום אצווה בתהליך...",
+    
+    // הודעות שגיאה למצב תרגום אצווה
+    errorNumberingRetry: "שגיאת מספור, מנסה שוב ({0}/{1})...",
+    errorRateLimitExceeded: "חריגה ממגבלת קצב ה-API, ממתין 10 שניות...",
+    errorTranslationRetry: "שגיאת תרגום, מנסה שוב ({0}/{1})...",
+    errorTranslationFailed: "התרגום נכשל לאחר {0} ניסיונות, ממשיך...",
+    
+    // מצב תרגום מיוחד
+    batchModeLabel: "מצב תרגום הקשר גדול מיוחד"
 };
 
 // Export the language object

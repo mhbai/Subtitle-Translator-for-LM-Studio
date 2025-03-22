@@ -68,7 +68,26 @@ const id = {
     errorApiNotAvailable: "API LM Studio tidak tersedia. Silakan periksa apakah LM Studio berjalan di latar belakang.",
     errorRetranslation: "Terjadi kesalahan selama proses terjemahan ulang!",
     errorLoadWorkFile: "Terjadi kesalahan saat memuat file kerja. Silakan periksa format file!",
-    errorServerConnection: "Tidak dapat terhubung ke server LM Studio"
+    errorServerConnection: "Tidak dapat terhubung ke server LM Studio",
+    
+    // Teks animasi pemuatan
+    loadingGeneral: "Memuat...",
+    loadingFileProcessing: "Memproses file...",
+    loadingTablePopulation: "Mengisi tabel...",
+    loadingWorkFileProcessing: "Memproses file kerja...",
+    loadingMmmFileProcessing: "Memproses file MMM...",
+    loadingTranslation: "Menerjemahkan...",
+    loadingClickToClose: "Klik di mana saja di luar untuk menutup",
+    loadingBatchTranslation: "Terjemahan batch sedang berlangsung...",
+    
+    // Pesan kesalahan untuk mode terjemahan batch
+    errorNumberingRetry: "Kesalahan penomoran, mencoba lagi ({0}/{1})...",
+    errorRateLimitExceeded: "Batas kecepatan API terlampaui, menunggu 10 detik...",
+    errorTranslationRetry: "Kesalahan terjemahan, mencoba lagi ({0}/{1})...",
+    errorTranslationFailed: "Terjemahan gagal setelah {0} percobaan, melanjutkan...",
+    
+    // Mode terjemahan khusus
+    batchModeLabel: "Mode terjemahan konteks besar khusus"
 };
 
 // Export the language object

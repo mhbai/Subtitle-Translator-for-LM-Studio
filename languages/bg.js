@@ -68,7 +68,26 @@ const bg = {
     errorApiNotAvailable: "LM Studio API не е достъпно. Моля, проверете дали LM Studio работи на заден план.",
     errorRetranslation: "Възникна грешка по време на повторния превод!",
     errorLoadWorkFile: "Възникна грешка при зареждане на работния файл. Моля, проверете формата на файла!",
-    errorServerConnection: "Не може да се осъществи връзка със сървъра на LM Studio"
+    errorServerConnection: "Не може да се осъществи връзка със сървъра на LM Studio",
+    
+    // Текстове за анимация на зареждане
+    loadingGeneral: "Зареждане...",
+    loadingFileProcessing: "Обработка на файл...",
+    loadingTablePopulation: "Попълване на таблица...",
+    loadingWorkFileProcessing: "Обработка на работен файл...",
+    loadingMmmFileProcessing: "Обработка на MMM файл...",
+    loadingTranslation: "Превеждане...",
+    loadingClickToClose: "Кликнете някъде извън, за да затворите",
+    loadingBatchTranslation: "Групов превод в процес...",
+    
+    // Съобщения за грешки в режим на групов превод
+    errorNumberingRetry: "Грешка при номериране, опитвам отново ({0}/{1})...",
+    errorRateLimitExceeded: "Надвишен лимит на скоростта на API, изчакване 10 секунди...",
+    errorTranslationRetry: "Грешка при превод, опитвам отново ({0}/{1})...",
+    errorTranslationFailed: "Преводът се провали след {0} опита, продължавам...",
+    
+    // Специален режим на превод
+    batchModeLabel: "Специален режим на превод с голям контекст"
 };
 
 // Export the language object

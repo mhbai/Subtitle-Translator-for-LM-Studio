@@ -68,7 +68,26 @@ const cs = {
     errorApiNotAvailable: "LM Studio API není dostupné. Prosím zkontrolujte, zda LM Studio běží na pozadí.",
     errorRetranslation: "Během opětovného překladu došlo k chybě!",
     errorLoadWorkFile: "Během načítání pracovního souboru došlo k chybě. Prosím zkontrolujte formát souboru!",
-    errorServerConnection: "Nelze se připojit k serveru LM Studio"
+    errorServerConnection: "Nelze se připojit k serveru LM Studio",
+    
+    // Texty animace načítání
+    loadingGeneral: "Načítání...",
+    loadingFileProcessing: "Zpracování souboru...",
+    loadingTablePopulation: "Plnění tabulky...",
+    loadingWorkFileProcessing: "Zpracování pracovního souboru...",
+    loadingMmmFileProcessing: "Zpracování MMM souboru...",
+    loadingTranslation: "Překládání...",
+    loadingClickToClose: "Klikněte kamkoliv vně pro zavření",
+    loadingBatchTranslation: "Probíhá dávkový překlad...",
+    
+    // Chybové zprávy pro režim dávkového překladu
+    errorNumberingRetry: "Chyba číslování, zkouším znovu ({0}/{1})...",
+    errorRateLimitExceeded: "Překročen limit rychlosti API, čekám 10 sekund...",
+    errorTranslationRetry: "Chyba překladu, zkouším znovu ({0}/{1})...",
+    errorTranslationFailed: "Překlad selhal po {0} pokusech, pokračuji...",
+    
+    // Speciální režim překladu
+    batchModeLabel: "Speciální režim překladu s velkým kontextem"
 };
 
 // Export the language object

@@ -19,7 +19,7 @@ The latest update brings exciting new features to enhance your translation exper
 
 - Modern, responsive, dark-styled user interface with Bootstrap framework
 - Loading and processing .srt subtitle files
-- Selection of source and target languages from 15 supported languages
+- Selection of source and target languages from 30 supported languages
 - **Multilingual user interface** in 30 different languages
 - Sentence-by-sentence translation of subtitles using the local LM Studio AI model or ChatGPT API
 - **Translation mode selection**: LM Studio local model or ChatGPT API (GPT-4o or GPT-4o-mini)
@@ -246,7 +246,7 @@ A legújabb frissítés izgalmas új funkciókat kínál a fordítási élmény 
 
 - Modern, reszponzív, dark stílusú felhasználói felület Bootstrap keretrendszerrel
 - .srt feliratfájlok betöltése és feldolgozása
-- Forrásnyelv és célnyelv kiválasztása 15 támogatott nyelvből
+- Forrásnyelv és célnyelv kiválasztása 30 támogatott nyelvből
 - **Többnyelvű felhasználói felület** 30 különböző nyelven
 - Feliratok mondatonkénti fordítása a helyi LM Studio AI modell vagy a ChatGPT API segítségével
 - **Fordítási mód választás**: LM Studio helyi modell vagy ChatGPT API (GPT-4o vagy GPT-4o-mini)

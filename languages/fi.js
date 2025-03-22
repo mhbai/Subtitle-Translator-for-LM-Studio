@@ -68,7 +68,26 @@ const fi = {
     errorApiNotAvailable: "LM Studio API ei ole käytettävissä. Tarkista, että LM Studio on käynnissä taustalla.",
     errorRetranslation: "Uudelleenkäännöksen aikana tapahtui virhe!",
     errorLoadWorkFile: "Työtiedoston lataamisen aikana tapahtui virhe. Tarkista tiedostomuoto!",
-    errorServerConnection: "Yhteys LM Studio -palvelimeen epäonnistui"
+    errorServerConnection: "Yhteys LM Studio -palvelimeen epäonnistui",
+    
+    // Latausanimaatiotekstit
+    loadingGeneral: "Ladataan...",
+    loadingFileProcessing: "Käsitellään tiedostoa...",
+    loadingTablePopulation: "Täytetään taulukkoa...",
+    loadingWorkFileProcessing: "Käsitellään työtiedostoa...",
+    loadingMmmFileProcessing: "Käsitellään MMM-tiedostoa...",
+    loadingTranslation: "Käännetään...",
+    loadingClickToClose: "Napsauta ulkopuolelta sulkeaksesi",
+    loadingBatchTranslation: "Eräkäännös käynnissä...",
+    
+    // Eräkäännöstilan virheilmoitukset
+    errorNumberingRetry: "Numerointivirhe, yritetään uudelleen ({0}/{1})...",
+    errorRateLimitExceeded: "API-nopeusrajoitus ylitetty, odotetaan 10 sekuntia...",
+    errorTranslationRetry: "Käännösvirhe, yritetään uudelleen ({0}/{1})...",
+    errorTranslationFailed: "Käännös epäonnistui {0} yrityksen jälkeen, jatketaan...",
+    
+    // Erikoiskäännöstila
+    batchModeLabel: "Erikoinen laajan kontekstin käännöstila"
 };
 
 // Export the language object

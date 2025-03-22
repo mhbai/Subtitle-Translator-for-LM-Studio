@@ -68,7 +68,26 @@ const ar = {
     errorApiNotAvailable: "واجهة برمجة تطبيقات LM Studio غير متاحة. يرجى التحقق من تشغيل LM Studio في الخلفية.",
     errorRetranslation: "حدث خطأ أثناء إعادة الترجمة!",
     errorLoadWorkFile: "حدث خطأ أثناء تحميل ملف العمل. يرجى التحقق من تنسيق الملف!",
-    errorServerConnection: "تعذر الاتصال بخادم LM Studio"
+    errorServerConnection: "تعذر الاتصال بخادم LM Studio",
+    
+    // نصوص تحميل الرسوم المتحركة
+    loadingGeneral: "جاري التحميل...",
+    loadingFileProcessing: "جاري معالجة الملف...",
+    loadingTablePopulation: "جاري ملء الجدول...",
+    loadingWorkFileProcessing: "جاري معالجة ملف العمل...",
+    loadingMmmFileProcessing: "جاري معالجة ملف MMM...",
+    loadingTranslation: "جاري الترجمة...",
+    loadingClickToClose: "انقر في أي مكان خارج النافذة للإغلاق",
+    loadingBatchTranslation: "جاري الترجمة الدفعية...",
+    
+    // رسائل خطأ وضع الترجمة الدفعية
+    errorNumberingRetry: "خطأ في الترقيم، إعادة المحاولة ({0}/{1})...",
+    errorRateLimitExceeded: "تم تجاوز حد معدل واجهة برمجة التطبيقات، انتظار 10 ثوانٍ...",
+    errorTranslationRetry: "خطأ في الترجمة، إعادة المحاولة ({0}/{1})...",
+    errorTranslationFailed: "فشلت الترجمة بعد {0} محاولات، جاري المتابعة...",
+    
+    // وضع الترجمة الخاص
+    batchModeLabel: "وضع الترجمة الخاص بالسياق الكبير"
 };
 
 // Export the language object
