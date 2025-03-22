@@ -670,7 +670,7 @@ async function translateBatchWithOpenRouterGeminiFlash(startIndex, sourceLanguag
         }
         
         // Homokóra animáció megjelenítése
-        showLoadingOverlay("Kötegelt fordítás folyamatban...");
+        showLoadingOverlay('loadingBatchTranslation');
         
         // Köteg összeállítása
         let batchTexts = "";
@@ -738,7 +738,16 @@ NE adj hozzá magyarázatot vagy egyéb szöveget.`;
                 } else {
                     // Sorszámozási hiba, újrapróbálkozás
                     console.error(`Sorszámozási hiba a fordításban, újrapróbálkozás (${retryCount + 1}/${MAX_RETRIES})`);
-                    showLoadingOverlay(`Sorszámozási hiba, újrapróbálkozás (${retryCount + 1}/${MAX_RETRIES})...`);
+                    
+                    // Többnyelvű hibaüzenet
+                    const currentLang = currentLangCode || 'hu';
+                    const translations = uiTranslations[currentLang] || {};
+                    let errorMessage = translations.errorNumberingRetry || `Sorszámozási hiba, újrapróbálkozás ({0}/{1})...`;
+                    
+                    // Helyőrzők cseréje
+                    errorMessage = errorMessage.replace('{0}', retryCount + 1).replace('{1}', MAX_RETRIES);
+                    
+                    showLoadingOverlay(errorMessage);
                     retryCount++;
                     
                     // Kis szünet az újrapróbálkozás előtt
@@ -750,7 +759,13 @@ NE adj hozzá magyarázatot vagy egyéb szöveget.`;
                 // Ha sebességkorlát-túllépés (429) hiba, akkor várunk egy ideig és újra próbáljuk
                 if (error.message && error.message.includes('429')) {
                     console.log('Sebességkorlát-túllépés (429), várakozás 10 másodpercet...');
-                    showLoadingOverlay('API sebességkorlát túllépve, várakozás 10 másodpercet...');
+                    
+                    // Többnyelvű hibaüzenet
+                    const currentLang = currentLangCode || 'hu';
+                    const translations = uiTranslations[currentLang] || {};
+                    const errorMessage = translations.errorRateLimitExceeded || 'API sebességkorlát túllépve, várakozás 10 másodpercet...';
+                    
+                    showLoadingOverlay(errorMessage);
                     
                     // Várakozás 10 másodpercet
                     await new Promise(resolve => setTimeout(resolve, 10000));
@@ -761,7 +776,16 @@ NE adj hozzá magyarázatot vagy egyéb szöveget.`;
                 
                 // Egyéb hiba esetén újrapróbálkozás
                 console.error(`Fordítási hiba, újrapróbálkozás (${retryCount + 1}/${MAX_RETRIES})`);
-                showLoadingOverlay(`Fordítási hiba, újrapróbálkozás (${retryCount + 1}/${MAX_RETRIES})...`);
+                
+                // Többnyelvű hibaüzenet
+                const currentLang = currentLangCode || 'hu';
+                const translations = uiTranslations[currentLang] || {};
+                let errorMessage = translations.errorTranslationRetry || `Fordítási hiba, újrapróbálkozás ({0}/{1})...`;
+                
+                // Helyőrzők cseréje
+                errorMessage = errorMessage.replace('{0}', retryCount + 1).replace('{1}', MAX_RETRIES);
+                
+                showLoadingOverlay(errorMessage);
                 retryCount++;
                 
                 // Kis szünet az újrapróbálkozás előtt
@@ -772,7 +796,16 @@ NE adj hozzá magyarázatot vagy egyéb szöveget.`;
         // Ha minden újrapróbálkozás sikertelen volt
         if (!translationSuccessful) {
             console.error(`Sikertelen fordítás ${MAX_RETRIES} próbálkozás után, továbblépés a következő kötegre.`);
-            showLoadingOverlay(`Sikertelen fordítás ${MAX_RETRIES} próbálkozás után, továbblépés...`, 2000);
+            
+            // Többnyelvű hibaüzenet
+            const currentLang = currentLangCode || 'hu';
+            const translations = uiTranslations[currentLang] || {};
+            let errorMessage = translations.errorTranslationFailed || `Sikertelen fordítás {0} próbálkozás után, továbblépés...`;
+            
+            // Helyőrzők cseréje
+            errorMessage = errorMessage.replace('{0}', MAX_RETRIES);
+            
+            showLoadingOverlay(errorMessage, 2000);
             
             // Kis szünet a következő köteg előtt
             await new Promise(resolve => setTimeout(resolve, 2000));
@@ -881,6 +914,19 @@ function processTranslatedBatch(translatedBatch, batchStart, batchEnd, {
 
 // Segédfüggvény a homokóra animáció megjelenítéséhez adott ideig
 function showLoadingOverlay(message, duration = null) {
+    // A jelenlegi nyelv alapján választjuk ki a megfelelő üzenetet
+    const currentLang = currentLangCode || 'hu';
+    const translations = uiTranslations[currentLang] || {};
+    
+    // Ha a message egy kulcs a fordításokban, akkor használjuk a fordított szöveget
+    if (translations[message]) {
+        message = translations[message];
+    }
+    
+    // Az alapértelmezett "Betöltés..." szöveg fordítása
+    const loadingText = translations.loadingGeneral || "Betöltés...";
+    const clickToCloseText = translations.loadingClickToClose || "Kattints bárhova az ablakon kívül a bezáráshoz";
+    
     // Ha már létezik, csak frissítjük az üzenetet
     let overlay = document.getElementById('loadingOverlay');
     
@@ -928,14 +974,14 @@ function showLoadingOverlay(message, duration = null) {
         messageElement.id = 'loadingMessage';
         messageElement.style.marginTop = '15px';
         messageElement.style.fontSize = '1.2rem';
-        messageElement.textContent = message || 'Betöltés...';
+        messageElement.textContent = message || loadingText;
         
         // Létrehozzuk a bezárás tippet
         const closeTip = document.createElement('div');
         closeTip.style.marginTop = '15px';
         closeTip.style.fontSize = '0.9rem';
         closeTip.style.opacity = '0.7';
-        closeTip.textContent = 'Kattints bárhova az ablakon kívül a bezáráshoz';
+        closeTip.textContent = clickToCloseText;
         
         // Összeállítjuk a DOM-ot
         container.appendChild(spinner);
@@ -947,7 +993,7 @@ function showLoadingOverlay(message, duration = null) {
         // Csak frissítjük az üzenetet
         const messageElement = document.getElementById('loadingMessage');
         if (messageElement) {
-            messageElement.textContent = message || 'Betöltés...';
+            messageElement.textContent = message || loadingText;
         }
         
         // Megjelenítjük, ha rejtve volt

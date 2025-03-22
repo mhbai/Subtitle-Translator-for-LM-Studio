@@ -396,6 +396,9 @@ document.addEventListener('DOMContentLoaded', function() {
     function processSrtFile(file) {
         const reader = new FileReader();
         
+        // Betöltési animáció megjelenítése
+        showLoadingOverlay('loadingFileProcessing');
+        
         reader.onload = function(e) {
             // Fájl tartalmának beolvasása
             const content = e.target.result;
@@ -408,36 +411,45 @@ document.addEventListener('DOMContentLoaded', function() {
             // Feliratok feldolgozása
             parseSrtFile(content);
             
-            // Táblázat feltöltése
-            populateTable();
+            // Táblázat feltöltése előtt jelezzük, hogy ez hosszabb időt vehet igénybe
+            showLoadingOverlay('loadingTablePopulation');
             
-            // Fordítás gomb engedélyezése
-            startTranslationBtn.disabled = false;
-            saveTranslationBtn.disabled = true;
-            saveWorkFileBtn.classList.add('d-none');
-            
-            // Fordítási állapot alaphelyzetbe állítása
-            isTranslationPaused = false;
-            currentTranslationIndex = 0;
-            
-            // A fordítás indítása gomb szövegének beállítása az aktuális nyelven
-            if (typeof uiTranslations !== 'undefined' && uiTranslations[currentLangCode]) {
-                startTranslationBtn.innerHTML = `<i class="bi bi-translate me-2"></i>${uiTranslations[currentLangCode].startTranslation}`;
-            } else {
-                startTranslationBtn.innerHTML = '<i class="bi bi-translate me-2"></i>Start Translation';
-            }
-            
-            stopTranslationBtn.classList.add('d-none');
-            
-            // Sor számok frissítése
-            lineCountSpan.textContent = originalSubtitles.length;
-            
-            // Forrás blokkmentése gomb megjelenítése
-            if (saveSourceBlockBtn) {
-                saveSourceBlockBtn.classList.remove('d-none');
-            } else {
-                createSaveSourceBlockButton();
-            }
+            // Táblázat feltöltése késleltetéssel, hogy a betöltési animáció megjelenjen
+            setTimeout(() => {
+                // Táblázat feltöltése
+                populateTable();
+                
+                // Fordítás gomb engedélyezése
+                startTranslationBtn.disabled = false;
+                saveTranslationBtn.disabled = true;
+                saveWorkFileBtn.classList.add('d-none');
+                
+                // Fordítási állapot alaphelyzetbe állítása
+                isTranslationPaused = false;
+                currentTranslationIndex = 0;
+                
+                // A fordítás indítása gomb szövegének beállítása az aktuális nyelven
+                if (typeof uiTranslations !== 'undefined' && uiTranslations[currentLangCode]) {
+                    startTranslationBtn.innerHTML = `<i class="bi bi-translate me-2"></i>${uiTranslations[currentLangCode].startTranslation}`;
+                } else {
+                    startTranslationBtn.innerHTML = '<i class="bi bi-translate me-2"></i>Start Translation';
+                }
+                
+                stopTranslationBtn.classList.add('d-none');
+                
+                // Sor számok frissítése
+                lineCountSpan.textContent = originalSubtitles.length;
+                
+                // Forrás blokkmentése gomb megjelenítése
+                if (saveSourceBlockBtn) {
+                    saveSourceBlockBtn.classList.remove('d-none');
+                } else {
+                    createSaveSourceBlockButton();
+                }
+                
+                // Betöltési animáció elrejtése
+                hideLoadingOverlay();
+            }, 50); // Rövid késleltetés, hogy a betöltési animáció megjelenjen
         };
         
         reader.readAsText(file);
@@ -446,6 +458,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // Munkafájl feldolgozása
     function processWorkFile(file) {
         const reader = new FileReader();
+        
+        // Betöltési animáció megjelenítése
+        showLoadingOverlay('loadingWorkFileProcessing');
         
         reader.onload = function(e) {
             try {
@@ -471,35 +486,53 @@ document.addEventListener('DOMContentLoaded', function() {
                 fileNameSpan.textContent = fileName;
                 lineCountSpan.textContent = originalSubtitles.length;
                 
-                // Táblázat feltöltése
-                populateTable();
+                // Táblázat feltöltése előtt jelezzük, hogy ez hosszabb időt vehet igénybe
+                showLoadingOverlay('loadingTablePopulation');
                 
-                // Újrafordítás gombok megjelenítése a már lefordított sorokhoz
-                translatedSubtitles.forEach((subtitle, index) => {
-                    if (subtitle) {
-                        const retranslateBtn = document.getElementById(`retranslate-${index}`);
-                        if (retranslateBtn) {
-                            retranslateBtn.classList.remove('d-none');
+                // Táblázat feltöltése késleltetéssel, hogy a betöltési animáció megjelenjen
+                setTimeout(() => {
+                    // Táblázat feltöltése
+                    populateTable();
+                    
+                    // Újrafordítás gombok megjelenítése a már lefordított sorokhoz
+                    translatedSubtitles.forEach((subtitle, index) => {
+                        if (subtitle) {
+                            const retranslateBtn = document.getElementById(`retranslate-${index}`);
+                            if (retranslateBtn) {
+                                retranslateBtn.classList.remove('d-none');
+                            }
                         }
+                    });
+                    
+                    // Folyamatjelző frissítése
+                    updateProgressBar(currentTranslationIndex, originalSubtitles.length);
+                    
+                    // UI frissítése
+                    startTranslationBtn.disabled = false;
+                    startTranslationBtn.innerHTML = '<i class="bi bi-play-circle me-2"></i>Fordítás folytatása';
+                    
+                    if (translatedSubtitles.length > 0) {
+                        saveTranslationBtn.disabled = false;
+                        saveWorkFileBtn.classList.remove('d-none');
                     }
-                });
-                
-                // Folyamatjelző frissítése
-                updateProgressBar(currentTranslationIndex, originalSubtitles.length);
-                
-                // UI frissítése
-                startTranslationBtn.disabled = false;
-                startTranslationBtn.innerHTML = '<i class="bi bi-play-circle me-2"></i>Fordítás folytatása';
-                
-                if (translatedSubtitles.length > 0) {
-                    saveTranslationBtn.disabled = false;
-                    saveWorkFileBtn.classList.remove('d-none');
-                }
-                
-                alert('Work file successfully loaded! Translation can continue.');
+                    
+                    // Betöltési animáció elrejtése
+                    hideLoadingOverlay();
+                    
+                    // Sikeres betöltés üzenet a jelenlegi nyelven
+                    const successMessage = uiTranslations[currentLangCode]?.successLoadWorkFile || 'Work file successfully loaded! Translation can continue.';
+                    alert(successMessage);
+                }, 50); // Rövid késleltetés, hogy a betöltési animáció megjelenjen
             } catch (error) {
+                // Hiba esetén elrejtjük a betöltési animációt
+                hideLoadingOverlay();
+                
                 console.error('Hiba a munkafájl betöltése során:', error);
-                alert('Hiba történt a munkafájl betöltése során. Ellenőrizze a fájl formátumát!');
+                
+                // Hibaüzenet a jelenlegi nyelven
+                const errorMessage = uiTranslations[currentLangCode]?.errorLoadWorkFile || 'Error loading work file. Please check the file format!';
+                alert(errorMessage);
+                
                 event.target.value = '';
             }
         };
@@ -511,6 +544,9 @@ document.addEventListener('DOMContentLoaded', function() {
     function processMmmFile(file) {
         const reader = new FileReader();
         
+        // Betöltési animáció megjelenítése
+        showLoadingOverlay('loadingMmmFileProcessing');
+        
         reader.onload = function(e) {
             // Fájl tartalmának beolvasása
             const content = e.target.result;
@@ -521,21 +557,36 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Ellenőrizzük, hogy van-e már betöltött felirat
             if (originalSubtitles.length === 0) {
-                alert('Load an .srt file before loading an .mmm file!');
+                // Hiba esetén elrejtjük a betöltési animációt
+                hideLoadingOverlay();
+                
+                // Hibaüzenet a jelenlegi nyelven
+                const errorMessage = uiTranslations[currentLangCode]?.errorNoSrtFirst || 'Load an .srt file before loading an .mmm file!';
+                alert(errorMessage);
                 return;
             }
             
             // MMM fájl feldolgozása - csak a fordított szövegek frissítése
             parseMmmFile(content);
             
-            // Táblázat frissítése
-            populateTable();
+            // Táblázat feltöltése előtt jelezzük, hogy ez hosszabb időt vehet igénybe
+            showLoadingOverlay('loadingTablePopulation');
             
-            // Fordítás gomb engedélyezése
-            startTranslationBtn.disabled = false;
-            saveTranslationBtn.disabled = false;
-            saveWorkFileBtn.classList.remove('d-none');
+            // Táblázat feltöltése késleltetéssel, hogy a betöltési animáció megjelenjen
+            setTimeout(() => {
+                // Táblázat frissítése
+                populateTable();
+                
+                // Fordítás gomb engedélyezése
+                startTranslationBtn.disabled = false;
+                saveTranslationBtn.disabled = false;
+                saveWorkFileBtn.classList.remove('d-none');
+                
+                // Betöltési animáció elrejtése
+                hideLoadingOverlay();
+            }, 50); // Rövid késleltetés, hogy a betöltési animáció megjelenjen
         };
+        
         reader.readAsText(file);
     }
     

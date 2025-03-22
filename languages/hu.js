@@ -52,6 +52,8 @@ const hu = {
     translationCompleted: "A fordítás sikeresen befejeződött!",
     successLoadWorkFile: "Munkafájl sikeresen betöltve! A fordítás folytatható.",
     successSaveWorkFile: "Munkafájl sikeresen elmentve!",
+    successWorkFile: "A munkafájl sikeresen elmentve!",
+    successSourceBlock: "A forrás blokk sikeresen elmentve!",
     
     // Hibaüzenetek
     errorFileLoad: "Hiba a fájl betöltése során",
@@ -68,7 +70,30 @@ const hu = {
     errorApiNotAvailable: "Az LM Studio API nem érhető el. Kérjük, ellenőrizze, hogy fut-e az LM Studio a háttérben.",
     errorRetranslation: "Hiba történt az újrafordítás során!",
     errorLoadWorkFile: "Hiba történt a munkafájl betöltése során. Ellenőrizze a fájl formátumát!",
-    errorServerConnection: "Nem sikerült kapcsolódni az LM Studio szerverhez"
+    errorServerConnection: "Nem sikerült kapcsolódni az LM Studio szerverhez",
+    errorFileSave: "Hiba történt a fájl mentése során!",
+    
+    // API kulcs kezelés
+    toggleApiKeyVisibility: "API kulcs megjelenítése/elrejtése",
+    
+    // Betöltési animáció szövegei
+    loadingGeneral: "Betöltés...",
+    loadingFileProcessing: "Fájl betöltése folyamatban...",
+    loadingTablePopulation: "Táblázat feltöltése folyamatban...",
+    loadingWorkFileProcessing: "Munkafájl betöltése folyamatban...",
+    loadingMmmFileProcessing: "MMM fájl betöltése folyamatban...",
+    loadingTranslation: "Fordítás folyamatban...",
+    loadingClickToClose: "Kattints bárhova az ablakon kívül a bezáráshoz",
+    loadingBatchTranslation: "Kötegelt fordítás folyamatban...",
+    
+    // Kötegelt fordítási mód hibaüzenetei
+    errorNumberingRetry: "Sorszámozási hiba, újrapróbálkozás ({0}/{1})...",
+    errorRateLimitExceeded: "API sebességkorlát túllépve, várakozás 10 másodpercet...",
+    errorTranslationRetry: "Fordítási hiba, újrapróbálkozás ({0}/{1})...",
+    errorTranslationFailed: "Sikertelen fordítás {0} próbálkozás után, továbblépés...",
+    
+    // Speciális fordítási mód
+    batchModeLabel: "Speciális nagy kontextusú fordítási mód"
 };
 
 // Export the language object

@@ -50,25 +50,50 @@ const en = {
     // Success messages
     successTranslation: "Translation successfully completed!",
     translationCompleted: "Translation successfully completed!",
-    successLoadWorkFile: "Work file successfully loaded! You can continue the translation.",
+    successLoadWorkFile: "Work file successfully loaded! Translation can continue.",
     successSaveWorkFile: "Work file successfully saved!",
+    successWorkFile: "Work file successfully saved!",
+    successSourceBlock: "Source block successfully saved!",
     
     // Error messages
     errorFileLoad: "Error loading file",
-    errorTranslation: "An error occurred during translation!",
-    errorSave: "Error saving file",
-    errorNoFile: "Please select a file!",
-    errorTranslationRunning: "Please stop the translation before loading a new file!",
-    errorInvalidFile: "Only .srt, .wrk or .mmm files can be loaded!",
-    errorNoSubtitles: "The file does not contain valid subtitles!",
-    errorNoSrtFirst: "Please load an .srt file first before loading an .mmm file!",
-    errorNoValidText: "The file does not contain valid texts or the line numbers do not match the loaded subtitles!",
-    errorNoTranslation: "Nothing to save! Please translate the subtitles first.",
-    errorNoSubtitleToSave: "No subtitles loaded to save!",
+    errorTranslation: "Error during translation",
+    errorSaveTranslation: "Error saving translation",
+    errorSaveSrt: "Error saving SRT file",
+    errorSaveSourceBlock: "Error saving source block",
+    errorLoadLanguage: "Error loading language file",
+    errorNoSubtitles: "No subtitles loaded",
+    errorNoTranslation: "No translation available",
+    errorNoSourceLanguage: "Please select source language",
+    errorNoTargetLanguage: "Please select target language",
+    errorApiKey: "API key is required for this translation mode",
     errorApiNotAvailable: "LM Studio API is not available. Please check if LM Studio is running in the background.",
-    errorRetranslation: "An error occurred during retranslation!",
-    errorLoadWorkFile: "An error occurred while loading the work file. Please check the file format!",
-    errorServerConnection: "Could not connect to LM Studio server"
+    errorRetranslation: "Error during retranslation!",
+    errorLoadWorkFile: "Error loading work file. Please check the file format!",
+    errorServerConnection: "Could not connect to LM Studio server",
+    errorFileSave: "Error saving file!",
+    
+    // API key management
+    toggleApiKeyVisibility: "Show/Hide API key",
+    
+    // Loading animation texts
+    loadingGeneral: "Loading...",
+    loadingFileProcessing: "Processing file...",
+    loadingTablePopulation: "Populating table...",
+    loadingWorkFileProcessing: "Processing work file...",
+    loadingMmmFileProcessing: "Processing MMM file...",
+    loadingTranslation: "Translating...",
+    loadingClickToClose: "Click anywhere outside to close",
+    loadingBatchTranslation: "Batch translation in progress...",
+    
+    // Batch translation mode error messages
+    errorNumberingRetry: "Numbering error, retrying ({0}/{1})...",
+    errorRateLimitExceeded: "API rate limit exceeded, waiting 10 seconds...",
+    errorTranslationRetry: "Translation error, retrying ({0}/{1})...",
+    errorTranslationFailed: "Translation failed after {0} attempts, moving on...",
+    
+    // Special translation mode
+    batchModeLabel: "Special large context translation mode"
 };
 
 // Export the language object
