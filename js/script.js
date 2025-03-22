@@ -316,7 +316,7 @@ document.addEventListener('DOMContentLoaded', function() {
             event.target.value = '';
             
             // Figyelmeztetés megjelenítése
-            alert('Kérjük, először állítsa le a fordítást, mielőtt új fájlt töltene be!');
+            alert('Please stop the translation before loading a new file!');
             return;
         }
         
@@ -337,7 +337,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // MMM fájl feldolgozása
             processMmmFile(file);
         } else {
-            alert('Csak .srt, .wrk vagy .mmm kiterjesztésű fájlokat lehet betölteni!');
+            alert('Only files with the extension .srt, .wrk or .mmm can be loaded!');
             event.target.value = '';
             return;
         }
@@ -447,7 +447,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     saveWorkFileBtn.classList.remove('d-none');
                 }
                 
-                alert('Munkafájl sikeresen betöltve! A fordítás folytatható.');
+                alert('Work file successfully loaded! Translation can continue.');
             } catch (error) {
                 console.error('Hiba a munkafájl betöltése során:', error);
                 alert('Hiba történt a munkafájl betöltése során. Ellenőrizze a fájl formátumát!');
@@ -472,7 +472,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Ellenőrizzük, hogy van-e már betöltött felirat
             if (originalSubtitles.length === 0) {
-                alert('Először töltsön be egy .srt fájlt, mielőtt .mmm fájlt töltene be!');
+                alert('Load an .srt file before loading an .mmm file!');
                 return;
             }
             
@@ -587,7 +587,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         if (!foundValidText) {
-            alert('A fájl nem tartalmaz érvényes szövegeket vagy a sorszámok nem egyeznek a betöltött feliratokkal!');
+            alert('The file does not contain valid texts or the line numbers do not match the loaded subtitles!');
         }
     }
 
@@ -758,7 +758,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (selectedMode === 'chatgpt_4o_mini' || selectedMode === 'chatgpt_4o') {
                 // Ellenőrizzük, hogy van-e API kulcs
                 if (!apiKey) {
-                    alert(uiTranslations[currentLangCode]?.errorNoApiKey || 'Kérjük, adja meg az API kulcsot a ChatGPT használatához!');
+                    alert(uiTranslations[currentLangCode]?.errorNoApiKey || 'Please enter the API key to use ChatGPT!');
                     return;
                 }
                 
@@ -806,7 +806,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
         } catch (error) {
             console.error('Újrafordítási hiba:', error);
-            alert(`Hiba történt az újrafordítás során: ${error.message}`);
+            alert(`An error occurred during the re-translation: ${error.message}`);
         } finally {
             // Fordítás gomb visszaállítása
             if (retranslateBtn) {
@@ -828,7 +828,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         if (selectedMode === 'chatgpt_4o_mini' || selectedMode === 'chatgpt_4o') {
             if (!apiKey) {
-                alert('Kérjük, adja meg az API kulcsot a ChatGPT használatához!');
+                alert('Please enter the API key to use ChatGPT!');
                 return;
             }
         }
@@ -1020,7 +1020,7 @@ NE használd a "${uniqueMarker}" vagy "${endMarker}" jelöléseket a válaszodba
                 // Ha sebességkorlát-túllépés (429) hiba, akkor várunk egy ideig és újra próbáljuk
                 if (error.message.includes('429')) {
                     console.log('Sebességkorlát-túllépés (429), várakozás 10 másodpercet...');
-                    alert('Az API sebességkorlát-túllépés miatt várakozunk 10 másodpercet, majd folytatjuk a fordítást.');
+                    alert('We wait 10 seconds for the API speed limit to be exceeded and then continue translating.');
                     
                     // Várakozás 10 másodpercet
                     await new Promise(resolve => setTimeout(resolve, 10000));
@@ -1094,7 +1094,7 @@ NE használd a "${uniqueMarker}" vagy "${endMarker}" jelöléseket a válaszodba
                 // Ha sebességkorlát-túllépés (429) hiba, akkor várunk egy ideig és újra próbáljuk
                 if (error.message.includes('429')) {
                     console.log('Sebességkorlát-túllépés (429), várakozás 10 másodpercet...');
-                    alert('Az API sebességkorlát-túllépés miatt várakozunk 10 másodpercet, majd folytatjuk a fordítást.');
+                    alert('We wait 10 seconds for the API speed limit to be exceeded and then continue translating.');
                     
                     // Várakozás 10 másodpercet
                     await new Promise(resolve => setTimeout(resolve, 10000));
@@ -1104,7 +1104,7 @@ NE használd a "${uniqueMarker}" vagy "${endMarker}" jelöléseket a válaszodba
                     continue;
                 }
                 
-                alert(`Hiba történt a fordítás során: ${error.message}`);
+                alert(`An error occurred during translation: ${error.message}`);
                 pauseTranslation();
                 break;
             }
@@ -1303,7 +1303,7 @@ NE használd a "${uniqueMarker}" vagy "${endMarker}" jelöléseket a válaszodba
     function saveTranslation() {
         // Ellenőrizzük, hogy van-e fordítás
         if (translatedSubtitles.length === 0) {
-            alert('Nincs mit menteni! Kérjük, először fordítsa le a feliratokat.');
+            alert('There is nothing to save! Please translate the subtitles first.');
             return;
         }
         
@@ -1346,7 +1346,7 @@ if (fileName.toLowerCase().endsWith('.wrk') || fileName.toLowerCase().endsWith('
     function saveWorkFile() {
         // Ellenőrizzük, hogy van-e betöltött felirat
         if (originalSubtitles.length === 0) {
-            alert('Nincs betöltött felirat a mentéshez!');
+            alert('No loaded subtitle to save!');
             return;
         }
         
@@ -1935,7 +1935,7 @@ function startTranslation() {
         // ChatGPT-4o fordítás
         translateWithChatGpt('példa szöveg', 'en', 'hu', apiKey, 'gpt-4o');
     } else {
-        alert('Kérjük, adja meg az API kulcsot a ChatGPT használatához!');
+        alert('Please enter the API key to use ChatGPT!');
     }
 }
 
@@ -2039,7 +2039,7 @@ function createSaveSourceBlockButton() {
 // Forrás szöveg blokkokba mentése
 function saveSourceBlock() {
     if (!originalSubtitles || originalSubtitles.length === 0) {
-        alert(uiTranslations[currentLangCode]?.errorNoSubtitleToSave || 'Nincs betöltött felirat a mentéshez!');
+        alert(uiTranslations[currentLangCode]?.errorNoSubtitleToSave || 'No loaded subtitle to save!');
         return;
     }
     
