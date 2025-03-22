@@ -304,8 +304,8 @@ NE használd a "${uniqueMarker}" vagy "${endMarker}" jelöléseket a válaszodba
     return localCurrentIndex;
 }
 
-// Szekvenciális fordítás az OpenRouter API-val
-async function translateSequentiallyWithOpenRouter(startIndex, sourceLanguage, targetLanguage, apiKey, temperature, {
+ // Szekvenciális fordítás az OpenRouter API-val
+ async function translateSequentiallyWithOpenRouter(startIndex, sourceLanguage, targetLanguage, apiKey, temperature, {
     originalSubtitles,
     translatedSubtitles,
     isTranslationPausedRef,
@@ -622,6 +622,352 @@ NE használd a "${uniqueMarker}" vagy "${endMarker}" jelöléseket a válaszodba
     
     // Visszaadjuk az utolsó feldolgozott indexet
     return lastProcessedIndex;
+}
+
+// Kötegelt fordítás az OpenRouter API-val (Gemini Flash 2.0 modellel)
+async function translateBatchWithOpenRouterGeminiFlash(startIndex, sourceLanguage, targetLanguage, apiKey, temperature, {
+    originalSubtitles,
+    translatedSubtitles,
+    isTranslationPausedRef,
+    currentTranslationIndex,
+    updateProgressBar,
+    updateTranslatedText,
+    translationMemory,
+    saveTranslationBtn,
+    saveWorkFileBtn,
+    scrollToRow,
+    pauseTranslation,
+    showCurrentRowStopButton
+}) {
+    // Köteg mérete (egyszerre ennyi sort küldünk fordításra)
+    const BATCH_SIZE = 30;
+    
+    // API kérések közötti késleltetés (ms) - 0.5 másodperc
+    const API_DELAY = 500;
+    
+    // Maximum újrapróbálkozások száma sorszám-egyezési hiba esetén
+    const MAX_RETRIES = 3;
+    
+    // Az utolsó feldolgozott index nyomon követése
+    let lastProcessedIndex = startIndex;
+    
+    // Végigmegyünk a feliratokon kötegekben
+    for (let batchStart = startIndex; batchStart < originalSubtitles.length; batchStart += BATCH_SIZE) {
+        // Ha a fordítás szüneteltetése be van kapcsolva, akkor kilépünk a ciklusból
+        if (isTranslationPausedRef.value) {
+            break;
+        }
+        
+        // Aktuális köteg végének meghatározása
+        const batchEnd = Math.min(batchStart + BATCH_SIZE, originalSubtitles.length);
+        
+        // Folyamatjelző frissítése
+        updateProgressBar(batchStart, originalSubtitles.length);
+        
+        // Megjelenítjük az aktuális sor megállítás gombját
+        if (showCurrentRowStopButton) {
+            showCurrentRowStopButton(batchStart);
+        }
+        
+        // Homokóra animáció megjelenítése
+        showLoadingOverlay("Kötegelt fordítás folyamatban...");
+        
+        // Köteg összeállítása
+        let batchTexts = "";
+        let hasUnprocessedLines = false;
+        
+        for (let i = batchStart; i < batchEnd; i++) {
+            // Csak a még le nem fordított sorokat küldjük el
+            if (!translatedSubtitles[i] || translatedSubtitles[i].trim() === '') {
+                // Sorszám + szöveg formátumban
+                batchTexts += `${i+1}. ${originalSubtitles[i].text}\n`;
+                hasUnprocessedLines = true;
+            }
+        }
+        
+        // Ha nincs fordítandó szöveg ebben a kötegben, ugrunk a következőre
+        if (!hasUnprocessedLines) {
+            hideLoadingOverlay();
+            continue;
+        }
+        
+        // Fordítási utasítás
+        const systemPrompt = `Fordítsd le a következő számozott sorokat ${getLanguageNameLocal(sourceLanguage)} nyelvről ${getLanguageNameLocal(targetLanguage)} nyelvre. 
+Minden sort külön fordíts le, és tartsd meg a sorszámozást a fordításban is.
+FONTOS: A válaszodban CSAK a lefordított sorokat add vissza a sorszámokkal együtt, pontosan ugyanolyan formátumban és sorszámozással, ahogy megkaptad.
+Például ha az input:
+123. Eredeti szöveg
+124. Másik eredeti szöveg
+Akkor a válaszod legyen:
+123. Lefordított szöveg
+124. Lefordított másik szöveg
+NE változtasd meg a sorszámokat! NE kezdd újra a számozást 1-től! Használd pontosan az eredeti sorszámokat!
+NE adj hozzá magyarázatot vagy egyéb szöveget.`;
+
+        let retryCount = 0;
+        let translationSuccessful = false;
+        
+        while (retryCount < MAX_RETRIES && !translationSuccessful) {
+            try {
+                // Fordítás végrehajtása
+                const translatedBatch = await translateWithOpenRouterApi(
+                    batchTexts,
+                    systemPrompt,
+                    apiKey,
+                    temperature,
+                    0,  // retryCount
+                    'google/gemini-2.0-flash-001'  // modelId
+                );
+                
+                // Ellenőrizzük, hogy a visszakapott sorszámok megfelelnek-e az elküldötteknek
+                const isNumberingValid = validateLineNumbering(translatedBatch, batchStart);
+                
+                if (isNumberingValid) {
+                    // Fordítás feldolgozása
+                    processTranslatedBatch(translatedBatch, batchStart, batchEnd, {
+                        translatedSubtitles,
+                        updateTranslatedText,
+                        translationMemory,
+                        originalSubtitles,
+                        saveTranslationBtn,
+                        saveWorkFileBtn
+                    });
+                    
+                    // Sikeres fordítás
+                    translationSuccessful = true;
+                } else {
+                    // Sorszámozási hiba, újrapróbálkozás
+                    console.error(`Sorszámozási hiba a fordításban, újrapróbálkozás (${retryCount + 1}/${MAX_RETRIES})`);
+                    showLoadingOverlay(`Sorszámozási hiba, újrapróbálkozás (${retryCount + 1}/${MAX_RETRIES})...`);
+                    retryCount++;
+                    
+                    // Kis szünet az újrapróbálkozás előtt
+                    await new Promise(resolve => setTimeout(resolve, 2000));
+                }
+            } catch (error) {
+                console.error('Kötegelt fordítási hiba:', error);
+                
+                // Ha sebességkorlát-túllépés (429) hiba, akkor várunk egy ideig és újra próbáljuk
+                if (error.message && error.message.includes('429')) {
+                    console.log('Sebességkorlát-túllépés (429), várakozás 10 másodpercet...');
+                    showLoadingOverlay('API sebességkorlát túllépve, várakozás 10 másodpercet...');
+                    
+                    // Várakozás 10 másodpercet
+                    await new Promise(resolve => setTimeout(resolve, 10000));
+                    
+                    // Nem számítjuk újrapróbálkozásnak
+                    continue;
+                }
+                
+                // Egyéb hiba esetén újrapróbálkozás
+                console.error(`Fordítási hiba, újrapróbálkozás (${retryCount + 1}/${MAX_RETRIES})`);
+                showLoadingOverlay(`Fordítási hiba, újrapróbálkozás (${retryCount + 1}/${MAX_RETRIES})...`);
+                retryCount++;
+                
+                // Kis szünet az újrapróbálkozás előtt
+                await new Promise(resolve => setTimeout(resolve, 2000));
+            }
+        }
+        
+        // Ha minden újrapróbálkozás sikertelen volt
+        if (!translationSuccessful) {
+            console.error(`Sikertelen fordítás ${MAX_RETRIES} próbálkozás után, továbblépés a következő kötegre.`);
+            showLoadingOverlay(`Sikertelen fordítás ${MAX_RETRIES} próbálkozás után, továbblépés...`, 2000);
+            
+            // Kis szünet a következő köteg előtt
+            await new Promise(resolve => setTimeout(resolve, 2000));
+        } else {
+            // Utolsó feldolgozott index frissítése
+            lastProcessedIndex = batchEnd - 1;
+            
+            // Görgetés az utolsó feldolgozott sorhoz
+            scrollToRow(lastProcessedIndex);
+        }
+        
+        // Homokóra animáció elrejtése
+        hideLoadingOverlay();
+        
+        // Kis szünet a következő API kérés előtt
+        if (batchEnd < originalSubtitles.length) {
+            await new Promise(resolve => setTimeout(resolve, API_DELAY));
+        }
+    }
+    
+    // Visszaadjuk az utolsó feldolgozott indexet
+    return lastProcessedIndex;
+}
+
+// Segédfüggvény a sorszámozás ellenőrzéséhez
+function validateLineNumbering(translatedBatch, batchStart) {
+    // Fordítás feldolgozása soronként
+    const lines = translatedBatch.split('\n');
+    
+    // Ellenőrizzük az első néhány sort (legalább 3-at, ha van annyi)
+    const linesToCheck = Math.min(3, lines.length);
+    let validLines = 0;
+    
+    for (let i = 0; i < linesToCheck; i++) {
+        const line = lines[i].trim();
+        if (line === '') continue;
+        
+        // Sorszám kinyerése (pl. "123. Szöveg" formátumból)
+        const match = line.match(/^(\d+)\.\s*(.*)/);
+        if (match) {
+            const lineNumber = parseInt(match[1], 10);
+            
+            // Ellenőrizzük, hogy a sorszám a megfelelő tartományban van-e
+            // A sorszám 1-től kezdődik, de a tömb indexek 0-tól, ezért +1
+            if (lineNumber >= batchStart + 1) {
+                validLines++;
+            }
+        }
+    }
+    
+    // Ha legalább egy érvényes sort találtunk, és nincs érvénytelen sor, akkor rendben van
+    return validLines > 0;
+}
+
+// Segédfüggvény a kötegelt fordítás eredményének feldolgozásához
+function processTranslatedBatch(translatedBatch, batchStart, batchEnd, {
+    translatedSubtitles,
+    updateTranslatedText,
+    translationMemory,
+    originalSubtitles,
+    saveTranslationBtn,
+    saveWorkFileBtn
+}) {
+    // Fordítás feldolgozása soronként
+    const lines = translatedBatch.split('\n');
+    
+    for (const line of lines) {
+        // Csak a nem üres sorokat dolgozzuk fel
+        if (line.trim() === '') continue;
+        
+        // Sorszám kinyerése (pl. "123. Szöveg" formátumból)
+        const match = line.match(/^(\d+)\.\s*(.*)/);
+        if (match) {
+            const lineNumber = parseInt(match[1], 10);
+            const translatedText = match[2].trim();
+            
+            // Ellenőrizzük, hogy érvényes sorszám-e
+            if (lineNumber > 0 && lineNumber <= originalSubtitles.length) {
+                // A sorszám 1-től kezdődik, de a tömb indexek 0-tól
+                const index = lineNumber - 1;
+                
+                // Csak akkor frissítjük, ha a köteghez tartozik
+                if (index >= batchStart && index < batchEnd) {
+                    // Frissítjük a fordított szöveget
+                    translatedSubtitles[index] = translatedText;
+                    
+                    // Frissítjük a táblázatban is
+                    updateTranslatedText(index, translatedText);
+                    
+                    // Frissítjük a fordítási memóriát is
+                    if (!translationMemory.translations) {
+                        translationMemory.translations = {};
+                    }
+                    translationMemory.translations[originalSubtitles[index].text] = translatedText;
+                }
+            }
+        }
+    }
+    
+    // Mentés gomb engedélyezése
+    saveTranslationBtn.disabled = false;
+    
+    // Munkafájl mentés gomb megjelenítése
+    saveWorkFileBtn.classList.remove('d-none');
+}
+
+// Segédfüggvény a homokóra animáció megjelenítéséhez adott ideig
+function showLoadingOverlay(message, duration = null) {
+    // Ha már létezik, csak frissítjük az üzenetet
+    let overlay = document.getElementById('loadingOverlay');
+    
+    if (!overlay) {
+        // Létrehozzuk az overlay elemet
+        overlay = document.createElement('div');
+        overlay.id = 'loadingOverlay';
+        overlay.style.position = 'fixed';
+        overlay.style.top = '0';
+        overlay.style.left = '0';
+        overlay.style.width = '100%';
+        overlay.style.height = '100%';
+        overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
+        overlay.style.display = 'flex';
+        overlay.style.justifyContent = 'center';
+        overlay.style.alignItems = 'center';
+        overlay.style.zIndex = '9999';
+        overlay.style.cursor = 'pointer'; // Kurzor mutatása, hogy jelezze a kattinthatóságot
+        
+        // Kattintás eseménykezelő hozzáadása az overlay-hez
+        overlay.addEventListener('click', function(event) {
+            // Csak akkor rejtjük el, ha közvetlenül az overlay-re kattintottak, nem a tartalomra
+            if (event.target === overlay) {
+                hideLoadingOverlay();
+            }
+        });
+        
+        // Létrehozzuk a tartalom konténert
+        const container = document.createElement('div');
+        container.style.textAlign = 'center';
+        container.style.color = 'white';
+        container.style.padding = '20px';
+        container.style.borderRadius = '10px';
+        container.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+        
+        // Létrehozzuk a spinner elemet
+        const spinner = document.createElement('div');
+        spinner.className = 'spinner-border text-light';
+        spinner.setAttribute('role', 'status');
+        spinner.style.width = '3rem';
+        spinner.style.height = '3rem';
+        
+        // Létrehozzuk az üzenet elemet
+        const messageElement = document.createElement('div');
+        messageElement.id = 'loadingMessage';
+        messageElement.style.marginTop = '15px';
+        messageElement.style.fontSize = '1.2rem';
+        messageElement.textContent = message || 'Betöltés...';
+        
+        // Létrehozzuk a bezárás tippet
+        const closeTip = document.createElement('div');
+        closeTip.style.marginTop = '15px';
+        closeTip.style.fontSize = '0.9rem';
+        closeTip.style.opacity = '0.7';
+        closeTip.textContent = 'Kattints bárhova az ablakon kívül a bezáráshoz';
+        
+        // Összeállítjuk a DOM-ot
+        container.appendChild(spinner);
+        container.appendChild(messageElement);
+        container.appendChild(closeTip);
+        overlay.appendChild(container);
+        document.body.appendChild(overlay);
+    } else {
+        // Csak frissítjük az üzenetet
+        const messageElement = document.getElementById('loadingMessage');
+        if (messageElement) {
+            messageElement.textContent = message || 'Betöltés...';
+        }
+        
+        // Megjelenítjük, ha rejtve volt
+        overlay.style.display = 'flex';
+    }
+    
+    // Ha van megadva időtartam, akkor automatikusan elrejtjük
+    if (duration) {
+        setTimeout(() => {
+            hideLoadingOverlay();
+        }, duration);
+    }
+}
+
+// Homokóra animáció elrejtése
+function hideLoadingOverlay() {
+    const overlay = document.getElementById('loadingOverlay');
+    if (overlay) {
+        overlay.style.display = 'none';
+    }
 }
 
 // Fordítás az OpenRouter API-val
@@ -1006,6 +1352,7 @@ window.retranslateSubtitle = retranslateSubtitle;
 window.translateSequentially = translateSequentially;
 window.translateSequentiallyWithOpenRouter = translateSequentiallyWithOpenRouter;
 window.translateSequentiallyWithOpenRouterGeminiFlash = translateSequentiallyWithOpenRouterGeminiFlash;
+window.translateBatchWithOpenRouterGeminiFlash = translateBatchWithOpenRouterGeminiFlash;
 window.translateWithOpenRouterApi = translateWithOpenRouterApi;
 window.translateTextWithContext = translateTextWithContext;
 window.translateText = translateText;
