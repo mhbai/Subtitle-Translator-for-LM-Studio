@@ -280,6 +280,9 @@ document.addEventListener('DOMContentLoaded', function() {
         startTranslationBtn.classList.remove('d-none');
         stopTranslationBtn.classList.add('d-none');
         
+        // Elrejtjük az aktuális sor megállítás gombját is, ha létezik
+        hideCurrentRowStopButton();
+        
         // 10 másodperc után jelenítjük meg a Reset gombot
         setTimeout(() => {
             resetTranslationBtn.classList.remove('d-none');
@@ -765,6 +768,23 @@ document.addEventListener('DOMContentLoaded', function() {
             
             actionsCell.appendChild(retranslateBtn);
             
+            // Fordítás megállítása gomb - kezdetben rejtve
+            const rowStopBtn = document.createElement('button');
+            rowStopBtn.type = 'button';
+            rowStopBtn.className = 'btn btn-sm btn-warning d-none';
+            rowStopBtn.dataset.bsToggle = 'tooltip';
+            rowStopBtn.dataset.bsPlacement = 'left';
+            rowStopBtn.dataset.bsTitle = uiTranslations[currentLangCode]?.stopTranslation || 'Fordítás megállítása';
+            
+            // A gomb tartalma: ikon + szöveg (a szöveg a nyelvváltáskor frissül)
+            const stopText = uiTranslations[currentLang]?.stopTranslation || 'Fordítás megállítása';
+            rowStopBtn.innerHTML = `<i class="bi bi-pause-circle me-1"></i>${stopText}`;
+            
+            rowStopBtn.id = `row-stop-${index}`;
+            rowStopBtn.addEventListener('click', pauseTranslation);
+            
+            actionsCell.appendChild(rowStopBtn);
+            
             row.appendChild(actionsCell);
             
             subtitleTable.appendChild(row);
@@ -854,7 +874,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 saveWorkFileBtn,
                 scrollToRow,
                 pauseTranslation,
-                translateWithChatGptCustomPrompt
+                translateWithChatGptCustomPrompt,
+                showCurrentRowStopButton
             });
         } else if (selectedMode === 'openrouter_gemma_27b') {
             // Szekvenciális fordítás az OpenRouter API-val
@@ -869,7 +890,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 saveTranslationBtn,
                 saveWorkFileBtn,
                 scrollToRow,
-                pauseTranslation
+                pauseTranslation,
+                showCurrentRowStopButton
             });
         } else if (selectedMode === 'openrouter_gemini_flash') {
             // Szekvenciális fordítás az OpenRouter API-val (Gemini Flash 2.0)
@@ -884,7 +906,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 saveTranslationBtn,
                 saveWorkFileBtn,
                 scrollToRow,
-                pauseTranslation
+                pauseTranslation,
+                showCurrentRowStopButton
             });
         } else {
             // LM Studio fordítás - eredeti logika
@@ -1829,3 +1852,23 @@ function downloadTextFile(text, fileName) {
 
 // Referencia objektum a szüneteltetés változóhoz
 let isTranslationPausedRef = { value: false };
+
+// Aktuális sor megállítás gombjának megjelenítése
+function showCurrentRowStopButton(index) {
+    // Először elrejtjük az összes sormegállítás gombot
+    hideCurrentRowStopButton();
+    
+    // Megjelenítjük az aktuális sor megállítás gombját
+    const rowStopBtn = document.getElementById(`row-stop-${index}`);
+    if (rowStopBtn) {
+        rowStopBtn.classList.remove('d-none');
+    }
+}
+
+// Aktuális sor megállítás gombjának elrejtése
+function hideCurrentRowStopButton() {
+    const allRowStopBtns = document.querySelectorAll('[id^="row-stop-"]');
+    allRowStopBtns.forEach(btn => {
+        btn.classList.add('d-none');
+    });
+}

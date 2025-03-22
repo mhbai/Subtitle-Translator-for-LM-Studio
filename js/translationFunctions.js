@@ -128,7 +128,8 @@ async function retranslateSubtitle(index, {
     saveWorkFileBtn,
     scrollToRow,
     pauseTranslation,
-    translateWithChatGptCustomPrompt
+    translateWithChatGptCustomPrompt,
+    showCurrentRowStopButton
  }) {
     // ChatGPT API kérések közötti késleltetés (ms) - 0.2 másodperc
     const API_DELAY = 200;
@@ -153,6 +154,11 @@ async function retranslateSubtitle(index, {
         
         // Folyamatjelző frissítése
         updateProgressBar(i, originalSubtitles.length);
+        
+        // Megjelenítjük az aktuális sor megállítás gombját
+        if (showCurrentRowStopButton) {
+            showCurrentRowStopButton(i);
+        }
         
         try {
             // Kontextus összeállítása (előző és következő mondatok)
@@ -267,7 +273,7 @@ NE használd a "${uniqueMarker}" vagy "${endMarker}" jelöléseket a válaszodba
             // Görgetés az aktuális sorhoz
             scrollToRow(i);
             
-            // Késleltetés a következő API kérés előtt, hogy elkerüljük a sebességkorlát-túllépést
+            // Kis szünet a következő API kérés előtt, hogy elkerüljük a sebességkorlát-túllépést
             if (i < originalSubtitles.length - 1) {
                 await new Promise(resolve => setTimeout(resolve, API_DELAY));
             }
@@ -335,6 +341,11 @@ async function translateSequentiallyWithOpenRouter(startIndex, sourceLanguage, t
         
         // Folyamatjelző frissítése
         updateProgressBar(i, originalSubtitles.length);
+        
+        // Megjelenítjük az aktuális sor megállítás gombját
+        if (typeof window.showCurrentRowStopButton === 'function') {
+            window.showCurrentRowStopButton(i);
+        }
         
         try {
             // Kontextus összeállítása (előző és következő mondatok)
@@ -489,6 +500,11 @@ async function translateSequentiallyWithOpenRouterGeminiFlash(startIndex, source
         
         // Folyamatjelző frissítése
         updateProgressBar(i, originalSubtitles.length);
+        
+        // Megjelenítjük az aktuális sor megállítás gombját
+        if (typeof window.showCurrentRowStopButton === 'function') {
+            window.showCurrentRowStopButton(i);
+        }
         
         try {
             // Kontextus összeállítása (előző és következő mondatok)
