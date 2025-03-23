@@ -87,7 +87,8 @@ const vi = {
     errorTranslationFailed: "Dịch thất bại sau {0} lần thử, đang tiếp tục...",
     
     // Chế độ dịch đặc biệt
-    batchModeLabel: "Chế độ dịch ngữ cảnh lớn đặc biệt"
+    batchModeLabel: "Chế độ dịch ngữ cảnh lớn đặc biệt",
+    batchModeInfo: "Khi tính năng này được bật, chương trình xử lý 30 dòng văn bản cùng một lúc theo cách đặc biệt, cho phép dịch nhanh hơn với khả năng hiểu và độ chính xác tốt hơn"
 };
 
 // Export the language object

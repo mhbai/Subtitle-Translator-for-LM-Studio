@@ -87,7 +87,8 @@ const sk = {
     errorTranslationFailed: "Preklad zlyhal po {0} pokusoch, pokračujem...",
     
     // Špeciálny režim prekladu
-    batchModeLabel: "Špeciálny režim prekladu s veľkým kontextom"
+    batchModeLabel: "Špeciálny režim prekladu s veľkým kontextom",
+    batchModeInfo: "Keď je táto funkcia povolená, program spracováva 30 riadkov textu naraz špeciálnym spôsobom, čo umožňuje rýchlejší preklad s lepším porozumením a presnosťou"
 };
 
 // Export the language object

@@ -87,7 +87,8 @@ const da = {
     errorTranslationFailed: "Oversættelse mislykkedes efter {0} forsøg, fortsætter...",
     
     // Speciel oversættelsestilstand
-    batchModeLabel: "Speciel oversættelsestilstand med stor kontekst"
+    batchModeLabel: "Speciel oversættelsestilstand med stor kontekst",
+    batchModeInfo: "Når denne funktion er aktiveret, behandler programmet 30 linjer tekst på én gang på en særlig måde, hvilket muliggør hurtigere oversættelse med bedre forståelse og nøjagtighed"
 };
 
 // Export the language object

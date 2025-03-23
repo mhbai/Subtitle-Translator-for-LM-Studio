@@ -87,7 +87,8 @@ const cs = {
     errorTranslationFailed: "Překlad selhal po {0} pokusech, pokračuji...",
     
     // Speciální režim překladu
-    batchModeLabel: "Speciální režim překladu s velkým kontextem"
+    batchModeLabel: "Speciální režim překladu s velkým kontextem",
+    batchModeInfo: "Když je tato funkce povolena, program zpracovává 30 řádků textu najednou speciálním způsobem, což umožňuje rychlejší překlad s lepším porozuměním a přesností"
 };
 
 // Export the language object

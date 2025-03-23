@@ -87,7 +87,8 @@ const pl = {
     errorTranslationFailed: "Tłumaczenie nie powiodło się po {0} próbach, kontynuowanie...",
     
     // Specjalny tryb tłumaczenia
-    batchModeLabel: "Specjalny tryb tłumaczenia z dużym kontekstem"
+    batchModeLabel: "Specjalny tryb tłumaczenia z dużym kontekstem",
+    batchModeInfo: "Gdy ta funkcja jest włączona, program przetwarza jednocześnie 30 linii tekstu w specjalny sposób, co umożliwia szybsze tłumaczenie z lepszym zrozumieniem i dokładnością"
 };
 
 // Export the language object

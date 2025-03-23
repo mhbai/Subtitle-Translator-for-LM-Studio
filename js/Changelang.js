@@ -255,10 +255,23 @@ function updateUiTexts(translations) {
                 oldTooltip.dispose();
             }
             
+            // Először távolítsuk el az esetleges korábbi title attribútumot
+            batchModeInfo.removeAttribute('title');
+            batchModeInfo.removeAttribute('data-bs-original-title');
+            
             // Új tooltip létrehozása az aktuális nyelvvel
+            const tooltipText = translations.batchModeInfo || "Ezt a funkciót bekapcsolva a program egy speciális módon egyszerre 30 sor szöveget dolgoz fel, így sokkal gyorsabban és nagyobb szövegértéssel és pontossággal tudja a fordítást elvégezni a program";
+            
+            // Két különböző megközelítés a tooltip frissítésére:
+            // 1. Új tooltip objektum létrehozása
             new bootstrap.Tooltip(batchModeInfo, {
-                title: translations.batchModeInfo || "Ezt a funkciót bekapcsolva a program egy speciális módon egyszerre 30 sor szöveget dolgoz fel, így sokkal gyorsabban és nagyobb szövegértéssel és pontossággal tudja a fordítást elvégezni a program"
+                title: tooltipText
             });
+            
+            // 2. Közvetlenül a data attribútum beállítása (biztosra menve)
+            batchModeInfo.setAttribute('data-bs-original-title', tooltipText);
+            
+            console.log(`Tooltip frissítve: ${tooltipText}`);
         }
         
         console.log("UI szövegek frissítése befejezve!");

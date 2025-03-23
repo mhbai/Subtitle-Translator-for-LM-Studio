@@ -87,7 +87,8 @@ const ro = {
     errorTranslationFailed: "Traducerea a eșuat după {0} încercări, se continuă...",
     
     // Mod special de traducere
-    batchModeLabel: "Mod special de traducere cu context mare"
+    batchModeLabel: "Mod special de traducere cu context larg",
+    batchModeInfo: "Când această funcție este activată, programul procesează 30 de rânduri de text simultan într-un mod special, permițând o traducere mai rapidă cu o mai bună înțelegere și acuratețe"
 };
 
 // Export the language object

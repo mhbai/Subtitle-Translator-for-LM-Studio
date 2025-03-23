@@ -86,8 +86,9 @@ const ja = {
     errorTranslationRetry: "翻訳エラー、再試行中 ({0}/{1})...",
     errorTranslationFailed: "{0}回の試行後に翻訳に失敗しました、続行中...",
     
-    // 特殊翻訳モード
-    batchModeLabel: "特殊な大規模コンテキスト翻訳モード"
+    // 特別翻訳モード
+    batchModeLabel: "特別な大規模コンテキスト翻訳モード",
+    batchModeInfo: "この機能を有効にすると、プログラムは特別な方法で一度に30行のテキストを処理し、より速い翻訳と良好な理解度と精度を実現します"
 };
 
 // Export the language object

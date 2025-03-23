@@ -87,7 +87,8 @@ const fr = {
     errorTranslationFailed: "Échec de la traduction après {0} tentatives, on continue...",
     
     // Mode de traduction spécial
-    batchModeLabel: "Mode de traduction spécial à contexte large"
+    batchModeLabel: "Mode de traduction spécial à contexte large",
+    batchModeInfo: "Lorsque cette fonction est activée, le programme traite 30 lignes de texte à la fois d'une manière spéciale, permettant une traduction plus rapide avec une meilleure compréhension et précision"
 };
 
 // Export the language object

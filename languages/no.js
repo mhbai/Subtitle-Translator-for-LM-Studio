@@ -87,7 +87,8 @@ const no = {
     errorTranslationFailed: "Oversettelse mislyktes etter {0} forsøk, fortsetter...",
     
     // Spesiell oversettelsesmodus
-    batchModeLabel: "Spesiell oversettelsesmodus med stor kontekst"
+    batchModeLabel: "Spesiell oversettelsesmodus med stor kontekst",
+    batchModeInfo: "Når denne funksjonen er aktivert, behandler programmet 30 tekstlinjer samtidig på en spesiell måte, noe som muliggjør raskere oversettelse med bedre forståelse og nøyaktighet"
 };
 
 // Export the language object

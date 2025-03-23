@@ -87,7 +87,8 @@ const id = {
     errorTranslationFailed: "Terjemahan gagal setelah {0} percobaan, melanjutkan...",
     
     // Mode terjemahan khusus
-    batchModeLabel: "Mode terjemahan konteks besar khusus"
+    batchModeLabel: "Mode terjemahan konteks besar khusus",
+    batchModeInfo: "Saat fitur ini diaktifkan, program memproses 30 baris teks sekaligus dengan cara khusus, memungkinkan terjemahan lebih cepat dengan pemahaman dan akurasi yang lebih baik"
 };
 
 // Export the language object

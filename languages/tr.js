@@ -87,7 +87,8 @@ const tr = {
     errorTranslationFailed: "{0} denemeden sonra çeviri başarısız oldu, devam ediliyor...",
     
     // Özel çeviri modu
-    batchModeLabel: "Özel geniş bağlam çeviri modu"
+    batchModeLabel: "Özel geniş bağlam çeviri modu",
+    batchModeInfo: "Bu özellik etkinleştirildiğinde, program özel bir şekilde aynı anda 30 satır metni işleyerek daha iyi anlama ve doğrulukla daha hızlı çeviri yapılmasını sağlar"
 };
 
 // Export the language object

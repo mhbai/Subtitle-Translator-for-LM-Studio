@@ -4,6 +4,15 @@ This application is a simple yet powerful web tool for translating .srt subtitle
 
 ![Running image](Images/Screen01.jpg)
 
+## Version 1.2 Update
+
+The latest update brings powerful performance improvements and enhanced user experience:
+
+- **Special Large Context Translation Mode for Gemini Flash 2.0 model**: Added a batch translation mode that processes 30 lines of text at once, significantly improving translation speed, comprehension, and accuracy
+- **Gemini Model Support**: Enhanced compatibility with Google's Gemini models for better performance with batch translation mode
+- **Improved Tooltip System**: Added informative tooltips for the batch translation mode in all 30 supported languages
+- **Interface Consistency**: Enhanced user interface to ensure all language files contain proper translations for all features, along with minor improvements to displays and translation processes to better assist with the work
+
 ## Version 1.1 Update
 
 The latest update brings exciting new features to enhance your translation experience:
@@ -231,9 +240,18 @@ MAGYAR NYELVŰ LEÍRÁS:
 Ez az alkalmazás egy egyszerű, de hatékony webes eszköz .srt formátumú feliratfájlok fordítására. A program a helyi gépen futó LM Studio mesterséges intelligencia modellt vagy a ChatGPT API-t használja a fordításhoz.
 
 
+## 1.2-es verzió frissítés
+
+A legújabb frissítés hatékony teljesítménybeli javításokat és továbbfejlesztett felhasználói élményt kínál:
+
+- **Speciális nagy kontextusú fordítási mód a Gemini Flash 2.0 modellhez**: Hozzáadtunk egy kötegelt fordítási módot, amely egyszerre 30 sor szöveget dolgoz fel, jelentősen javítva a fordítási sebességet, szövegértést és pontosságot
+- **Gemini modell támogatás**: Továbbfejlesztett kompatibilitás a Google Gemini modelljeivel a kötegelt fordítási mód jobb teljesítménye érdekében
+- **Továbbfejlesztett tooltip rendszer**: Informatív tooltipek hozzáadása a kötegelt fordítási módhoz mind a 30 támogatott nyelven
+- **Felhasználói felület konzisztencia**: Továbbfejlesztett felhasználói felület, amely biztosítja, hogy minden nyelvi fájl megfelelő fordításokat tartalmazzon, illetve a munkát még jobban segítő apróbb változtatások a megelenítések és a fordítási folyamatok során.
+
 ## 1.1-es verzió frissítés
 
-A legújabb frissítés izgalmas új funkciókat kínál a fordítási élmény javítására:
+A korábbi frissítés izgalmas új funkciókat kínált a fordítási élmény javítására:
 
 - **OpenRouter.ai API integráció**: Az OpenRouter.ai API támogatása, amely több AI modellhez biztosít hozzáférést
 - **Új fordítási modellek**:

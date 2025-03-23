@@ -87,7 +87,8 @@ const nl = {
     errorTranslationFailed: "Vertaling mislukt na {0} pogingen, doorgaan...",
     
     // Speciale vertaalmodus
-    batchModeLabel: "Speciale vertaalmodus met grote context"
+    batchModeLabel: "Speciale vertaalmodus met grote context",
+    batchModeInfo: "Wanneer deze functie is ingeschakeld, verwerkt het programma 30 regels tekst tegelijk op een speciale manier, wat zorgt voor snellere vertaling met beter begrip en nauwkeurigheid"
 };
 
 // Export the language object

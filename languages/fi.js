@@ -87,7 +87,8 @@ const fi = {
     errorTranslationFailed: "Käännös epäonnistui {0} yrityksen jälkeen, jatketaan...",
     
     // Erikoiskäännöstila
-    batchModeLabel: "Erikoinen laajan kontekstin käännöstila"
+    batchModeLabel: "Erityinen laajan kontekstin käännöstila",
+    batchModeInfo: "Kun tämä toiminto on käytössä, ohjelma käsittelee 30 tekstiriviä kerralla erityisellä tavalla, mahdollistaen nopeamman käännöksen paremmalla ymmärryksellä ja tarkkuudella"
 };
 
 // Export the language object

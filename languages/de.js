@@ -87,7 +87,8 @@ const de = {
     errorTranslationFailed: "Übersetzung nach {0} Versuchen fehlgeschlagen, weiter geht's...",
     
     // Spezieller Übersetzungsmodus
-    batchModeLabel: "Spezieller Übersetzungsmodus mit großem Kontext"
+    batchModeLabel: "Spezieller Übersetzungsmodus mit großem Kontext",
+    batchModeInfo: "Wenn diese Funktion aktiviert ist, verarbeitet das Programm auf besondere Weise 30 Textzeilen gleichzeitig, was eine schnellere Übersetzung mit besserem Verständnis und höherer Genauigkeit ermöglicht"
 };
 
 // Export the language object

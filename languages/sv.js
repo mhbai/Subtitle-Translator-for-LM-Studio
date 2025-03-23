@@ -87,7 +87,8 @@ const sv = {
     errorTranslationFailed: "Översättning misslyckades efter {0} försök, fortsätter...",
     
     // Speciellt översättningsläge
-    batchModeLabel: "Speciellt översättningsläge med stor kontext"
+    batchModeLabel: "Speciellt översättningsläge med stor kontext",
+    batchModeInfo: "När denna funktion är aktiverad bearbetar programmet 30 textrader samtidigt på ett speciellt sätt, vilket möjliggör snabbare översättning med bättre förståelse och noggrannhet"
 };
 
 // Export the language object

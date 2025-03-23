@@ -87,7 +87,8 @@ const ko = {
     errorTranslationFailed: "{0}번 시도 후 번역 실패, 계속 진행 중...",
     
     // 특수 번역 모드
-    batchModeLabel: "특수 대규모 컨텍스트 번역 모드"
+    batchModeLabel: "특수 대용량 컨텍스트 번역 모드",
+    batchModeInfo: "이 기능을 활성화하면 프로그램이 특별한 방식으로 한 번에 30줄의 텍스트를 처리하여 더 나은 이해력과 정확도로 더 빠른 번역이 가능합니다"
 };
 
 // Export the language object

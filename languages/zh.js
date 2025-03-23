@@ -87,7 +87,8 @@ const zh = {
     errorTranslationFailed: "经过{0}次尝试后翻译失败，继续进行...",
     
     // 特殊翻译模式
-    batchModeLabel: "特殊大上下文翻译模式"
+    batchModeLabel: "特殊大上下文翻译模式",
+    batchModeInfo: "启用此功能后，程序会以特殊方式一次处理30行文本，从而实现更快的翻译，具有更好的理解力和准确性"
 };
 
 // Export the language object
