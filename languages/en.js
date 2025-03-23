@@ -93,7 +93,8 @@ const en = {
     errorTranslationFailed: "Translation failed after {0} attempts, moving on...",
     
     // Special translation mode
-    batchModeLabel: "Special large context translation mode"
+    batchModeLabel: "Special large context translation mode",
+    batchModeInfo: "When this feature is enabled, the program processes 30 lines of text at once in a special way, allowing for faster translation with better comprehension and accuracy"
 };
 
 // Export the language object

@@ -93,7 +93,8 @@ const hu = {
     errorTranslationFailed: "Sikertelen fordítás {0} próbálkozás után, továbblépés...",
     
     // Speciális fordítási mód
-    batchModeLabel: "Speciális nagy kontextusú fordítási mód"
+    batchModeLabel: "Speciális nagy kontextusú fordítási mód",
+    batchModeInfo: "Ezt a funkciót bekapcsolva a program egy speciális módon egyszerre 30 sor szöveget dolgoz fel, így sokkal gyorsabban és nagyobb szövegértéssel és pontossággal tudja a fordítást elvégezni a program"
 };
 
 // Export the language object

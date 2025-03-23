@@ -181,6 +181,23 @@ document.addEventListener('DOMContentLoaded', function() {
                                savedTranslationMode === 'openrouter_gemini_flash')) {
         translationModeSelect.value = savedTranslationMode;
         
+        // Ha a Gemini Flash mód van elmentve, akkor megjelenítjük a batch mód konténert
+        if (savedTranslationMode === 'openrouter_gemini_flash') {
+            const batchModeContainer = document.getElementById('batchModeContainer');
+            if (batchModeContainer) {
+                batchModeContainer.classList.remove('d-none');
+                
+                // Batch mód információs tooltip inicializálása
+                const batchModeInfo = document.getElementById('batchModeInfo');
+                if (batchModeInfo) {
+                    // Tooltip inicializálása
+                    const tooltip = new bootstrap.Tooltip(batchModeInfo, {
+                        title: uiTranslations[currentLangCode]?.batchModeInfo || 'Ezt a funkciót bekapcsolva a program egy speciális módon egyszerre 30 sor szöveget dolgoz fel, így sokkal gyorsabban és nagyobb szövegértéssel és pontossággal tudja a fordítást elvégezni a program'
+                    });
+                }
+            }
+        }
+        
         // Ha ChatGPT mód van elmentve, akkor betöltjük az API kulcsot is
         if (savedTranslationMode === 'chatgpt_4o_mini' || savedTranslationMode === 'chatgpt_4o') {
             apiKeyContainer.classList.remove('d-none');
@@ -867,8 +884,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    
-
     // Fordítás indítása
     async function startTranslation() {
         // Ellenőrizzük, hogy van-e betöltött felirat
@@ -1002,8 +1017,6 @@ document.addEventListener('DOMContentLoaded', function() {
             finishTranslation();
         }
     }
-
-   
 
     // LM Studio fordítás
     async function translateWithLmStudio(startIndex, sourceLanguage, targetLanguage, temperature) {
@@ -1319,8 +1332,8 @@ if (fileName.toLowerCase().endsWith('.wrk') || fileName.toLowerCase().endsWith('
             'el': 'Ελληνικά',
             'uk': 'Українська',
             'he': 'עברית',
-            'th': 'ไทย',
             'vi': 'Tiếng Việt',
+            'th': 'ไทย',
             'id': 'Bahasa Indonesia'
         };
         
@@ -1496,6 +1509,26 @@ if (fileName.toLowerCase().endsWith('.wrk') || fileName.toLowerCase().endsWith('
                 fileInputLabel.textContent = translations.fileInputLabel;
             }
             
+            // Batch mód címke és tooltip frissítése
+            const batchModeLabel = document.getElementById('batchModeLabel');
+            if (batchModeLabel) {
+                batchModeLabel.textContent = translations.batchModeLabel || "Speciális nagy kontextusú fordítási mód";
+            }
+            
+            const batchModeInfo = document.getElementById('batchModeInfo');
+            if (batchModeInfo) {
+                // Töröljük a régi tooltip-et
+                const oldTooltip = bootstrap.Tooltip.getInstance(batchModeInfo);
+                if (oldTooltip) {
+                    oldTooltip.dispose();
+                }
+                
+                // Új tooltip létrehozása az aktuális nyelvvel
+                new bootstrap.Tooltip(batchModeInfo, {
+                    title: translations.batchModeInfo || "Ezt a funkciót bekapcsolva a program egy speciális módon egyszerre 30 sor szöveget dolgoz fel, így sokkal gyorsabban és nagyobb szövegértéssel és pontossággal tudja a fordítást elvégezni a program"
+                });
+            }
+            
             console.log("UI szövegek frissítése befejezve!");
         } catch (error) {
             console.error("Hiba történt az UI szövegek frissítése során:", error);
@@ -1504,7 +1537,7 @@ if (fileName.toLowerCase().endsWith('.wrk') || fileName.toLowerCase().endsWith('
         // Tooltipek inicializálása
         initTooltips();
     }
-
+    
     // Bootstrap tooltipek inicializálása
     function initTooltips() {
         // Meglévő tooltipek eltávolítása
@@ -1536,6 +1569,15 @@ function handleTranslationModeChange() {
     const batchModeContainer = document.getElementById('batchModeContainer');
     if (selectedMode === 'openrouter_gemini_flash') {
         batchModeContainer.classList.remove('d-none');
+        
+        // Tooltip inicializálása a batch mód információs ikonhoz
+        const batchModeInfo = document.getElementById('batchModeInfo');
+        if (batchModeInfo) {
+            // Tooltip inicializálása
+            const tooltip = new bootstrap.Tooltip(batchModeInfo, {
+                title: uiTranslations[currentLangCode]?.batchModeInfo || 'Ezt a funkciót bekapcsolva a program egy speciális módon egyszerre 30 sor szöveget dolgoz fel, így sokkal gyorsabban és nagyobb szövegértéssel és pontossággal tudja a fordítást elvégezni a program'
+            });
+        }
     } else {
         batchModeContainer.classList.add('d-none');
         // Ha nem Gemini Flash, akkor kikapcsoljuk a batch módot
