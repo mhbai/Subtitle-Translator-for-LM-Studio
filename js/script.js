@@ -189,6 +189,11 @@ document.addEventListener('DOMContentLoaded', function() {
             const savedApiKey = loadApiKey();
             if (savedApiKey) {
                 apiKeyInput.value = savedApiKey;
+                apiKeyInput.type = 'password';
+                
+                // Elrejtjük az input mezőt és megjelenítjük a gombot
+                apiKeyInputGroup.classList.add('d-none');
+                showApiKeyFieldBtn.classList.remove('d-none');
             }
         } else if (savedTranslationMode === 'openrouter_gemma_27b' || savedTranslationMode === 'openrouter_gemini_flash') {
             apiKeyContainer.classList.remove('d-none');
@@ -197,6 +202,11 @@ document.addEventListener('DOMContentLoaded', function() {
             const savedOpenRouterApiKey = loadOpenRouterApiKey();
             if (savedOpenRouterApiKey) {
                 apiKeyInput.value = savedOpenRouterApiKey;
+                apiKeyInput.type = 'password';
+                
+                // Elrejtjük az input mezőt és megjelenítjük a gombot
+                apiKeyInputGroup.classList.add('d-none');
+                showApiKeyFieldBtn.classList.remove('d-none');
             }
         }
     }
