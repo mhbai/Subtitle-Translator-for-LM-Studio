@@ -1116,6 +1116,16 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    // Segédfüggvény a ChatGPT API-val történő fordításhoz
+    async function translateWithChatGpt(text, sourceLanguage, targetLanguage, apiKey, model = 'gpt-4o-mini', temperature = 0.7) {
+        // A rendszerüzenet összeállítása
+        const systemPrompt = `Fordítsd le a szöveget ${getLanguageName(sourceLanguage)} nyelvről ${getLanguageName(targetLanguage)} nyelvre. 
+Csak a fordítást add vissza, semmi mást. Ne adj hozzá magyarázatot vagy megjegyzést.`;
+        
+        // Delegáljuk a fordítást a részletes ChatGPT fordító funkciónak
+        return translateWithChatGptCustomPrompt(text, systemPrompt, apiKey, model, temperature);
+    }
+
     // Fordított szöveg frissítése a táblázatban
     function updateTranslatedText(index, text) {
         const editableTextarea = document.querySelector(`#translated-${index} textarea`);
