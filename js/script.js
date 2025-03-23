@@ -182,7 +182,7 @@ document.addEventListener('DOMContentLoaded', function() {
         translationModeSelect.value = savedTranslationMode;
         
         // Ha a Gemini Flash mód van elmentve, akkor megjelenítjük a batch mód konténert
-        if (savedTranslationMode === 'openrouter_gemini_flash') {
+        if (savedTranslationMode === 'openrouter_gemini_flash' || savedTranslationMode === 'chatgpt_4o_mini' || savedTranslationMode === 'chatgpt_4o') {
             const batchModeContainer = document.getElementById('batchModeContainer');
             if (batchModeContainer) {
                 batchModeContainer.classList.remove('d-none');
@@ -937,12 +937,14 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Szekvenciális fordítás a ChatGPT API-val
         if (selectedMode === 'chatgpt_4o_mini' || selectedMode === 'chatgpt_4o') {
-            // Ellenőrizzük, hogy a kötegelt mód be van-e kapcsolva (csak a chatgpt_4o_mini esetén)
+            // Ellenőrizzük, hogy a kötegelt mód be van-e kapcsolva
             const batchModeCheckbox = document.getElementById('batchModeCheckbox');
             
-            if (selectedMode === 'chatgpt_4o_mini' && batchModeCheckbox && batchModeCheckbox.checked) {
-                // Kötegelt fordítás a ChatGPT-4o mini modellel
-                await window.translateBatchWithChatGpt4oMini(currentTranslationIndex, sourceLanguage, targetLanguage, apiKey, temperature, {
+            if (batchModeCheckbox && batchModeCheckbox.checked) {
+                // Kötegelt fordítás a ChatGPT modellekkel
+                const modelName = selectedMode === 'chatgpt_4o_mini' ? 'gpt-4o-mini' : 'gpt-4o';
+                
+                await window.translateBatchWithChatGpt(currentTranslationIndex, sourceLanguage, targetLanguage, apiKey, temperature, modelName, {
                     originalSubtitles,
                     translatedSubtitles,
                     isTranslationPausedRef, // Globális referencia objektum átadása
@@ -1348,7 +1350,7 @@ function handleTranslationModeChange() {
     
     // Batch mód konténer kezelése
     const batchModeContainer = document.getElementById('batchModeContainer');
-    if (selectedMode === 'openrouter_gemini_flash' || selectedMode === 'chatgpt_4o_mini') {
+    if (selectedMode === 'openrouter_gemini_flash' || selectedMode === 'chatgpt_4o_mini' || selectedMode === 'chatgpt_4o') {
         batchModeContainer.classList.remove('d-none');
         
         // Tooltip inicializálása a batch mód információs ikonhoz
@@ -1361,7 +1363,7 @@ function handleTranslationModeChange() {
         }
     } else {
         batchModeContainer.classList.add('d-none');
-        // Ha nem Gemini Flash vagy ChatGPT-4o mini, akkor kikapcsoljuk a batch módot
+        // Ha nem Gemini Flash, ChatGPT-4o mini vagy ChatGPT-4o, akkor kikapcsoljuk a batch módot
         const batchModeCheckbox = document.getElementById('batchModeCheckbox');
         if (batchModeCheckbox) {
             batchModeCheckbox.checked = false;

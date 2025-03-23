@@ -7,9 +7,9 @@ This application is a simple yet powerful web tool for translating .srt subtitle
 ## Version History
 
 ### Version 1.3 (2025-03-23)
-- Added batch mode for ChatGPT-4o mini model, allowing for translation of 30 lines at once
-- Improved translation speed and accuracy with the batch mode for ChatGPT-4o mini
-- The special large context translation mode is now available for both Gemini Flash and ChatGPT-4o mini models
+- Added batch mode for ChatGPT-4o mini and ChatGPT-4o models, allowing for translation of 30 lines at once
+- Improved translation speed and accuracy with the batch mode for ChatGPT models
+- The special large context translation mode is now available for Gemini Flash, ChatGPT-4o mini, and ChatGPT-4o models
 
 ### Version 1.2 (2025-03-22)
 
@@ -249,9 +249,9 @@ Ez az alkalmazás egy egyszerű, de hatékony webes eszköz .srt formátumú fel
 ## Verzió történet
 
 ### 1.3-as verzió (2025-03-23)
-- ChatGPT-4o mini modellhez is hozzáadtuk a batch módot, amely egyszerre 30 sor szöveget képes feldolgozni
-- Javított fordítási sebesség és pontosság a ChatGPT-4o mini batch módjával
-- A speciális nagy kontextusú fordítási mód most már elérhető mind a Gemini Flash, mind a ChatGPT-4o mini modellekhez
+- ChatGPT-4o mini és ChatGPT-4o modellekhez is hozzáadtuk a batch módot, amely egyszerre 30 sor szöveget képes feldolgozni
+- Javított fordítási sebesség és pontosság a ChatGPT modellek batch módjával
+- A speciális nagy kontextusú fordítási mód most már elérhető a Gemini Flash, ChatGPT-4o mini és ChatGPT-4o modellekhez
 
 ### 1.2-es verzió (2025-03-22)
 

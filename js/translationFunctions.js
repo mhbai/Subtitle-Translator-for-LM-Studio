@@ -873,7 +873,7 @@ NE adj hozzá magyarázatot vagy egyéb szöveget.`;
                 console.error('Kötegelt fordítási hiba:', error);
                 
                 // Ha sebességkorlát-túllépés (429) hiba, akkor várunk egy ideig és újra próbáljuk
-                if (error.message && error.message.includes('429')) {
+                if (error.message.includes('429')) {
                     console.log('Sebességkorlát-túllépés (429), várakozás 10 másodpercet...');
                     
                     // Többnyelvű hibaüzenet
@@ -946,8 +946,8 @@ NE adj hozzá magyarázatot vagy egyéb szöveget.`;
     return lastProcessedIndex;
 }
 
-// Kötegelt fordítás a ChatGPT-4o mini modellel
-async function translateBatchWithChatGpt4oMini(startIndex, sourceLanguage, targetLanguage, apiKey, temperature, {
+// Kötegelt fordítás a ChatGPT modellekkel
+async function translateBatchWithChatGpt(startIndex, sourceLanguage, targetLanguage, apiKey, temperature, model, {
     originalSubtitles,
     translatedSubtitles,
     isTranslationPausedRef,
@@ -1036,7 +1036,7 @@ NE adj hozzá magyarázatot vagy egyéb szöveget.`;
                     batchTexts,
                     systemPrompt,
                     apiKey,
-                    'gpt-4o-mini',
+                    model,
                     temperature,
                     0  // retryCount
                 );
@@ -1727,7 +1727,7 @@ window.translateSequentially = translateSequentially;
 window.translateSequentiallyWithOpenRouter = translateSequentiallyWithOpenRouter;
 window.translateSequentiallyWithOpenRouterGeminiFlash = translateSequentiallyWithOpenRouterGeminiFlash;
 window.translateBatchWithOpenRouterGeminiFlash = translateBatchWithOpenRouterGeminiFlash;
-window.translateBatchWithChatGpt4oMini = translateBatchWithChatGpt4oMini;
+window.translateBatchWithChatGpt = translateBatchWithChatGpt;
 window.translateWithOpenRouterApi = translateWithOpenRouterApi;
 window.translateTextWithContext = translateTextWithContext;
 window.translateText = translateText;
