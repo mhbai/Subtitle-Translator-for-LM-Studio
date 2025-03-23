@@ -4,7 +4,14 @@ This application is a simple yet powerful web tool for translating .srt subtitle
 
 ![Running image](Images/Screen01.jpg)
 
-## Version 1.2 Update
+## Version History
+
+### Version 1.3 (2025-03-23)
+- Added batch mode for ChatGPT-4o mini model, allowing for translation of 30 lines at once
+- Improved translation speed and accuracy with the batch mode for ChatGPT-4o mini
+- The special large context translation mode is now available for both Gemini Flash and ChatGPT-4o mini models
+
+### Version 1.2 (2025-03-22)
 
 The latest update brings powerful performance improvements and enhanced user experience:
 
@@ -239,8 +246,14 @@ MAGYAR NYELVŰ LEÍRÁS:
 
 Ez az alkalmazás egy egyszerű, de hatékony webes eszköz .srt formátumú feliratfájlok fordítására. A program a helyi gépen futó LM Studio mesterséges intelligencia modellt vagy a ChatGPT API-t használja a fordításhoz.
 
+## Verzió történet
 
-## 1.2-es verzió frissítés
+### 1.3-as verzió (2025-03-23)
+- ChatGPT-4o mini modellhez is hozzáadtuk a batch módot, amely egyszerre 30 sor szöveget képes feldolgozni
+- Javított fordítási sebesség és pontosság a ChatGPT-4o mini batch módjával
+- A speciális nagy kontextusú fordítási mód most már elérhető mind a Gemini Flash, mind a ChatGPT-4o mini modellekhez
+
+### 1.2-es verzió (2025-03-22)
 
 A legújabb frissítés hatékony teljesítménybeli javításokat és továbbfejlesztett felhasználói élményt kínál:
 
@@ -458,26 +471,16 @@ Az alkalmazás felhasználói felülete 30 különböző nyelven érhető el:
 - A kiválasztott nyelv szerint az alkalmazás összes funkcionális felirata, nyomógomb szövege és figyelmeztető üzenete automatikusan frissül
 - A nyelvi beállítás a böngésző localStorage-jában tárolódik, így a felhasználó következő látogatásakor is megmarad
 
-### 9. Fordítási mód választás
+## Hibaelhárítás
 
-Az alkalmazás három különböző fordítási módot kínál:
-
-- **LM Studio (helyi)**: A helyi gépen futó LM Studio modell használata a fordításhoz
-- **ChatGPT (GPT-4o-mini)**: Az OpenAI GPT-4o-mini modelljének használata a fordításhoz
-- **ChatGPT (GPT-4o)**: Az OpenAI GPT-4o modelljének használata a fordításhoz
-
-A fordítási mód a böngésző localStorage-jában tárolódik, így a felhasználó következő látogatásakor is megmarad.
-
-### 10. API kulcs biztonságos tárolása
-
-Az OpenAI API kulcs biztonságos tárolása:
-
-- Az API kulcs titkosítva tárolódik a böngésző localStorage-jában
-- AES titkosítási algoritmus védi az API kulcsot
-- A felhasználónak nem kell minden alkalommal újra beírnia az API kulcsot, amikor újraindítja a programot
-- A titkosítás védelmet nyújt a felületes vizsgálat ellen
-
-
+- **A fordítás nem indul el (LM Studio mód):** Ellenőrizd, hogy az LM Studio fut-e és elérhető-e a http://localhost:1234 címen
+- **A fordítás nem indul el (ChatGPT mód):** Ellenőrizd, hogy megadtad-e az érvényes OpenAI API kulcsot
+- **Fordítási hiba:** Ellenőrizd a böngésző konzolját a részletes hibaüzenetért
+- **Lassú fordítás:** A fordítás sebessége függ a használt nyelvi modell méretétől és a számítógép teljesítményétől, illetve a ChatGPT API válaszidejétől
+- **Pontatlan fordítás:** Próbálj nagyobb vagy specializáltabb nyelvi modellt használni, vagy állítsd alacsonyabbra a fordítási szabadságfokot
+- **Szerkesztés nem működik:** Ha problémád van a szerkesztéssel, próbáld frissíteni az oldalt, vagy használj más böngészőt
+- **Munkafájl betöltési hiba:** Ellenőrizd, hogy a munkafájl formátuma megfelelő-e, és nem sérült-e a fájl
+- **API kulcs nem mentődik:** Ellenőrizd, hogy a böngésződ támogatja-e a localStorage használatát és nincs-e letiltva
 
 ## Technikai információk
 - Az alkalmazás tisztán kliens-oldali, nem igényel szervert
@@ -522,14 +525,3 @@ Az LM Studio helyi szerverének használatakor előfordulhatnak CORS (Cross-Orig
 
 #### Biztonsági figyelmeztetés:
 A CORS korlátozások megkerülése biztonsági kockázatot jelenthet. Csak megbízható helyi alkalmazásokkal (mint az LM Studio) használd ezeket a megoldásokat, és csak addig, amíg szükséges.
-
-## Hibaelhárítás
-
-- **A fordítás nem indul el (LM Studio mód):** Ellenőrizd, hogy az LM Studio fut-e és elérhető-e a http://localhost:1234 címen
-- **A fordítás nem indul el (ChatGPT mód):** Ellenőrizd, hogy megadtad-e az érvényes OpenAI API kulcsot
-- **Fordítási hiba:** Ellenőrizd a böngésző konzolját a részletes hibaüzenetért
-- **Lassú fordítás:** A fordítás sebessége függ a használt nyelvi modell méretétől és a számítógép teljesítményétől, illetve a ChatGPT API válaszidejétől
-- **Pontatlan fordítás:** Próbálj nagyobb vagy specializáltabb nyelvi modellt használni, vagy állítsd alacsonyabbra a fordítási szabadságfokot
-- **Szerkesztés nem működik:** Ha problémád van a szerkesztéssel, próbáld frissíteni az oldalt, vagy használj más böngészőt
-- **Munkafájl betöltési hiba:** Ellenőrizd, hogy a munkafájl formátuma megfelelő-e, és nem sérült-e a fájl
-- **API kulcs nem mentődik:** Ellenőrizd, hogy a böngésződ támogatja-e a localStorage használatát és nincs-e letiltva

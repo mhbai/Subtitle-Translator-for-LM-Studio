@@ -946,6 +946,212 @@ NE adj hozzá magyarázatot vagy egyéb szöveget.`;
     return lastProcessedIndex;
 }
 
+// Kötegelt fordítás a ChatGPT-4o mini modellel
+async function translateBatchWithChatGpt4oMini(startIndex, sourceLanguage, targetLanguage, apiKey, temperature, {
+    originalSubtitles,
+    translatedSubtitles,
+    isTranslationPausedRef,
+    currentTranslationIndex,
+    updateProgressBar,
+    updateTranslatedText,
+    translationMemory,
+    saveTranslationBtn,
+    saveWorkFileBtn,
+    scrollToRow,
+    pauseTranslation,
+    showCurrentRowStopButton
+}) {
+    // Köteg mérete (egyszerre ennyi sort küldünk fordításra)
+    const BATCH_SIZE = 30;
+    
+    // API kérések közötti késleltetés (ms) - 0.5 másodperc
+    const API_DELAY = 500;
+    
+    // Maximum újrapróbálkozások száma sorszám-egyezési hiba esetén
+    const MAX_RETRIES = 3;
+    
+    // Az utolsó feldolgozott index nyomon követése
+    let lastProcessedIndex = startIndex;
+    
+    // Végigmegyünk a feliratokon kötegekben
+    for (let batchStart = startIndex; batchStart < originalSubtitles.length; batchStart += BATCH_SIZE) {
+        // Ha a fordítás szüneteltetése be van kapcsolva, akkor kilépünk a ciklusból
+        if (isTranslationPausedRef.value) {
+            break;
+        }
+        
+        // Aktuális köteg végének meghatározása
+        const batchEnd = Math.min(batchStart + BATCH_SIZE, originalSubtitles.length);
+        
+        // Folyamatjelző frissítése
+        updateProgressBar(batchStart, originalSubtitles.length);
+        
+        // Megjelenítjük az aktuális sor megállítás gombját
+        if (showCurrentRowStopButton) {
+            showCurrentRowStopButton(batchStart);
+        }
+        
+        // Homokóra animáció megjelenítése
+        showLoadingOverlay('loadingBatchTranslation');
+        
+        // Köteg összeállítása
+        let batchTexts = "";
+        let hasUnprocessedLines = false;
+        
+        for (let i = batchStart; i < batchEnd; i++) {
+            // Csak a még le nem fordított sorokat küldjük el
+            if (!translatedSubtitles[i] || translatedSubtitles[i].trim() === '') {
+                // Sorszám + szöveg formátumban
+                batchTexts += `${i+1}. ${originalSubtitles[i].text}\n`;
+                hasUnprocessedLines = true;
+            }
+        }
+        
+        // Ha nincs fordítandó szöveg ebben a kötegben, ugrunk a következőre
+        if (!hasUnprocessedLines) {
+            hideLoadingOverlay();
+            continue;
+        }
+        
+        // Fordítási utasítás
+        const systemPrompt = `Fordítsd le a következő számozott sorokat ${getLanguageNameLocal(sourceLanguage)} nyelvről ${getLanguageNameLocal(targetLanguage)} nyelvre. 
+Minden sort külön fordíts le, és tartsd meg a sorszámozást a fordításban is.
+FONTOS: A válaszodban CSAK a lefordított sorokat add vissza a sorszámokkal együtt, pontosan ugyanolyan formátumban és sorszámozással, ahogy megkaptad.
+Például ha az input:
+123. Eredeti szöveg
+124. Másik eredeti szöveg
+Akkor a válaszod legyen:
+123. Lefordított szöveg
+124. Lefordított másik szöveg
+NE változtasd meg a sorszámokat! NE kezdd újra a számozást 1-től! Használd pontosan az eredeti sorszámokat!
+NE adj hozzá magyarázatot vagy egyéb szöveget.`;
+
+        let retryCount = 0;
+        let translationSuccessful = false;
+        
+        while (retryCount < MAX_RETRIES && !translationSuccessful) {
+            try {
+                // Fordítás végrehajtása
+                const translatedBatch = await translateWithChatGptCustomPrompt(
+                    batchTexts,
+                    systemPrompt,
+                    apiKey,
+                    'gpt-4o-mini',
+                    temperature,
+                    0  // retryCount
+                );
+                
+                // Ellenőrizzük, hogy a visszakapott sorszámok megfelelnek-e az elküldötteknek
+                const isNumberingValid = validateLineNumbering(translatedBatch, batchStart);
+                
+                if (isNumberingValid) {
+                    // Fordítás feldolgozása
+                    processTranslatedBatch(translatedBatch, batchStart, batchEnd, {
+                        translatedSubtitles,
+                        updateTranslatedText,
+                        translationMemory,
+                        originalSubtitles,
+                        saveTranslationBtn,
+                        saveWorkFileBtn
+                    });
+                    
+                    // Sikeres fordítás
+                    translationSuccessful = true;
+                } else {
+                    // Sorszámozási hiba, újrapróbálkozás
+                    console.error(`Sorszámozási hiba a fordításban, újrapróbálkozás (${retryCount + 1}/${MAX_RETRIES})`);
+                    
+                    // Többnyelvű hibaüzenet
+                    const currentLang = currentLangCode || 'hu';
+                    const translations = uiTranslations[currentLang] || {};
+                    let errorMessage = translations.errorNumberingRetry || `Sorszámozási hiba, újrapróbálkozás ({0}/{1})...`;
+                    
+                    // Helyőrzők cseréje
+                    errorMessage = errorMessage.replace('{0}', retryCount + 1).replace('{1}', MAX_RETRIES);
+                    
+                    showLoadingOverlay(errorMessage);
+                    retryCount++;
+                    
+                    // Kis szünet az újrapróbálkozás előtt
+                    await new Promise(resolve => setTimeout(resolve, 2000));
+                }
+            } catch (error) {
+                console.error('Kötegelt fordítási hiba:', error);
+                
+                // Ha sebességkorlát-túllépés (429) hiba, akkor várunk egy ideig és újra próbáljuk
+                if (error.message && error.message.includes('429')) {
+                    console.log('Sebességkorlát-túllépés (429), várakozás 10 másodpercet...');
+                    
+                    // Többnyelvű hibaüzenet
+                    const currentLang = currentLangCode || 'hu';
+                    const translations = uiTranslations[currentLang] || {};
+                    const errorMessage = translations.errorRateLimitExceeded || 'API sebességkorlát túllépve, várakozás 10 másodpercet...';
+                    
+                    showLoadingOverlay(errorMessage);
+                    
+                    // Várakozás 10 másodpercet
+                    await new Promise(resolve => setTimeout(resolve, 10000));
+                    
+                    // Nem számítjuk újrapróbálkozásnak
+                    continue;
+                }
+                
+                // Egyéb hiba esetén újrapróbálkozás
+                console.error(`Fordítási hiba, újrapróbálkozás (${retryCount + 1}/${MAX_RETRIES})`);
+                
+                // Többnyelvű hibaüzenet
+                const currentLang = currentLangCode || 'hu';
+                const translations = uiTranslations[currentLang] || {};
+                let errorMessage = translations.errorTranslationRetry || `Fordítási hiba, újrapróbálkozás ({0}/{1})...`;
+                
+                // Helyőrzők cseréje
+                errorMessage = errorMessage.replace('{0}', retryCount + 1).replace('{1}', MAX_RETRIES);
+                
+                showLoadingOverlay(errorMessage);
+                retryCount++;
+                
+                // Kis szünet az újrapróbálkozás előtt
+                await new Promise(resolve => setTimeout(resolve, 2000));
+            }
+        }
+        
+        // Ha minden újrapróbálkozás sikertelen volt
+        if (!translationSuccessful) {
+            console.error(`Sikertelen fordítás ${MAX_RETRIES} próbálkozás után, továbblépés a következő kötegre.`);
+            
+            // Többnyelvű hibaüzenet
+            const currentLang = currentLangCode || 'hu';
+            const translations = uiTranslations[currentLang] || {};
+            let errorMessage = translations.errorTranslationFailed || `Sikertelen fordítás {0} próbálkozás után, továbblépés...`;
+            
+            // Helyőrzők cseréje
+            errorMessage = errorMessage.replace('{0}', MAX_RETRIES);
+            
+            showLoadingOverlay(errorMessage, 2000);
+            
+            // Kis szünet a következő köteg előtt
+            await new Promise(resolve => setTimeout(resolve, 2000));
+        } else {
+            // Utolsó feldolgozott index frissítése
+            lastProcessedIndex = batchEnd - 1;
+            
+            // Görgetés az utolsó feldolgozott sorhoz
+            scrollToRow(lastProcessedIndex);
+        }
+        
+        // Homokóra animáció elrejtése
+        hideLoadingOverlay();
+        
+        // Kis szünet a következő API kérés előtt
+        if (batchEnd < originalSubtitles.length) {
+            await new Promise(resolve => setTimeout(resolve, API_DELAY));
+        }
+    }
+    
+    // Visszaadjuk az utolsó feldolgozott indexet
+    return lastProcessedIndex;
+}
+
 // Segédfüggvény a sorszámozás ellenőrzéséhez
 function validateLineNumbering(translatedBatch, batchStart) {
     // Fordítás feldolgozása soronként
@@ -1521,6 +1727,9 @@ window.translateSequentially = translateSequentially;
 window.translateSequentiallyWithOpenRouter = translateSequentiallyWithOpenRouter;
 window.translateSequentiallyWithOpenRouterGeminiFlash = translateSequentiallyWithOpenRouterGeminiFlash;
 window.translateBatchWithOpenRouterGeminiFlash = translateBatchWithOpenRouterGeminiFlash;
+window.translateBatchWithChatGpt4oMini = translateBatchWithChatGpt4oMini;
 window.translateWithOpenRouterApi = translateWithOpenRouterApi;
 window.translateTextWithContext = translateTextWithContext;
 window.translateText = translateText;
+window.showLoadingOverlay = showLoadingOverlay;
+window.hideLoadingOverlay = hideLoadingOverlay;
