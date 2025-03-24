@@ -68,7 +68,7 @@ async function retranslateSubtitle(index, {
                 model,
                 temperature
             );
-        } else if (selectedMode === 'openrouter_gemini_flash') {
+        } else if (selectedMode.startsWith('openrouter_')) {
             // Ellenőrizzük, hogy van-e API kulcs
             if (!apiKey) {
                 alert(uiTranslations[currentLangCode]?.errorNoApiKey || 'Please enter the API key to use OpenRouter API!');
@@ -114,72 +114,26 @@ A többi szöveg csak kontextus, azt NE fordítsd le.
 A fordításodban KIZÁRÓLAG a lefordított szöveget add vissza, semmilyen jelölést, magyarázatot vagy egyéb szöveget NE adj hozzá.
 NE használd a "${uniqueMarker}" vagy "${endMarker}" jelöléseket a válaszodban.`;
             
-            // Fordítás végrehajtása az OpenRouter API-val Gemini Flash 2.0 modellel
+            // Modell azonosító kiválasztása a fordítási mód alapján
+            let modelId;
+            
+            if (selectedMode === 'openrouter_gemini_flash') {
+                modelId = 'google/gemini-2.0-flash-001';
+            } else if (selectedMode === 'openrouter_gemma_27b') {
+                modelId = 'google/gemma-3-27b-it:free';
+            } else {
+                // Alapértelmezett esetben Gemma 3 27B
+                modelId = 'google/gemma-3-27b-it:free';
+            }
+            
+            // Fordítás végrehajtása az OpenRouter API-val a kiválasztott modellel
             const rawTranslatedText = await translateWithOpenRouterApi(
                 contextText,
                 systemPrompt,
                 apiKey,
                 temperature,
                 0,
-                'google/gemini-2.0-flash-001' // Gemini Flash modell azonosító
-            );
-            
-            // Fordítás tisztítása
-            translatedText = cleanTranslation(rawTranslatedText, uniqueMarker, endMarker);
-        } else if (selectedMode === 'openrouter_gemma_27b') {
-            // Ellenőrizzük, hogy van-e API kulcs
-            if (!apiKey) {
-                alert(uiTranslations[currentLangCode]?.errorNoApiKey || 'Please enter the API key to use OpenRouter API!');
-                return;
-            }
-            
-            // Kontextus összeállítása (előző és következő mondatok)
-            const currentSubtitle = originalSubtitles[index].text;
-            
-            // Előző 4 mondat összegyűjtése (ha van)
-            let previousContext = "";
-            for (let j = Math.max(0, index - 4); j < index; j++) {
-                if (originalSubtitles[j] && originalSubtitles[j].text) {
-                    previousContext += originalSubtitles[j].text + "\n";
-                }
-            }
-            
-            // Következő 4 mondat összegyűjtése (ha van)
-            let nextContext = "";
-            for (let j = index + 1; j < Math.min(originalSubtitles.length, index + 5); j++) {
-                if (originalSubtitles[j] && originalSubtitles[j].text) {
-                    nextContext += originalSubtitles[j].text + "\n";
-                }
-            }
-            
-            // Egyedi azonosító a fordítandó sorhoz
-            const uniqueMarker = "###FORDÍTANDÓ_SOR###";
-            const endMarker = "###FORDÍTÁS_VÉGE###";
-            
-            // Teljes kontextus összeállítása
-            let contextText = "";
-            if (previousContext) {
-                contextText += "Előző sorok kontextusként (NEM kell fordítani):\n" + previousContext + "\n";
-            }
-            contextText += uniqueMarker + "\n" + currentSubtitle + "\n" + endMarker + "\n";
-            if (nextContext) {
-                contextText += "Következő sorok kontextusként (NEM kell fordítani):\n" + nextContext;
-            }
-            
-            // Fordítási utasítás
-            const systemPrompt = `Fordítsd le CSAK a "${uniqueMarker}" és "${endMarker}" közötti szöveget ${getLanguageNameLocal(sourceLanguage)} nyelvről ${getLanguageNameLocal(targetLanguage)} nyelvre. 
-A többi szöveg csak kontextus, azt NE fordítsd le. 
-A fordításodban KIZÁRÓLAG a lefordított szöveget add vissza, semmilyen jelölést, magyarázatot vagy egyéb szöveget NE adj hozzá.
-NE használd a "${uniqueMarker}" vagy "${endMarker}" jelöléseket a válaszodban.`;
-            
-            // Fordítás végrehajtása az OpenRouter API-val Gemma 3 27B modellel
-            const rawTranslatedText = await translateWithOpenRouterApi(
-                contextText,
-                systemPrompt,
-                apiKey,
-                temperature,
-                0,
-                'google/gemma-3-27b-it:free' // Gemma 3 27B modell azonosító
+                modelId
             );
             
             // Fordítás tisztítása
@@ -231,8 +185,8 @@ NE használd a "${uniqueMarker}" vagy "${endMarker}" jelöléseket a válaszodba
     }
 }
 
- // Szekvenciális fordítás a ChatGPT API-val
- async function translateSequentially(startIndex, sourceLanguage, targetLanguage, apiKey, mode, temperature, {
+// Szekvenciális fordítás a ChatGPT API-val
+async function translateSequentially(startIndex, sourceLanguage, targetLanguage, apiKey, mode, temperature, {
     originalSubtitles,
     translatedSubtitles,
     isTranslationPausedRef, // Referencia a szüneteltetés változóhoz
@@ -246,7 +200,7 @@ NE használd a "${uniqueMarker}" vagy "${endMarker}" jelöléseket a válaszodba
     pauseTranslation,
     translateWithChatGptCustomPrompt,
     showCurrentRowStopButton
- }) {
+}) {
     // ChatGPT API kérések közötti késleltetés (ms) - 0.2 másodperc
     const API_DELAY = 200;
     
@@ -420,8 +374,8 @@ NE használd a "${uniqueMarker}" vagy "${endMarker}" jelöléseket a válaszodba
     return localCurrentIndex;
 }
 
- // Szekvenciális fordítás az OpenRouter API-val
- async function translateSequentiallyWithOpenRouter(startIndex, sourceLanguage, targetLanguage, apiKey, temperature, {
+// Szekvenciális fordítás az OpenRouter API-val
+async function translateSequentiallyWithOpenRouter(startIndex, sourceLanguage, targetLanguage, apiKey, temperature, {
     originalSubtitles,
     translatedSubtitles,
     isTranslationPausedRef,
@@ -1733,3 +1687,667 @@ window.translateTextWithContext = translateTextWithContext;
 window.translateText = translateText;
 window.showLoadingOverlay = showLoadingOverlay;
 window.hideLoadingOverlay = hideLoadingOverlay;
+
+// Új, univerzális szekvenciális fordítás az OpenRouter API-val
+async function translateSequentiallyWithOpenRouterUniversal(startIndex, sourceLanguage, targetLanguage, apiKey, temperature, modelType, {
+    originalSubtitles,
+    translatedSubtitles,
+    isTranslationPausedRef,
+    currentTranslationIndex,
+    updateProgressBar,
+    updateTranslatedText,
+    translationMemory,
+    saveTranslationBtn,
+    saveWorkFileBtn,
+    scrollToRow,
+    pauseTranslation,
+    showCurrentRowStopButton
+}) {
+    // API kérések közötti késleltetés (ms) - 0.2 másodperc
+    const API_DELAY = 200;
+    
+    // Modell azonosító kiválasztása
+    let modelId;
+    let modelDisplayName;
+    
+    if (modelType === 'openrouter_gemini_flash') {
+        modelId = 'google/gemini-2.0-flash-001';
+        modelDisplayName = 'Gemini Flash';
+    } else if (modelType === 'openrouter_gemma_27b') {
+        modelId = 'google/gemma-3-27b-it:free';
+        modelDisplayName = 'Gemma 3 27B';
+    } else {
+        // Alapértelmezett esetben Gemma 3 27B
+        modelId = 'google/gemma-3-27b-it:free';
+        modelDisplayName = 'Gemma 3 27B';
+    }
+    
+    // Az utolsó feldolgozott index nyomon követése
+    let lastProcessedIndex = startIndex;
+    
+    // Végigmegyünk a feliratokon egyesével, szekvenciálisan
+    for (let i = startIndex; i < originalSubtitles.length; i++) {
+        // Ha a fordítás szüneteltetése be van kapcsolva, akkor kilépünk a ciklusból
+        if (isTranslationPausedRef.value) {
+            break;
+        }
+        
+        // Aktuális fordítási index frissítése
+        lastProcessedIndex = i;
+        
+        // Ellenőrizzük, hogy már le van-e fordítva ez a felirat
+        if (translatedSubtitles[i]) {
+            continue; // Átugorjuk a már lefordított feliratokat
+        }
+        
+        // Folyamatjelző frissítése
+        updateProgressBar(i, originalSubtitles.length);
+        
+        // Megjelenítjük az aktuális sor megállítás gombját
+        if (showCurrentRowStopButton) {
+            showCurrentRowStopButton(i);
+        }
+        
+        try {
+            // Kontextus összeállítása (előző és következő mondatok)
+            const currentSubtitle = originalSubtitles[i].text;
+            
+            // Előző 4 mondat összegyűjtése (ha van)
+            let previousContext = "";
+            for (let j = Math.max(0, i - 4); j < i; j++) {
+                if (originalSubtitles[j] && originalSubtitles[j].text) {
+                    previousContext += originalSubtitles[j].text + "\n";
+                }
+            }
+            
+            // Következő 4 mondat összegyűjtése (ha van)
+            let nextContext = "";
+            for (let j = i + 1; j < Math.min(originalSubtitles.length, i + 5); j++) {
+                if (originalSubtitles[j] && originalSubtitles[j].text) {
+                    nextContext += originalSubtitles[j].text + "\n";
+                }
+            }
+            
+            // Egyedi azonosító a fordítandó sorhoz
+            const uniqueMarker = "###FORDÍTANDÓ_SOR###";
+            const endMarker = "###FORDÍTÁS_VÉGE###";
+            
+            // Teljes kontextus összeállítása
+            let contextText = "";
+            if (previousContext) {
+                contextText += "Előző sorok kontextusként (NEM kell fordítani):\n" + previousContext + "\n";
+            }
+            contextText += uniqueMarker + "\n" + currentSubtitle + "\n" + endMarker + "\n";
+            if (nextContext) {
+                contextText += "Következő sorok kontextusként (NEM kell fordítani):\n" + nextContext;
+            }
+            
+            // Fordítási utasítás
+            const systemPrompt = `Fordítsd le CSAK a "${uniqueMarker}" és "${endMarker}" közötti szöveget ${getLanguageNameLocal(sourceLanguage)} nyelvről ${getLanguageNameLocal(targetLanguage)} nyelvre. 
+A többi szöveg csak kontextus, azt NE fordítsd le. 
+A fordításodban KIZÁRÓLAG a lefordított szöveget add vissza, semmilyen jelölést, magyarázatot vagy egyéb szöveget NE adj hozzá.
+NE használd a "${uniqueMarker}" vagy "${endMarker}" jelöléseket a válaszodban.`;
+            
+            // Fordítás végrehajtása az OpenRouter API-val a kiválasztott modellel
+            let translatedText;
+            try {
+                translatedText = await translateWithOpenRouterApi(
+                    contextText,
+                    systemPrompt,
+                    apiKey,
+                    temperature,
+                    0,
+                    modelId
+                );
+            } catch (error) {
+                console.error(`OpenRouter API hiba (${modelDisplayName}):`, error);
+                // Részletes hibaüzenet megjelenítése
+                alert(`OpenRouter API hiba (${modelDisplayName}): ${error.message}`);
+                pauseTranslation();
+                break;
+            }
+            
+            // Fordítás tisztítása
+            translatedText = cleanTranslation(translatedText, uniqueMarker, endMarker);
+            
+            // Fordított szöveg mentése
+            translatedSubtitles[i] = translatedText;
+            
+            // Táblázat frissítése
+            updateTranslatedText(i, translatedText);
+            
+            // Újrafordítás gomb megjelenítése
+            const retranslateBtn = document.getElementById(`retranslate-${i}`);
+            if (retranslateBtn) {
+                retranslateBtn.classList.remove('d-none');
+            }
+            
+            // Görgetés az aktuális sorhoz
+            scrollToRow(i);
+            
+            // Fordítási memória frissítése
+            if (!translationMemory.translations) {
+                translationMemory.translations = {};
+            }
+            translationMemory.translations[originalSubtitles[i].text] = translatedText;
+            
+            // Mentés gomb engedélyezése
+            saveTranslationBtn.disabled = false;
+            
+            // Munkafájl mentés gomb megjelenítése
+            saveWorkFileBtn.classList.remove('d-none');
+            
+            // Kis szünet a következő API kérés előtt a sebességkorlát elkerülése érdekében
+            await new Promise(resolve => setTimeout(resolve, API_DELAY));
+            
+        } catch (error) {
+            console.error(`Fordítási hiba (${modelDisplayName}):`, error);
+            
+            // Ha sebességkorlát-túllépés (429) hiba, akkor várunk egy ideig és újra próbáljuk
+            if (error.message.includes('429')) {
+                console.log('Sebességkorlát-túllépés (429), várakozás 10 másodpercet...');
+                alert('We wait 10 seconds for the API speed limit to be exceeded and then continue translating.');
+                
+                // Várakozás 10 másodpercet
+                await new Promise(resolve => setTimeout(resolve, 10000));
+                
+                // Visszalépünk egy indexet, hogy újra megpróbáljuk ezt a feliratot
+                i--;
+                continue;
+            }
+            
+            alert(`An error occurred during translation with ${modelDisplayName}: ${error.message}`);
+            pauseTranslation();
+            break;
+        }
+    }
+    
+    // Visszaadjuk az utolsó feldolgozott indexet
+    return lastProcessedIndex;
+}
+
+// Univerzális kötegelt fordítás az OpenRouter API-val
+async function translateBatchWithOpenRouterUniversal(startIndex, sourceLanguage, targetLanguage, apiKey, temperature, modelType, {
+    originalSubtitles,
+    translatedSubtitles,
+    isTranslationPausedRef,
+    currentTranslationIndex,
+    updateProgressBar,
+    updateTranslatedText,
+    translationMemory,
+    saveTranslationBtn,
+    saveWorkFileBtn,
+    scrollToRow,
+    pauseTranslation,
+    showCurrentRowStopButton
+}) {
+    // Modell azonosító kiválasztása
+    let modelId;
+    let modelDisplayName;
+    
+    if (modelType === 'openrouter_gemini_flash') {
+        modelId = 'google/gemini-2.0-flash-001';
+        modelDisplayName = 'Gemini Flash';
+    } else if (modelType === 'openrouter_gemma_27b') {
+        modelId = 'google/gemma-3-27b-it:free';
+        modelDisplayName = 'Gemma 3 27B';
+    } else {
+        // Alapértelmezett esetben Gemma 3 27B
+        modelId = 'google/gemma-3-27b-it:free';
+        modelDisplayName = 'Gemma 3 27B';
+    }
+
+    // Batch méret (ennyi feliratot fordítunk egyszerre)
+    const BATCH_SIZE = 30;
+    
+    // API kérések közötti késleltetés (ms) - 0.5 másodperc
+    const API_DELAY = 500;
+    
+    // Maximum újrapróbálkozások száma sorszám-egyezési hiba esetén
+    const MAX_RETRIES = 3;
+    
+    // Az utolsó feldolgozott index nyomon követése
+    let lastProcessedIndex = startIndex;
+    
+    // Végigmegyünk a feliratokon, kötegelt módon
+    for (let batchStart = startIndex; batchStart < originalSubtitles.length; batchStart += BATCH_SIZE) {
+        // Ha a fordítás szüneteltetése be van kapcsolva, akkor kilépünk a ciklusból
+        if (isTranslationPausedRef.value) {
+            break;
+        }
+        
+        // Aktuális köteg vége (de nem lehet nagyobb, mint a feliratok száma)
+        const batchEnd = Math.min(batchStart + BATCH_SIZE, originalSubtitles.length);
+        
+        // Folyamatjelző frissítése
+        updateProgressBar(batchStart, originalSubtitles.length);
+        
+        // Aktuális sor megállítás gombjának megjelenítése
+        if (showCurrentRowStopButton) {
+            showCurrentRowStopButton(batchStart);
+        }
+        
+        try {
+            // Köteg szövegének összeállítása
+            let batchText = "";
+            let hasUnprocessedLines = false;
+            
+            for (let i = batchStart; i < batchEnd; i++) {
+                // Csak a még le nem fordított sorokat küldjük el
+                if (!translatedSubtitles[i] || translatedSubtitles[i].trim() === '') {
+                    // Sorszámozott formában adjuk hozzá a szöveget
+                    batchText += `${i+1}. ${originalSubtitles[i].text}\n`;
+                    hasUnprocessedLines = true;
+                }
+            }
+            
+            // Ha nincs fordítandó szöveg ebben a kötegben, ugrunk a következőre
+            if (!hasUnprocessedLines) {
+                continue;
+            }
+            
+            // Fordítási utasítás
+            const systemPrompt = `Fordítsd le az alábbi számozott mondatokat ${getLanguageNameLocal(sourceLanguage)} nyelvről ${getLanguageNameLocal(targetLanguage)} nyelvre. 
+Minden mondatot külön fordíts le, és tartsd meg a sorszámozást a fordításban is.
+FONTOS: A válaszodban CSAK a lefordított mondatokat add vissza a sorszámokkal együtt, pontosan ugyanolyan formátumban és sorszámozással, ahogy megkaptad.
+Példa a várt formátumra:
+1. [fordított szöveg]
+2. [fordított másik szöveg]`;
+            
+            // Homokóra animáció megjelenítése
+            showLoadingOverlay(`${modelDisplayName} ${batchStart+1}-${batchEnd} fordítása folyamatban...`);
+            
+            let retryCount = 0;
+            let translationSuccessful = false;
+            
+            while (retryCount < MAX_RETRIES && !translationSuccessful) {
+                try {
+                    // Fordítás végrehajtása
+                    const translatedBatch = await translateWithOpenRouterApi(
+                        batchText,
+                        systemPrompt,
+                        apiKey,
+                        temperature,
+                        0,  // retryCount
+                        modelId
+                    );
+                    
+                    // Ellenőrizzük, hogy a visszakapott sorszámok megfelelnek-e az elküldötteknek
+                    const isNumberingValid = validateLineNumbering(translatedBatch, batchStart);
+                    
+                    if (isNumberingValid) {
+                        // Fordítás feldolgozása
+                        processTranslatedBatch(translatedBatch, batchStart, batchEnd, {
+                            translatedSubtitles,
+                            updateTranslatedText,
+                            translationMemory,
+                            originalSubtitles,
+                            saveTranslationBtn,
+                            saveWorkFileBtn
+                        });
+                        
+                        // Sikeres fordítás
+                        translationSuccessful = true;
+                    } else {
+                        // Sorszámozási hiba, újrapróbálkozás
+                        console.error(`Sorszámozási hiba a fordításban, újrapróbálkozás (${retryCount + 1}/${MAX_RETRIES})`);
+                        
+                        // Többnyelvű hibaüzenet
+                        const currentLang = currentLangCode || 'hu';
+                        const translations = uiTranslations[currentLang] || {};
+                        let errorMessage = translations.errorNumberingRetry || `Sorszámozási hiba, újrapróbálkozás ({0}/{1})...`;
+                        
+                        // Helyőrzők cseréje
+                        errorMessage = errorMessage.replace('{0}', retryCount + 1).replace('{1}', MAX_RETRIES);
+                        
+                        showLoadingOverlay(errorMessage);
+                        retryCount++;
+                        
+                        // Kis szünet az újrapróbálkozás előtt
+                        await new Promise(resolve => setTimeout(resolve, 2000));
+                    }
+                } catch (error) {
+                    console.error('Kötegelt fordítási hiba:', error);
+                    
+                    // Ha sebességkorlát-túllépés (429) hiba, akkor várunk egy ideig és újra próbáljuk
+                    if (error.message.includes('429')) {
+                        console.log('Sebességkorlát-túllépés (429), várakozás 10 másodpercet...');
+                        
+                        // Többnyelvű hibaüzenet
+                        const currentLang = currentLangCode || 'hu';
+                        const translations = uiTranslations[currentLang] || {};
+                        const errorMessage = translations.errorRateLimitExceeded || 'API sebességkorlát túllépve, várakozás 10 másodpercet...';
+                        
+                        showLoadingOverlay(errorMessage);
+                        
+                        // Várakozás 10 másodpercet
+                        await new Promise(resolve => setTimeout(resolve, 10000));
+                        
+                        // Nem számítjuk újrapróbálkozásnak
+                        continue;
+                    }
+                    
+                    // Egyéb hiba esetén újrapróbálkozás
+                    console.error(`Fordítási hiba, újrapróbálkozás (${retryCount + 1}/${MAX_RETRIES})`);
+                    
+                    // Többnyelvű hibaüzenet
+                    const currentLang = currentLangCode || 'hu';
+                    const translations = uiTranslations[currentLang] || {};
+                    let errorMessage = translations.errorTranslationRetry || `Fordítási hiba, újrapróbálkozás ({0}/{1})...`;
+                    
+                    // Helyőrzők cseréje
+                    errorMessage = errorMessage.replace('{0}', retryCount + 1).replace('{1}', MAX_RETRIES);
+                    
+                    showLoadingOverlay(errorMessage);
+                    retryCount++;
+                    
+                    // Kis szünet az újrapróbálkozás előtt
+                    await new Promise(resolve => setTimeout(resolve, 2000));
+                }
+            }
+            
+            // Ha minden újrapróbálkozás sikertelen volt
+            if (!translationSuccessful) {
+                console.error(`Sikertelen fordítás ${MAX_RETRIES} próbálkozás után, továbblépés a következő kötegre.`);
+                
+                // Többnyelvű hibaüzenet
+                const currentLang = currentLangCode || 'hu';
+                const translations = uiTranslations[currentLang] || {};
+                let errorMessage = translations.errorTranslationFailed || `Sikertelen fordítás {0} próbálkozás után, továbblépés...`;
+                
+                // Helyőrzők cseréje
+                errorMessage = errorMessage.replace('{0}', MAX_RETRIES);
+                
+                showLoadingOverlay(errorMessage, 2000);
+                
+                // Kis szünet a következő köteg előtt
+                await new Promise(resolve => setTimeout(resolve, 2000));
+            } else {
+                // Utolsó feldolgozott index frissítése
+                lastProcessedIndex = batchEnd - 1;
+                
+                // Görgetés az utolsó feldolgozott sorhoz
+                scrollToRow(lastProcessedIndex);
+            }
+            
+            // Homokóra animáció elrejtése
+            hideLoadingOverlay();
+            
+            // Kis szünet a következő API kérés előtt
+            if (batchEnd < originalSubtitles.length) {
+                await new Promise(resolve => setTimeout(resolve, API_DELAY));
+            }
+        } catch (error) {
+            console.error(`Fordítási hiba (${modelDisplayName} Batch):`, error);
+            alert(`Hiba történt a kötegelt fordítás során (${modelDisplayName}): ${error.message}`);
+            pauseTranslation();
+            break;
+        }
+    }
+    
+    // Visszaadjuk az utolsó feldolgozott indexet
+    return lastProcessedIndex;
+}
+
+// Feliratok fordítása szekvenciálisan (egyesével)
+async function translateSubtitleSequentially(startIndex, {
+    sourceLanguageSelect,
+    targetLanguageSelect,
+    temperatureSlider,
+    translationModeSelect,
+    apiKeyInput,
+    originalSubtitles,
+    translatedSubtitles,
+    isTranslationPausedRef, // Referencia a szüneteltetés változóhoz
+    currentTranslationIndex,
+    updateProgressBar,
+    updateTranslatedText,
+    translationMemory,
+    saveTranslationBtn,
+    saveWorkFileBtn,
+    scrollToRow,
+    pauseTranslation,
+    showCurrentRowStopButton,
+    currentLangCode,
+    uiTranslations
+}) {
+    // Nyelvi beállítások
+    const sourceLanguage = sourceLanguageSelect.value;
+    const targetLanguage = targetLanguageSelect.value;
+    
+    // Hőmérséklet beállítás
+    const temperature = parseFloat(temperatureSlider.value);
+    
+    // Fordítási mód ellenőrzése
+    const selectedMode = translationModeSelect.value;
+    const apiKey = apiKeyInput.value;
+    
+    // Az utolsó feldolgozott index nyomon követése
+    let lastProcessedIndex = startIndex;
+    
+    // A kiválasztott fordítási mód alapján hívjuk meg a megfelelő fordítási függvényt
+    if (selectedMode === 'chatgpt_4o_mini' || selectedMode === 'chatgpt_4o') {
+        // Ellenőrizzük, hogy van-e API kulcs
+        if (!apiKey) {
+            alert(uiTranslations[currentLangCode]?.errorNoApiKey || 'Please enter the API key to use ChatGPT!');
+            return startIndex;
+        }
+        
+        // ChatGPT modell kiválasztása
+        const model = selectedMode === 'chatgpt_4o_mini' ? 'gpt-4o-mini' : 'gpt-4o';
+        
+        // ChatGPT szekvenciális fordítás végrehajtása
+        lastProcessedIndex = await translateSequentiallyWithChatGpt(
+            startIndex,
+            sourceLanguage,
+            targetLanguage,
+            apiKey,
+            model,
+            temperature,
+            {
+                originalSubtitles,
+                translatedSubtitles,
+                isTranslationPausedRef,
+                currentTranslationIndex,
+                updateProgressBar,
+                updateTranslatedText,
+                translationMemory,
+                saveTranslationBtn,
+                saveWorkFileBtn,
+                scrollToRow,
+                pauseTranslation,
+                showCurrentRowStopButton
+            }
+        );
+    } else if (selectedMode.startsWith('openrouter_')) {
+        // Ellenőrizzük, hogy van-e API kulcs
+        if (!apiKey) {
+            alert(uiTranslations[currentLangCode]?.errorNoApiKey || 'Please enter the API key to use OpenRouter API!');
+            return startIndex;
+        }
+        
+        // OpenRouter szekvenciális fordítás végrehajtása az univerzális függvénnyel
+        lastProcessedIndex = await translateSequentiallyWithOpenRouterUniversal(
+            startIndex,
+            sourceLanguage,
+            targetLanguage,
+            apiKey,
+            temperature,
+            selectedMode, // modelType paraméterként átadjuk a kiválasztott modellt
+            {
+                originalSubtitles,
+                translatedSubtitles,
+                isTranslationPausedRef,
+                currentTranslationIndex,
+                updateProgressBar,
+                updateTranslatedText,
+                translationMemory,
+                saveTranslationBtn,
+                saveWorkFileBtn,
+                scrollToRow,
+                pauseTranslation,
+                showCurrentRowStopButton
+            }
+        );
+    } else {
+        // LM Studio fordítás végrehajtása
+        lastProcessedIndex = await translateSequentiallyWithLMStudio(
+            startIndex,
+            sourceLanguage,
+            targetLanguage,
+            temperature,
+            {
+                originalSubtitles,
+                translatedSubtitles,
+                isTranslationPausedRef,
+                currentTranslationIndex,
+                updateProgressBar,
+                updateTranslatedText,
+                translationMemory,
+                saveTranslationBtn,
+                saveWorkFileBtn,
+                scrollToRow,
+                pauseTranslation,
+                showCurrentRowStopButton
+            }
+        );
+    }
+    
+    return lastProcessedIndex;
+}
+
+// Feliratok fordítása kötegelt módban
+async function translateSubtitleBatch(startIndex, {
+    sourceLanguageSelect,
+    targetLanguageSelect,
+    temperatureSlider,
+    translationModeSelect,
+    apiKeyInput,
+    originalSubtitles,
+    translatedSubtitles,
+    isTranslationPausedRef,
+    currentTranslationIndex,
+    updateProgressBar,
+    updateTranslatedText,
+    translationMemory,
+    saveTranslationBtn,
+    saveWorkFileBtn,
+    scrollToRow,
+    pauseTranslation,
+    showCurrentRowStopButton,
+    currentLangCode,
+    uiTranslations
+}) {
+    // Nyelvi beállítások
+    const sourceLanguage = sourceLanguageSelect.value;
+    const targetLanguage = targetLanguageSelect.value;
+    
+    // Hőmérséklet beállítás
+    const temperature = parseFloat(temperatureSlider.value);
+    
+    // Fordítási mód ellenőrzése
+    const selectedMode = translationModeSelect.value;
+    const apiKey = apiKeyInput.value;
+    
+    // Az utolsó feldolgozott index nyomon követése
+    let lastProcessedIndex = startIndex;
+    
+    // A kiválasztott fordítási mód alapján hívjuk meg a megfelelő fordítási függvényt
+    if (selectedMode === 'chatgpt_4o_mini' || selectedMode === 'chatgpt_4o') {
+        // Ellenőrizzük, hogy van-e API kulcs
+        if (!apiKey) {
+            alert(uiTranslations[currentLangCode]?.errorNoApiKey || 'Please enter the API key to use ChatGPT!');
+            return startIndex;
+        }
+        
+        // ChatGPT modell kiválasztása
+        const model = selectedMode === 'chatgpt_4o_mini' ? 'gpt-4o-mini' : 'gpt-4o';
+        
+        // ChatGPT kötegelt fordítás végrehajtása
+        lastProcessedIndex = await translateBatchWithChatGpt(
+            startIndex,
+            sourceLanguage,
+            targetLanguage,
+            apiKey,
+            model,
+            temperature,
+            {
+                originalSubtitles,
+                translatedSubtitles,
+                isTranslationPausedRef,
+                currentTranslationIndex,
+                updateProgressBar,
+                updateTranslatedText,
+                translationMemory,
+                saveTranslationBtn,
+                saveWorkFileBtn,
+                scrollToRow,
+                pauseTranslation,
+                showCurrentRowStopButton
+            }
+        );
+    } else if (selectedMode.startsWith('openrouter_')) {
+        // Ellenőrizzük, hogy van-e API kulcs
+        if (!apiKey) {
+            alert(uiTranslations[currentLangCode]?.errorNoApiKey || 'Please enter the API key to use OpenRouter API!');
+            return startIndex;
+        }
+        
+        // OpenRouter kötegelt fordítás végrehajtása az univerzális függvénnyel
+        lastProcessedIndex = await translateBatchWithOpenRouterUniversal(
+            startIndex,
+            sourceLanguage,
+            targetLanguage,
+            apiKey,
+            temperature,
+            selectedMode, // modelType paraméterként átadjuk a kiválasztott modellt
+            {
+                originalSubtitles,
+                translatedSubtitles,
+                isTranslationPausedRef,
+                currentTranslationIndex,
+                updateProgressBar,
+                updateTranslatedText,
+                translationMemory,
+                saveTranslationBtn,
+                saveWorkFileBtn,
+                scrollToRow,
+                pauseTranslation,
+                showCurrentRowStopButton
+            }
+        );
+    } else {
+        // LM Studio-nak nincs kötegelt fordítási módja, helyette szekvenciális fordítást hívunk
+        lastProcessedIndex = await translateSequentiallyWithLMStudio(
+            startIndex,
+            sourceLanguage,
+            targetLanguage,
+            temperature,
+            {
+                originalSubtitles,
+                translatedSubtitles,
+                isTranslationPausedRef,
+                currentTranslationIndex,
+                updateProgressBar,
+                updateTranslatedText,
+                translationMemory,
+                saveTranslationBtn,
+                saveWorkFileBtn,
+                scrollToRow,
+                pauseTranslation,
+                showCurrentRowStopButton
+            }
+        );
+    }
+    
+    return lastProcessedIndex;
+}
+
+// Globális exportálások a többi fájl számára
+window.translateSubtitleSequentially = translateSubtitleSequentially;
+window.translateSubtitleBatch = translateSubtitleBatch;
+window.retranslateSubtitle = retranslateSubtitle;
+window.translateWithOpenRouterApi = translateWithOpenRouterApi;
+window.translateSequentiallyWithOpenRouterUniversal = translateSequentiallyWithOpenRouterUniversal;
+window.translateBatchWithOpenRouterUniversal = translateBatchWithOpenRouterUniversal;
+window.translateWithChatGpt = translateWithChatGpt;

@@ -239,6 +239,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // Fordítás módjának eseménykezelője
     translationModeSelect.addEventListener('change', handleTranslationModeChange);
     
+    // Fordítási mód kezelése inicializáláskor - hogy a batch mód konténer megfelelően jelenjen meg
+    handleTranslationModeChange();
+    
     // API kulcs változásának figyelése és mentése
     apiKeyInput.addEventListener('change', function() {
         // API kulcs mentése a localStorage-ba titkosítva
@@ -977,31 +980,71 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
             }
         } else if (selectedMode === 'openrouter_gemma_27b') {
-            // Szekvenciális fordítás az OpenRouter API-val
-            await window.translateSequentiallyWithOpenRouter(currentTranslationIndex, sourceLanguage, targetLanguage, apiKey, temperature, {
-                originalSubtitles,
-                translatedSubtitles,
-                isTranslationPausedRef, // Globális referencia objektum átadása
-                currentTranslationIndex,
-                updateProgressBar,
-                updateTranslatedText,
-                translationMemory,
-                saveTranslationBtn,
-                saveWorkFileBtn,
-                scrollToRow,
-                pauseTranslation,
-                showCurrentRowStopButton
-            });
+            // Ellenőrizzük, hogy a kötegelt mód be van-e kapcsolva
+            const batchModeCheckbox = document.getElementById('batchModeCheckbox');
+            
+            if (batchModeCheckbox && batchModeCheckbox.checked) {
+                // Kötegelt fordítás az OpenRouter API-val (Gemma 3 27B)
+                await window.translateSubtitleBatch(currentTranslationIndex, {
+                    sourceLanguageSelect,
+                    targetLanguageSelect,
+                    temperatureSlider,
+                    translationModeSelect,
+                    apiKeyInput,
+                    originalSubtitles,
+                    translatedSubtitles,
+                    isTranslationPausedRef,
+                    currentTranslationIndex,
+                    updateProgressBar,
+                    updateTranslatedText,
+                    translationMemory,
+                    saveTranslationBtn,
+                    saveWorkFileBtn,
+                    scrollToRow,
+                    pauseTranslation,
+                    showCurrentRowStopButton,
+                    currentLangCode,
+                    uiTranslations
+                });
+            } else {
+                // Szekvenciális fordítás az OpenRouter API-val (Gemma 3 27B)
+                await window.translateSubtitleSequentially(currentTranslationIndex, {
+                    sourceLanguageSelect,
+                    targetLanguageSelect,
+                    temperatureSlider,
+                    translationModeSelect,
+                    apiKeyInput,
+                    originalSubtitles,
+                    translatedSubtitles,
+                    isTranslationPausedRef,
+                    currentTranslationIndex,
+                    updateProgressBar,
+                    updateTranslatedText,
+                    translationMemory,
+                    saveTranslationBtn,
+                    saveWorkFileBtn,
+                    scrollToRow,
+                    pauseTranslation,
+                    showCurrentRowStopButton,
+                    currentLangCode,
+                    uiTranslations
+                });
+            }
         } else if (selectedMode === 'openrouter_gemini_flash') {
             // Ellenőrizzük, hogy a kötegelt mód be van-e kapcsolva
             const batchModeCheckbox = document.getElementById('batchModeCheckbox');
             
             if (batchModeCheckbox && batchModeCheckbox.checked) {
                 // Kötegelt fordítás az OpenRouter API-val (Gemini Flash 2.0)
-                await window.translateBatchWithOpenRouterGeminiFlash(currentTranslationIndex, sourceLanguage, targetLanguage, apiKey, temperature, {
+                await window.translateSubtitleBatch(currentTranslationIndex, {
+                    sourceLanguageSelect,
+                    targetLanguageSelect,
+                    temperatureSlider,
+                    translationModeSelect,
+                    apiKeyInput,
                     originalSubtitles,
                     translatedSubtitles,
-                    isTranslationPausedRef, // Globális referencia objektum átadása
+                    isTranslationPausedRef,
                     currentTranslationIndex,
                     updateProgressBar,
                     updateTranslatedText,
@@ -1010,14 +1053,21 @@ document.addEventListener('DOMContentLoaded', function() {
                     saveWorkFileBtn,
                     scrollToRow,
                     pauseTranslation,
-                    showCurrentRowStopButton
+                    showCurrentRowStopButton,
+                    currentLangCode,
+                    uiTranslations
                 });
             } else {
                 // Szekvenciális fordítás az OpenRouter API-val (Gemini Flash 2.0)
-                await window.translateSequentiallyWithOpenRouterGeminiFlash(currentTranslationIndex, sourceLanguage, targetLanguage, apiKey, temperature, {
+                await window.translateSubtitleSequentially(currentTranslationIndex, {
+                    sourceLanguageSelect,
+                    targetLanguageSelect,
+                    temperatureSlider,
+                    translationModeSelect,
+                    apiKeyInput,
                     originalSubtitles,
                     translatedSubtitles,
-                    isTranslationPausedRef, // Globális referencia objektum átadása
+                    isTranslationPausedRef,
                     currentTranslationIndex,
                     updateProgressBar,
                     updateTranslatedText,
@@ -1026,7 +1076,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     saveWorkFileBtn,
                     scrollToRow,
                     pauseTranslation,
-                    showCurrentRowStopButton
+                    showCurrentRowStopButton,
+                    currentLangCode,
+                    uiTranslations
                 });
             }
         } else {
@@ -1360,7 +1412,7 @@ function handleTranslationModeChange() {
     
     // Batch mód konténer kezelése
     const batchModeContainer = document.getElementById('batchModeContainer');
-    if (selectedMode === 'openrouter_gemini_flash' || selectedMode === 'chatgpt_4o_mini' || selectedMode === 'chatgpt_4o') {
+    if (selectedMode === 'openrouter_gemini_flash' || selectedMode === 'chatgpt_4o_mini' || selectedMode === 'chatgpt_4o' || selectedMode === 'openrouter_gemma_27b') {
         batchModeContainer.classList.remove('d-none');
         
         // Tooltip inicializálása a batch mód információs ikonhoz
@@ -1607,3 +1659,28 @@ function hideCurrentRowStopButton() {
         btn.classList.add('d-none');
     });
 }
+
+window.addEventListener('DOMContentLoaded', function() {
+    // UI elemek betöltése
+    loadUiElements();
+    
+    // Eseménykezelők beállítása
+    setupEventListeners();
+    
+    // Nyelvi beállítások inicializálása
+    initLanguageSelector();
+    
+    // Tooltipek inicializálása
+    initTooltips();
+    
+    // Mentett fordítási mód betöltése
+    const savedTranslationMode = localStorage.getItem('translationMode');
+    if (savedTranslationMode) {
+        translationModeSelect.value = savedTranslationMode;
+    }
+    
+    // Fordítási mód kezelése inicializáláskor
+    handleTranslationModeChange();
+    
+    console.log('Eseménykezelők beállítva');
+});
