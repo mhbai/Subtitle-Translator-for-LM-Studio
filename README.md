@@ -6,6 +6,17 @@ This application is a simple yet powerful web tool for translating .srt subtitle
 
 ## Version History
 
+### Version 1.4 (2025-03-24)
+- **New OpenRouter Models**: Added five new OpenRouter models to expand translation options:
+  - **DeepSeek R1** (free)
+  - **Gemini Pro 2.0 Experimental** (free)
+  - **DeepSeek V3** (free)
+  - **Llama 3.1 70B Instruct**
+  - **GPT-4o-mini**
+- **Batch Translation Mode**: Batch translation mode is now available for all OpenRouter models
+- Improved API key handling for all OpenRouter models
+- Enhanced translation reliability when using external API services
+
 ### Version 1.3 (2025-03-23)
 - Added batch mode for ChatGPT-4o mini and ChatGPT-4o models, allowing for translation of 30 lines at once
 - Improved translation speed and accuracy with the batch mode for ChatGPT models
@@ -247,6 +258,17 @@ MAGYAR NYELVŰ LEÍRÁS:
 Ez az alkalmazás egy egyszerű, de hatékony webes eszköz .srt formátumú feliratfájlok fordítására. A program a helyi gépen futó LM Studio mesterséges intelligencia modellt vagy a ChatGPT API-t használja a fordításhoz.
 
 ## Verzió történet
+
+### 1.4-es verzió (2025-03-24)
+- **Új OpenRouter modellek**: Öt új OpenRouter modell hozzáadása a fordítási lehetőségek bővítéséhez:
+  - **DeepSeek R1** (ingyenes)
+  - **Gemini Pro 2.0 Experimental** (ingyenes)
+  - **DeepSeek V3** (ingyenes)
+  - **Llama 3.1 70B Instruct**
+  - **GPT-4o-mini**
+- **Kötegelt fordítási mód**: Kötegelt fordítási mód most már elérhető minden OpenRouter modellhez
+- Javított API kulcs kezelés minden OpenRouter modellhez
+- Fejlesztett fordítási megbízhatóság külső API szolgáltatások használata esetén
 
 ### 1.3-as verzió (2025-03-23)
 - ChatGPT-4o mini és ChatGPT-4o modellekhez is hozzáadtuk a batch módot, amely egyszerre 30 sor szöveget képes feldolgozni

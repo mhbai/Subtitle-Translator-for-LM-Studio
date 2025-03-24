@@ -901,13 +901,13 @@ document.addEventListener('DOMContentLoaded', function() {
         // API kulcs ellenőrzése
         const apiKey = apiKeyInput.value.trim();
         
-        // API kulcs ellenőrzése ChatGPT módban
+        // API kulcs ellenőrzése ChatGPT és OpenRouter módban
         if (selectedMode === 'chatgpt_4o_mini' || selectedMode === 'chatgpt_4o') {
             if (!apiKey) {
                 alert('Please enter the API key to use ChatGPT!');
                 return;
             }
-        } else if (selectedMode === 'openrouter_gemma_27b' || selectedMode === 'openrouter_gemini_flash') {
+        } else if (selectedMode.startsWith('openrouter_')) {
             if (!apiKey) {
                 alert('Please enter the OpenRouter API key to use the selected model!');
                 return;
@@ -979,12 +979,18 @@ document.addEventListener('DOMContentLoaded', function() {
                     showCurrentRowStopButton
                 });
             }
-        } else if (selectedMode === 'openrouter_gemma_27b') {
+        } else if (selectedMode === 'openrouter_gemma_27b' || 
+                  selectedMode === 'openrouter_gemini_flash' || 
+                  selectedMode === 'openrouter_deepseek_r1' || 
+                  selectedMode === 'openrouter_gemini_pro' || 
+                  selectedMode === 'openrouter_deepseek_v3' || 
+                  selectedMode === 'openrouter_llama_70b' || 
+                  selectedMode === 'openrouter_gpt4o_mini') {
             // Ellenőrizzük, hogy a kötegelt mód be van-e kapcsolva
             const batchModeCheckbox = document.getElementById('batchModeCheckbox');
             
             if (batchModeCheckbox && batchModeCheckbox.checked) {
-                // Kötegelt fordítás az OpenRouter API-val (Gemma 3 27B)
+                // Kötegelt fordítás az OpenRouter API-val
                 await window.translateSubtitleBatch(currentTranslationIndex, {
                     sourceLanguageSelect,
                     targetLanguageSelect,
@@ -1007,58 +1013,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     uiTranslations
                 });
             } else {
-                // Szekvenciális fordítás az OpenRouter API-val (Gemma 3 27B)
-                await window.translateSubtitleSequentially(currentTranslationIndex, {
-                    sourceLanguageSelect,
-                    targetLanguageSelect,
-                    temperatureSlider,
-                    translationModeSelect,
-                    apiKeyInput,
-                    originalSubtitles,
-                    translatedSubtitles,
-                    isTranslationPausedRef,
-                    currentTranslationIndex,
-                    updateProgressBar,
-                    updateTranslatedText,
-                    translationMemory,
-                    saveTranslationBtn,
-                    saveWorkFileBtn,
-                    scrollToRow,
-                    pauseTranslation,
-                    showCurrentRowStopButton,
-                    currentLangCode,
-                    uiTranslations
-                });
-            }
-        } else if (selectedMode === 'openrouter_gemini_flash') {
-            // Ellenőrizzük, hogy a kötegelt mód be van-e kapcsolva
-            const batchModeCheckbox = document.getElementById('batchModeCheckbox');
-            
-            if (batchModeCheckbox && batchModeCheckbox.checked) {
-                // Kötegelt fordítás az OpenRouter API-val (Gemini Flash 2.0)
-                await window.translateSubtitleBatch(currentTranslationIndex, {
-                    sourceLanguageSelect,
-                    targetLanguageSelect,
-                    temperatureSlider,
-                    translationModeSelect,
-                    apiKeyInput,
-                    originalSubtitles,
-                    translatedSubtitles,
-                    isTranslationPausedRef,
-                    currentTranslationIndex,
-                    updateProgressBar,
-                    updateTranslatedText,
-                    translationMemory,
-                    saveTranslationBtn,
-                    saveWorkFileBtn,
-                    scrollToRow,
-                    pauseTranslation,
-                    showCurrentRowStopButton,
-                    currentLangCode,
-                    uiTranslations
-                });
-            } else {
-                // Szekvenciális fordítás az OpenRouter API-val (Gemini Flash 2.0)
+                // Szekvenciális fordítás az OpenRouter API-val
                 await window.translateSubtitleSequentially(currentTranslationIndex, {
                     sourceLanguageSelect,
                     targetLanguageSelect,
@@ -1412,7 +1367,15 @@ function handleTranslationModeChange() {
     
     // Batch mód konténer kezelése
     const batchModeContainer = document.getElementById('batchModeContainer');
-    if (selectedMode === 'openrouter_gemini_flash' || selectedMode === 'chatgpt_4o_mini' || selectedMode === 'chatgpt_4o' || selectedMode === 'openrouter_gemma_27b') {
+    if (selectedMode === 'openrouter_gemini_flash' || 
+        selectedMode === 'chatgpt_4o_mini' || 
+        selectedMode === 'chatgpt_4o' || 
+        selectedMode === 'openrouter_gemma_27b' ||
+        selectedMode === 'openrouter_deepseek_r1' ||
+        selectedMode === 'openrouter_gemini_pro' ||
+        selectedMode === 'openrouter_deepseek_v3' ||
+        selectedMode === 'openrouter_llama_70b' ||
+        selectedMode === 'openrouter_gpt4o_mini') {
         batchModeContainer.classList.remove('d-none');
         
         // Tooltip inicializálása a batch mód információs ikonhoz
@@ -1452,7 +1415,7 @@ function handleTranslationModeChange() {
         
         // API kulcs címke frissítése
         document.querySelector('label[for="apiKey"]').textContent = 'API kulcs:';
-    } else if (selectedMode === 'openrouter_gemma_27b' || selectedMode === 'openrouter_gemini_flash') {
+    } else if (selectedMode.startsWith('openrouter_')) {
         apiKeyContainer.classList.remove('d-none');
         
         // Ha van mentett OpenRouter API kulcs, csak a megjelenítés gombot mutatjuk

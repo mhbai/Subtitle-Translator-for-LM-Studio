@@ -121,6 +121,16 @@ NE használd a "${uniqueMarker}" vagy "${endMarker}" jelöléseket a válaszodba
                 modelId = 'google/gemini-2.0-flash-001';
             } else if (selectedMode === 'openrouter_gemma_27b') {
                 modelId = 'google/gemma-3-27b-it:free';
+            } else if (selectedMode === 'openrouter_deepseek_r1') {
+                modelId = 'deepseek/deepseek-r1:free';
+            } else if (selectedMode === 'openrouter_gemini_pro') {
+                modelId = 'google/gemini-2.0-pro-exp-02-05:free';
+            } else if (selectedMode === 'openrouter_deepseek_v3') {
+                modelId = 'deepseek/deepseek-chat:free';
+            } else if (selectedMode === 'openrouter_llama_70b') {
+                modelId = 'meta-llama/llama-3.1-70b-instruct';
+            } else if (selectedMode === 'openrouter_gpt4o_mini') {
+                modelId = 'openai/gpt-4o-mini';
             } else {
                 // Alapértelmezett esetben Gemma 3 27B
                 modelId = 'google/gemma-3-27b-it:free';
@@ -508,7 +518,7 @@ NE adj hozzá magyarázatot vagy egyéb szöveget.`;
                 console.error('Kötegelt fordítási hiba:', error);
                 
                 // Ha sebességkorlát-túllépés (429) hiba, akkor várunk egy ideig és újra próbáljuk
-                if (error.message && error.message.includes('429')) {
+                if (error.message.includes('429')) {
                     console.log('Sebességkorlát-túllépés (429), várakozás 10 másodpercet...');
                     
                     // Többnyelvű hibaüzenet
@@ -1193,6 +1203,21 @@ async function translateSequentiallyWithOpenRouterUniversal(startIndex, sourceLa
     } else if (modelType === 'openrouter_gemma_27b') {
         modelId = 'google/gemma-3-27b-it:free';
         modelDisplayName = 'Gemma 3 27B';
+    } else if (modelType === 'openrouter_deepseek_r1') {
+        modelId = 'deepseek/deepseek-r1:free';
+        modelDisplayName = 'DeepSeek R1';
+    } else if (modelType === 'openrouter_gemini_pro') {
+        modelId = 'google/gemini-2.0-pro-exp-02-05:free';
+        modelDisplayName = 'Gemini Pro 2.0 Exp';
+    } else if (modelType === 'openrouter_deepseek_v3') {
+        modelId = 'deepseek/deepseek-chat:free';
+        modelDisplayName = 'DeepSeek V3';
+    } else if (modelType === 'openrouter_llama_70b') {
+        modelId = 'meta-llama/llama-3.1-70b-instruct';
+        modelDisplayName = 'Llama 3.1 70B';
+    } else if (modelType === 'openrouter_gpt4o_mini') {
+        modelId = 'openai/gpt-4o-mini';
+        modelDisplayName = 'GPT-4o-mini';
     } else {
         // Alapértelmezett esetben Gemma 3 27B
         modelId = 'google/gemma-3-27b-it:free';
@@ -1370,6 +1395,21 @@ async function translateBatchWithOpenRouterUniversal(startIndex, sourceLanguage,
     } else if (modelType === 'openrouter_gemma_27b') {
         modelId = 'google/gemma-3-27b-it:free';
         modelDisplayName = 'Gemma 3 27B';
+    } else if (modelType === 'openrouter_deepseek_r1') {
+        modelId = 'deepseek/deepseek-r1:free';
+        modelDisplayName = 'DeepSeek R1';
+    } else if (modelType === 'openrouter_gemini_pro') {
+        modelId = 'google/gemini-2.0-pro-exp-02-05:free';
+        modelDisplayName = 'Gemini Pro 2.0 Exp';
+    } else if (modelType === 'openrouter_deepseek_v3') {
+        modelId = 'deepseek/deepseek-chat:free';
+        modelDisplayName = 'DeepSeek V3';
+    } else if (modelType === 'openrouter_llama_70b') {
+        modelId = 'meta-llama/llama-3.1-70b-instruct';
+        modelDisplayName = 'Llama 3.1 70B';
+    } else if (modelType === 'openrouter_gpt4o_mini') {
+        modelId = 'openai/gpt-4o-mini';
+        modelDisplayName = 'GPT-4o-mini';
     } else {
         // Alapértelmezett esetben Gemma 3 27B
         modelId = 'google/gemma-3-27b-it:free';
