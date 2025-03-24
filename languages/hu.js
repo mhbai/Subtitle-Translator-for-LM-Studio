@@ -91,6 +91,7 @@ const hu = {
     errorRateLimitExceeded: "API sebességkorlát túllépve, várakozás 10 másodpercet...",
     errorTranslationRetry: "Fordítási hiba, újrapróbálkozás ({0}/{1})...",
     errorTranslationFailed: "Sikertelen fordítás {0} próbálkozás után, továbblépés...",
+    batchTranslationInProgress: "{0} {1}-{2} fordítása folyamatban...",
     
     // Speciális fordítási mód
     batchModeLabel: "Speciális nagy kontextusú fordítási mód",

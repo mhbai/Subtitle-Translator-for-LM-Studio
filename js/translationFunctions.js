@@ -1436,7 +1436,7 @@ Példa a várt formátumra:
             // Homokóra animáció megjelenítése a kiválasztott nyelv szerint
             const currentLang = currentLangCode || 'hu';
             const translations = uiTranslations[currentLang] || {};
-            let translationInProgressMessage = translations.batchTranslationInProgress || `{0} {1}-{2} fordítása folyamatban...`;
+            let translationInProgressMessage = translations.batchTranslationInProgress || `{0} {1}-{2} translation in progress...`;
             translationInProgressMessage = translationInProgressMessage
                 .replace('{0}', modelDisplayName)
                 .replace('{1}', batchStart + 1)

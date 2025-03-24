@@ -85,6 +85,7 @@ const de = {
     errorRateLimitExceeded: "API-Ratenlimit überschritten, warte 10 Sekunden...",
     errorTranslationRetry: "Übersetzungsfehler, Wiederholung ({0}/{1})...",
     errorTranslationFailed: "Übersetzung nach {0} Versuchen fehlgeschlagen, weiter geht's...",
+    batchTranslationInProgress: "{0} {1}-{2} Übersetzung läuft...",
     
     // Spezieller Übersetzungsmodus
     batchModeLabel: "Spezieller Übersetzungsmodus mit großem Kontext",

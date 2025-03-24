@@ -91,6 +91,7 @@ const en = {
     errorRateLimitExceeded: "API rate limit exceeded, waiting 10 seconds...",
     errorTranslationRetry: "Translation error, retrying ({0}/{1})...",
     errorTranslationFailed: "Translation failed after {0} attempts, moving on...",
+    batchTranslationInProgress: "{0} {1}-{2} translation in progress...",
     
     // Special translation mode
     batchModeLabel: "Special large context translation mode",
