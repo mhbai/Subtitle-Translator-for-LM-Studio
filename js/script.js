@@ -964,6 +964,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 // Frissítjük a globális indexet a függvény visszatérési értékével
                 currentTranslationIndex = lastProcessedIndex;
+                
+                // Rövid késleltetés, hogy biztosan minden frissülhessen a DOM-ban
+                await new Promise(resolve => setTimeout(resolve, 500));
+                
+                // Ha végigértünk a feliratokon és nem szüneteltettük a fordítást
+                if (currentTranslationIndex >= originalSubtitles.length - 1 && !isTranslationPaused) {
+                    // Fordítás befejezése
+                    finishTranslation();
+                }
             } else {
                 // Normál szekvenciális fordítás
                 const lastProcessedIndex = await window.translateSequentially(currentTranslationIndex, sourceLanguage, targetLanguage, apiKey, selectedMode, temperature, {
@@ -979,11 +988,19 @@ document.addEventListener('DOMContentLoaded', function() {
                     scrollToRow,
                     pauseTranslation,
                     translateWithChatGptCustomPrompt,
-                    showCurrentRowStopButton
+                    showCurrentRowStopButton,
+                    currentLangCode,
+                    uiTranslations
                 });
                 
                 // Frissítjük a globális indexet a függvény visszatérési értékével
                 currentTranslationIndex = lastProcessedIndex;
+                
+                // Ha végigértünk a feliratokon és nem szüneteltettük a fordítást
+                if (currentTranslationIndex >= originalSubtitles.length - 1 && !isTranslationPaused) {
+                    // Fordítás befejezése
+                    finishTranslation();
+                }
             }
         } else if (selectedMode === 'openrouter_gemma_27b' || 
                   selectedMode === 'openrouter_gemini_flash' || 
