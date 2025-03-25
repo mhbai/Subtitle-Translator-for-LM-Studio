@@ -1021,6 +1021,15 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 // Frissítjük a globális indexet a függvény visszatérési értékével
                 currentTranslationIndex = lastProcessedIndex;
+                
+                // Rövid késleltetés, hogy biztosan minden frissülhessen a DOM-ban
+                await new Promise(resolve => setTimeout(resolve, 500));
+                
+                // Ha végigértünk a feliratokon és nem szüneteltettük a fordítást
+                if (currentTranslationIndex >= originalSubtitles.length - 1 && !isTranslationPaused) {
+                    // Fordítás befejezése
+                    finishTranslation();
+                }
             } else {
                 // Szekvenciális fordítás az OpenRouter API-val
                 const lastProcessedIndex = await window.translateSubtitleSequentially(currentTranslationIndex, {
@@ -1047,24 +1056,37 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 // Frissítjük a globális indexet a függvény visszatérési értékével
                 currentTranslationIndex = lastProcessedIndex;
+                
+                // Ha végigértünk a feliratokon és nem szüneteltettük a fordítást
+                if (currentTranslationIndex >= originalSubtitles.length - 1 && !isTranslationPaused) {
+                    // Fordítás befejezése
+                    finishTranslation();
+                }
             }
         } else {
             // LM Studio fordítás - eredeti logika
             await translateWithLmStudio(currentTranslationIndex, sourceLanguage, targetLanguage, temperature);
+            
+            // Ha végigértünk a feliratokon és nem szüneteltettük a fordítást
+            if (currentTranslationIndex >= originalSubtitles.length - 1 && !isTranslationPaused) {
+                // Fordítás befejezése
+                finishTranslation();
+            }
         }
         
+        // Eltávolítjuk a globális befejezés ellenőrzést, mivel minden fordítási mód után külön ellenőrizzük
         // Ha végigértünk a feliratokon és nem szüneteltettük a fordítást
-        if (currentTranslationIndex >= originalSubtitles.length - 1 && !isTranslationPaused) {
-            // Fordítás befejezése
-            finishTranslation();
-        }
+        // if (currentTranslationIndex >= originalSubtitles.length - 1 && !isTranslationPaused) {
+        //     // Fordítás befejezése
+        //     finishTranslation();
+        // }
     }
 
     // LM Studio fordítás
     async function translateWithLmStudio(startIndex, sourceLanguage, targetLanguage, temperature) {
         // Végigmegyünk a feliratokon
         for (let i = startIndex; i < originalSubtitles.length; i++) {
-            // Ha a fordítás szüneteltetése be van kapcsolva, akkor kilépünk a ciklusból
+            // Ha a fordítás szüneteltetve van, akkor kilépünk a ciklusból
             if (isTranslationPausedRef.value) {
                 break;
             }

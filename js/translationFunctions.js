@@ -485,7 +485,7 @@ NE adj hozzá magyarázatot vagy egyéb szöveget.`;
                 
                 if (isNumberingValid) {
                     // Fordítás feldolgozása
-                    processTranslatedBatch(translatedBatch, batchStart, batchEnd, {
+                    await processTranslatedBatch(translatedBatch, batchStart, batchEnd, {
                         translatedSubtitles,
                         updateTranslatedText,
                         translationMemory,
@@ -621,8 +621,8 @@ function validateLineNumbering(translatedBatch, batchStart) {
     return validLines > 0;
 }
 
-// Segédfüggvény a kötegelt fordítás eredményének feldolgozásához
-function processTranslatedBatch(translatedBatch, batchStart, batchEnd, {
+// Fordítás feldolgozása aszinkron módon
+async function processTranslatedBatch(translatedBatch, batchStart, batchEnd, {
     translatedSubtitles,
     updateTranslatedText,
     translationMemory,
@@ -633,6 +633,7 @@ function processTranslatedBatch(translatedBatch, batchStart, batchEnd, {
     // Fordítás feldolgozása soronként
     const lines = translatedBatch.split('\n');
     
+    // Sorokat aszinkron módon dolgozzuk fel, hogy a DOM frissítésére legyen idő
     for (const line of lines) {
         // Csak a nem üres sorokat dolgozzuk fel
         if (line.trim() === '') continue;
@@ -667,6 +668,9 @@ function processTranslatedBatch(translatedBatch, batchStart, batchEnd, {
                     if (retranslateBtn) {
                         retranslateBtn.classList.remove('d-none');
                     }
+                    
+                    // Rövid késleltetés, hogy a DOM frissítésére legyen idő
+                    await new Promise(resolve => setTimeout(resolve, 10));
                 }
             }
         }
@@ -675,8 +679,10 @@ function processTranslatedBatch(translatedBatch, batchStart, batchEnd, {
     // Mentés gomb engedélyezése
     saveTranslationBtn.disabled = false;
     
-    // Munkafájl mentés gomb megjelenítése
-    saveWorkFileBtn.classList.remove('d-none');
+    // Munkafájl mentés gomb engedélyezése, ha van
+    if (saveWorkFileBtn) {
+        saveWorkFileBtn.disabled = false;
+    }
 }
 
 // Segédfüggvény a homokóra animáció megjelenítéséhez adott ideig
@@ -1073,62 +1079,102 @@ async function translateTextWithContext(subtitles, currentIndex, sourceLanguage,
             })
         });
         
+        // Ha 429-es hiba (túl sok kérés), akkor újrapróbálkozunk
+        if (response.status === 429 && retryCount < 3) {
+            console.log(`429 hiba, újrapróbálkozás ${retryCount + 1}/3 (várakozás: 1000ms)...`);
+            // Várakozás 1 másodpercet
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            // Újrapróbálkozás
+            return translateTextWithContext(subtitles, currentIndex, sourceLanguage, targetLanguage, retryCount + 1, temperature, { getLanguageName });
+        }
+        
+        // Válasz szöveg ellenőrzése
+        const responseText = await response.text();
+        console.log('API válasz szöveg:', responseText);
+        
+        // Ha a válasz nem JSON formátumú, akkor hibát dobunk
         if (!response.ok) {
-            throw new Error(`API hiba: ${response.status} ${response.statusText}`);
+            throw new Error(`API hiba: ${response.status} ${response.statusText} - ${responseText}`);
         }
         
-        const data = await response.json();
-        
-        // Ellenőrizzük, hogy van-e válasz
-        if (data.choices && data.choices.length > 0 && data.choices[0].text) {
-            // Tisztítjuk a fordítást
-            let translatedText = data.choices[0].text.trim();
-            
-            // Ellenőrizzük, hogy a fordítás tartalmaz-e hibás formázást vagy kódjelölést
-            if (translatedText.includes('```') || 
-                translatedText.startsWith('`') || 
-                translatedText.includes('```')) {
-                
-                // Eltávolítjuk a ``` jelöléseket és a köztük lévő nyelvi azonosítót (ha van)
-                translatedText = translatedText.replace(/```[a-z]*\n?/g, '');
-                translatedText = translatedText.replace(/```/g, '');
-                
-                // Eltávolítjuk az egyszeres ` jeleket is
-                translatedText = translatedText.replace(/`/g, '');
-            }
-            
-            // Idézőjelek eltávolítása a fordítás elejéről és végéről, ha vannak
-            if ((translatedText.startsWith('"') && translatedText.endsWith('"')) || 
-                (translatedText.startsWith('"') && translatedText.endsWith('"'))) {
-                translatedText = translatedText.substring(1, translatedText.length - 1);
-            }
-            
-            // Ellenőrizzük, hogy a fordítás nem tartalmaz-e hibás vagy értelmetlen szöveget
-            // (pl. hibaüzenet, vagy túl rövid a fordítás az eredetihez képest)
-            const originalLength = currentSubtitle.length;
-            const translatedLength = translatedText.length;
-            const isTranslationSuspicious = 
-                translatedText.includes("error") || 
-                translatedText.includes("hiba") || 
-                translatedText.includes("unexpected") ||
-                (translatedLength < originalLength * 0.3 && originalLength > 10) || // Túl rövid fordítás
-                translatedText.includes("API") ||
-                translatedText.includes("endpoint");
-            
-            // Ha gyanús a fordítás és még nem próbáltuk újra túl sokszor, próbáljuk újra
-            if (isTranslationSuspicious && retryCount < 3) {
-                console.warn(`Gyanús fordítás, újrapróbálkozás (${retryCount + 1}/3): "${translatedText}"`);
-                
-                // Várjunk egy kicsit az újrapróbálkozás előtt
-                await new Promise(resolve => setTimeout(resolve, 1000));
-                // Újrapróbálkozás
-                return translateTextWithContext(subtitles, currentIndex, sourceLanguage, targetLanguage, retryCount + 1, temperature, { getLanguageName });
-            }
-            
-            return translatedText;
-        } else {
-            throw new Error('Nem érkezett fordítási eredmény');
+        // Válasz JSON-ná alakítása
+        let data;
+        try {
+            data = JSON.parse(responseText);
+        } catch (e) {
+            throw new Error(`Érvénytelen JSON válasz: ${responseText}`);
         }
+        
+        console.log('API válasz:', data); // Teljes válasz naplózása hibakereséshez
+        
+        // Ellenőrizzük, hogy a válasz tartalmazza-e a szükséges mezőket
+        if (!data) {
+            throw new Error('Érvénytelen API válasz: null vagy undefined');
+        }
+        
+        // Ha van hibaüzenet a válaszban, azt is megjelenítjük
+        if (data.error) {
+            throw new Error(`API hiba: ${data.error.message || JSON.stringify(data.error)}`);
+        }
+        
+        // Próbáljuk meg kinyerni a fordított szöveget a válaszból
+        let translatedText = null;
+        
+        // 1. Ellenőrizzük a choices[0].message.content útvonalat (standard OpenAI formátum)
+        if (data.choices && 
+            Array.isArray(data.choices) && 
+            data.choices.length > 0 && 
+            data.choices[0].message && 
+            data.choices[0].message.content) {
+            translatedText = data.choices[0].message.content.trim();
+        }
+        // 2. Ellenőrizzük a choices[0].text útvonalat (alternatív formátum)
+        else if (data.choices && 
+                Array.isArray(data.choices) && 
+                data.choices.length > 0 && 
+                data.choices[0].text) {
+            translatedText = data.choices[0].text.trim();
+        }
+        // 3. Ellenőrizzük a choices[0].content útvonalat (alternatív formátum)
+        else if (data.choices && 
+                Array.isArray(data.choices) && 
+                data.choices.length > 0 && 
+                data.choices[0].content) {
+            translatedText = data.choices[0].content.trim();
+        }
+        // 4. Ellenőrizzük a text útvonalat (egyszerű válasz)
+        else if (data.text) {
+            translatedText = data.text.trim();
+        }
+        // 5. Ellenőrizzük a content útvonalat (egyszerű válasz)
+        else if (data.content) {
+            translatedText = data.content.trim();
+        }
+        // 6. Ellenőrizzük a message.content útvonalat (egyszerű válasz)
+        else if (data.message && data.message.content) {
+            translatedText = data.message.content.trim();
+        }
+        // 7. Ellenőrizzük a completion útvonalat (régebbi API-k)
+        else if (data.completion) {
+            translatedText = data.completion.trim();
+        }
+        // 8. Ellenőrizzük a generated_text útvonalat (néhány API)
+        else if (data.generated_text) {
+            translatedText = data.generated_text.trim();
+        }
+        // 9. Utolsó lehetőség: a teljes válasz szövegként
+        else {
+            console.warn('Nem találtunk ismert mezőt a válaszban, a teljes választ használjuk szövegként.');
+            translatedText = JSON.stringify(data);
+        }
+        
+        if (!translatedText) {
+            throw new Error('Nem sikerült kinyerni a fordított szöveget a válaszból: ' + JSON.stringify(data));
+        }
+        
+        console.log('Fordítás eredménye:', translatedText);
+        
+        return translatedText;
     } catch (error) {
         console.error('Fordítási hiba:', error);
         
@@ -1504,7 +1550,7 @@ Példa a várt formátumra:
                     
                     if (isNumberingValid) {
                         // Fordítás feldolgozása
-                        processTranslatedBatch(translatedBatch, batchStart, batchEnd, {
+                        await processTranslatedBatch(translatedBatch, batchStart, batchEnd, {
                             translatedSubtitles,
                             updateTranslatedText,
                             translationMemory,
