@@ -1,5 +1,15 @@
 # SRT Subtitle Translator
 
+![SRT Subtitle Translator](https://img.shields.io/badge/SRT--Subtitle--Translator-2.0-blue)
+![HTML5](https://img.shields.io/badge/HTML5-E34F26?style=flat&logo=html5&logoColor=white)
+![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=flat&logo=css3&logoColor=white)
+![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=flat&logo=javascript&logoColor=black)
+![Bootstrap](https://img.shields.io/badge/Bootstrap-7952B3?style=flat&logo=bootstrap&logoColor=white)
+![OpenAI API](https://img.shields.io/badge/OpenAI-API-412991?style=flat&logo=openai&logoColor=white)
+![LM Studio](https://img.shields.io/badge/LM--Studio-Integration-00A98F?style=flat&logo=ai&logoColor=white)
+![OpenRouter](https://img.shields.io/badge/OpenRouter-API-FF6B6B?style=flat&logo=router&logoColor=white)
+![Multilingual](https://img.shields.io/badge/Multilingual-30_Languages-4CAF50)
+
 This application is a simple yet powerful web tool for translating .srt subtitle files. The program uses either the LM Studio artificial intelligence model running on the local machine or the ChatGPT and some openrouter models with API keys.
 
 ![Running image](Images/Screen01.jpg)
