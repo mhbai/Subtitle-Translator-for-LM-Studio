@@ -947,7 +947,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Kötegelt fordítás a ChatGPT modellekkel
                 const modelName = selectedMode === 'chatgpt_4o_mini' ? 'gpt-4o-mini' : 'gpt-4o';
                 
-                await window.translateBatchWithChatGpt(currentTranslationIndex, sourceLanguage, targetLanguage, apiKey, temperature, modelName, {
+                const lastProcessedIndex = await window.translateBatchWithChatGpt(currentTranslationIndex, sourceLanguage, targetLanguage, apiKey, temperature, modelName, {
                     originalSubtitles,
                     translatedSubtitles,
                     isTranslationPausedRef, // Globális referencia objektum átadása
@@ -961,9 +961,12 @@ document.addEventListener('DOMContentLoaded', function() {
                     pauseTranslation,
                     showCurrentRowStopButton
                 });
+                
+                // Frissítjük a globális indexet a függvény visszatérési értékével
+                currentTranslationIndex = lastProcessedIndex;
             } else {
                 // Normál szekvenciális fordítás
-                await window.translateSequentially(currentTranslationIndex, sourceLanguage, targetLanguage, apiKey, selectedMode, temperature, {
+                const lastProcessedIndex = await window.translateSequentially(currentTranslationIndex, sourceLanguage, targetLanguage, apiKey, selectedMode, temperature, {
                     originalSubtitles,
                     translatedSubtitles,
                     isTranslationPausedRef, // Globális referencia objektum átadása
@@ -978,6 +981,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     translateWithChatGptCustomPrompt,
                     showCurrentRowStopButton
                 });
+                
+                // Frissítjük a globális indexet a függvény visszatérési értékével
+                currentTranslationIndex = lastProcessedIndex;
             }
         } else if (selectedMode === 'openrouter_gemma_27b' || 
                   selectedMode === 'openrouter_gemini_flash' || 
@@ -991,7 +997,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             if (batchModeCheckbox && batchModeCheckbox.checked) {
                 // Kötegelt fordítás az OpenRouter API-val
-                await window.translateSubtitleBatch(currentTranslationIndex, {
+                const lastProcessedIndex = await window.translateSubtitleBatch(currentTranslationIndex, {
                     sourceLanguageSelect,
                     targetLanguageSelect,
                     temperatureSlider,
@@ -1012,9 +1018,12 @@ document.addEventListener('DOMContentLoaded', function() {
                     currentLangCode,
                     uiTranslations
                 });
+                
+                // Frissítjük a globális indexet a függvény visszatérési értékével
+                currentTranslationIndex = lastProcessedIndex;
             } else {
                 // Szekvenciális fordítás az OpenRouter API-val
-                await window.translateSubtitleSequentially(currentTranslationIndex, {
+                const lastProcessedIndex = await window.translateSubtitleSequentially(currentTranslationIndex, {
                     sourceLanguageSelect,
                     targetLanguageSelect,
                     temperatureSlider,
@@ -1035,6 +1044,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     currentLangCode,
                     uiTranslations
                 });
+                
+                // Frissítjük a globális indexet a függvény visszatérési értékével
+                currentTranslationIndex = lastProcessedIndex;
             }
         } else {
             // LM Studio fordítás - eredeti logika

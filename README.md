@@ -1,6 +1,6 @@
 # SRT Subtitle Translator
 
-This application is a simple yet powerful web tool for translating .srt subtitle files. The program uses either the LM Studio artificial intelligence model running on the local machine or the ChatGPT API for translation.
+This application is a simple yet powerful web tool for translating .srt subtitle files. The program uses either the LM Studio artificial intelligence model running on the local machine or the ChatGPT and some openrouter models with API keys.
 
 ![Running image](Images/Screen01.jpg)
 
