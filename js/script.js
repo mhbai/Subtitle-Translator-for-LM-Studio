@@ -1204,12 +1204,19 @@ Csak a fordítást add vissza, semmi mást. Ne adj hozzá magyarázatot vagy meg
             startTranslationBtn.innerHTML = '<i class="bi bi-translate me-2"></i>Start Translation';
         }
         
+        // Fordítás leállítva
+        isTranslationPaused = true;
+        isTranslationRunning = false;
+        
+        // Gombok frissítése
         startTranslationBtn.disabled = false;
         startTranslationBtn.classList.remove('d-none');
         stopTranslationBtn.classList.add('d-none');
         saveTranslationBtn.disabled = false;
         saveWorkFileBtn.classList.remove('d-none');
-        isTranslationRunning = false;
+        
+        // Elrejtjük az összes sormegállítás gombot is
+        hideCurrentRowStopButton();
         
         // Értesítés a fordítás befejezéséről
         if (typeof uiTranslations !== 'undefined' && uiTranslations[currentLangCode]) {
