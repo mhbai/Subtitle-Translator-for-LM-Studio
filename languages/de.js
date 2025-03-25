@@ -52,6 +52,8 @@ const de = {
     translationCompleted: "Übersetzung erfolgreich abgeschlossen!",
     successLoadWorkFile: "Arbeitsdatei erfolgreich geladen! Sie können die Übersetzung fortsetzen.",
     successSaveWorkFile: "Arbeitsdatei erfolgreich gespeichert!",
+    successWorkFile: "Arbeitsdatei erfolgreich gespeichert!",
+    successSourceBlock: "Quellblock erfolgreich gespeichert!",
     
     // Error messages
     errorFileLoad: "Fehler beim Laden der Datei",
@@ -69,6 +71,10 @@ const de = {
     errorRetranslation: "Fehler bei der erneuten Übersetzung!",
     errorLoadWorkFile: "Fehler beim Laden der Arbeitsdatei. Bitte überprüfen Sie das Dateiformat!",
     errorServerConnection: "Verbindung zum LM Studio-Server nicht möglich",
+    errorFileSave: "Fehler beim Speichern der Datei!",
+    
+    // API kulcs kezelés
+    toggleApiKeyVisibility: "API-Schlüssel anzeigen/ausblenden",
     
     // Ladeanimationstexte
     loadingGeneral: "Wird geladen...",

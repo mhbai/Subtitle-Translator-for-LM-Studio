@@ -52,6 +52,8 @@ const ru = {
     translationCompleted: "Перевод успешно завершен!",
     successLoadWorkFile: "Рабочий файл успешно загружен! Вы можете продолжить перевод.",
     successSaveWorkFile: "Рабочий файл успешно сохранен!",
+    successWorkFile: "Рабочий файл успешно сохранен!",
+    successSourceBlock: "Исходный блок успешно сохранен!",
     
     // Error messages
     errorFileLoad: "Ошибка при загрузке файла",
@@ -69,6 +71,10 @@ const ru = {
     errorRetranslation: "Произошла ошибка при повторном переводе!",
     errorLoadWorkFile: "Произошла ошибка при загрузке рабочего файла. Пожалуйста, проверьте формат файла!",
     errorServerConnection: "Не удалось подключиться к серверу LM Studio",
+    errorFileSave: "Ошибка при сохранении файла!",
+    
+    // Управление API ключом
+    toggleApiKeyVisibility: "Показать/скрыть API ключ",
     
     // Тексты анимации загрузки
     loadingGeneral: "Загрузка...",
@@ -85,6 +91,7 @@ const ru = {
     errorRateLimitExceeded: "Превышен лимит скорости API, ожидание 10 секунд...",
     errorTranslationRetry: "Ошибка перевода, повторная попытка ({0}/{1})...",
     errorTranslationFailed: "Перевод не удался после {0} попыток, продолжаем...",
+    batchTranslationInProgress: "{0} {1}-{2} перевод в процессе...",
     
     // Специальный режим перевода
     batchModeLabel: "Специальный режим перевода с расширенным контекстом",

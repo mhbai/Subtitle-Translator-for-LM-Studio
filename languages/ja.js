@@ -52,6 +52,8 @@ const ja = {
     translationCompleted: "翻訳が正常に完了しました！",
     successLoadWorkFile: "作業ファイルが正常に読み込まれました！翻訳を続行できます。",
     successSaveWorkFile: "作業ファイルが正常に保存されました！",
+    successWorkFile: "作業ファイルが正常に保存されました！",
+    successSourceBlock: "ソースブロックが正常に保存されました！",
     
     // Error messages
     errorFileLoad: "ファイル読み込み中にエラーが発生しました",
@@ -69,6 +71,10 @@ const ja = {
     errorRetranslation: "再翻訳中にエラーが発生しました！",
     errorLoadWorkFile: "作業ファイルの読み込み中にエラーが発生しました。ファイル形式を確認してください！",
     errorServerConnection: "LM Studioサーバーに接続できませんでした",
+    errorFileSave: "ファイル保存中にエラーが発生しました！",
+    
+    // APIキー管理
+    toggleApiKeyVisibility: "APIキーの表示/非表示",
     
     // 読み込みアニメーションテキスト
     loadingGeneral: "読み込み中...",
@@ -85,6 +91,7 @@ const ja = {
     errorRateLimitExceeded: "APIレート制限を超えました、10秒待機中...",
     errorTranslationRetry: "翻訳エラー、再試行中 ({0}/{1})...",
     errorTranslationFailed: "{0}回の試行後に翻訳に失敗しました、続行中...",
+    batchTranslationInProgress: "{0} {1}-{2} 翻訳処理中...",
     
     // 特別翻訳モード
     batchModeLabel: "特別な大規模コンテキスト翻訳モード",

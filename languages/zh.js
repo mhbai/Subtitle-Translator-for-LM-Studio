@@ -52,6 +52,8 @@ const zh = {
     translationCompleted: "翻译成功完成！",
     successLoadWorkFile: "工作文件成功加载！您可以继续翻译。",
     successSaveWorkFile: "工作文件成功保存！",
+    successWorkFile: "工作文件成功保存！",
+    successSourceBlock: "源块成功保存！",
     
     // Error messages
     errorFileLoad: "加载文件时出错",
@@ -69,6 +71,10 @@ const zh = {
     errorRetranslation: "重新翻译过程中发生错误！",
     errorLoadWorkFile: "加载工作文件时发生错误。请检查文件格式！",
     errorServerConnection: "无法连接到LM Studio服务器",
+    errorFileSave: "保存文件时出错！",
+    
+    // API密钥管理
+    toggleApiKeyVisibility: "显示/隐藏API密钥",
     
     // 加载动画文本
     loadingGeneral: "加载中...",
@@ -85,6 +91,7 @@ const zh = {
     errorRateLimitExceeded: "API速率限制超出，等待10秒...",
     errorTranslationRetry: "翻译错误，重试中 ({0}/{1})...",
     errorTranslationFailed: "经过{0}次尝试后翻译失败，继续进行...",
+    batchTranslationInProgress: "{0} {1}-{2} 翻译进行中...",
     
     // 特殊翻译模式
     batchModeLabel: "特殊大上下文翻译模式",

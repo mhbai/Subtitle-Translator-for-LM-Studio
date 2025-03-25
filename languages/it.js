@@ -52,6 +52,8 @@ const it = {
     translationCompleted: "Traduzione completata con successo!",
     successLoadWorkFile: "File di lavoro caricato con successo! Puoi continuare la traduzione.",
     successSaveWorkFile: "File di lavoro salvato con successo!",
+    successWorkFile: "File di lavoro salvato con successo!",
+    successSourceBlock: "Blocco di origine salvato con successo!",
     
     // Error messages
     errorFileLoad: "Errore durante il caricamento del file",
@@ -69,6 +71,10 @@ const it = {
     errorRetranslation: "Si è verificato un errore durante la ritraduzione!",
     errorLoadWorkFile: "Si è verificato un errore durante il caricamento del file di lavoro. Controlla il formato del file!",
     errorServerConnection: "Impossibile connettersi al server LM Studio",
+    errorFileSave: "Errore durante il salvataggio del file!",
+    
+    // API key management
+    toggleApiKeyVisibility: "Mostra/Nascondi chiave API",
     
     // Testi di animazione di caricamento
     loadingGeneral: "Caricamento in corso...",
@@ -85,6 +91,7 @@ const it = {
     errorRateLimitExceeded: "Limite di velocità API superato, attesa di 10 secondi...",
     errorTranslationRetry: "Errore di traduzione, nuovo tentativo ({0}/{1})...",
     errorTranslationFailed: "Traduzione fallita dopo {0} tentativi, proseguimento...",
+    batchTranslationInProgress: "{0} {1}-{2} traduzione in corso...",
     
     // Modalità di traduzione speciale
     batchModeLabel: "Modalità di traduzione speciale a contesto ampio",
