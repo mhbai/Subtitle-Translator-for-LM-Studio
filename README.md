@@ -16,6 +16,11 @@ This application is a simple yet powerful web tool for translating .srt subtitle
 
 ## Version History
 
+### Version 1.5 (2025-04-16)
+- **Updated OpenRouter Models**: Updated 2 new OpenRouter models:
+  - **Gemini Pro 2.4 Experimental** (free)
+  - **GPT-4.1-mini**
+
 ### Version 1.4 (2025-03-24)
 - **New OpenRouter Models**: Added five new OpenRouter models to expand translation options:
   - **DeepSeek R1** (free)
@@ -268,6 +273,11 @@ MAGYAR NYELVŰ LEÍRÁS:
 Ez az alkalmazás egy egyszerű, de hatékony webes eszköz .srt formátumú feliratfájlok fordítására. A program a helyi gépen futó LM Studio mesterséges intelligencia modellt vagy a ChatGPT API-t használja a fordításhoz.
 
 ## Verzió történet
+
+### 1.5-es verzió (2025-04-16)
+- **Frissítve az OpenRouter modellek**: 2 új modell frissítve:
+  - **Gemini Pro 2.5 Experimental** (ingyenes)
+  - **GPT-4.1-mini**
 
 ### 1.4-es verzió (2025-03-24)
 - **Új OpenRouter modellek**: Öt új OpenRouter modell hozzáadása a fordítási lehetőségek bővítéséhez:

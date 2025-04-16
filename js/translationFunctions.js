@@ -124,13 +124,13 @@ NE használd a "${uniqueMarker}" vagy "${endMarker}" jelöléseket a válaszodba
             } else if (selectedMode === 'openrouter_deepseek_r1') {
                 modelId = 'deepseek/deepseek-r1:free';
             } else if (selectedMode === 'openrouter_gemini_pro') {
-                modelId = 'google/gemini-2.0-pro-exp-02-05:free';
+                modelId = 'google/gemini-2.5-pro-exp-03-25:free';
             } else if (selectedMode === 'openrouter_deepseek_v3') {
                 modelId = 'deepseek/deepseek-chat:free';
             } else if (selectedMode === 'openrouter_llama_70b') {
                 modelId = 'meta-llama/llama-3.1-70b-instruct';
             } else if (selectedMode === 'openrouter_gpt4o_mini') {
-                modelId = 'openai/gpt-4o-mini';
+                modelId = 'openai/gpt-4.1-mini';
             } else {
                 // Alapértelmezett esetben Gemma 3 27B
                 modelId = 'google/gemma-3-27b-it:free';
@@ -1253,8 +1253,8 @@ async function translateSequentiallyWithOpenRouterUniversal(startIndex, sourceLa
         modelId = 'deepseek/deepseek-r1:free';
         modelDisplayName = 'DeepSeek R1';
     } else if (modelType === 'openrouter_gemini_pro') {
-        modelId = 'google/gemini-2.0-pro-exp-02-05:free';
-        modelDisplayName = 'Gemini Pro 2.0 Exp';
+        modelId = 'google/gemini-2.5-pro-exp-03-25:free';
+        modelDisplayName = 'Gemini Pro 2.5 Exp';
     } else if (modelType === 'openrouter_deepseek_v3') {
         modelId = 'deepseek/deepseek-chat:free';
         modelDisplayName = 'DeepSeek V3';
@@ -1262,8 +1262,8 @@ async function translateSequentiallyWithOpenRouterUniversal(startIndex, sourceLa
         modelId = 'meta-llama/llama-3.1-70b-instruct';
         modelDisplayName = 'Llama 3.1 70B';
     } else if (modelType === 'openrouter_gpt4o_mini') {
-        modelId = 'openai/gpt-4o-mini';
-        modelDisplayName = 'GPT-4o-mini';
+        modelId = 'openai/gpt-4.1-mini';
+        modelDisplayName = 'GPT-4.1-mini';
     } else {
         // Alapértelmezett esetben Gemma 3 27B
         modelId = 'google/gemma-3-27b-it:free';
@@ -1445,8 +1445,8 @@ async function translateBatchWithOpenRouterUniversal(startIndex, sourceLanguage,
         modelId = 'deepseek/deepseek-r1:free';
         modelDisplayName = 'DeepSeek R1';
     } else if (modelType === 'openrouter_gemini_pro') {
-        modelId = 'google/gemini-2.0-pro-exp-02-05:free';
-        modelDisplayName = 'Gemini Pro 2.0 Exp';
+        modelId = 'google/gemini-2.5-pro-exp-03-25:free';
+        modelDisplayName = 'Gemini Pro 2.5 Exp';
     } else if (modelType === 'openrouter_deepseek_v3') {
         modelId = 'deepseek/deepseek-chat:free';
         modelDisplayName = 'DeepSeek V3';
@@ -1454,8 +1454,8 @@ async function translateBatchWithOpenRouterUniversal(startIndex, sourceLanguage,
         modelId = 'meta-llama/llama-3.1-70b-instruct';
         modelDisplayName = 'Llama 3.1 70B';
     } else if (modelType === 'openrouter_gpt4o_mini') {
-        modelId = 'openai/gpt-4o-mini';
-        modelDisplayName = 'GPT-4o-mini';
+        modelId = 'openai/gpt-4.1-mini';
+        modelDisplayName = 'GPT-4.1-mini';
     } else {
         // Alapértelmezett esetben Gemma 3 27B
         modelId = 'google/gemma-3-27b-it:free';
