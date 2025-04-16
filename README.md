@@ -18,7 +18,7 @@ This application is a simple yet powerful web tool for translating .srt subtitle
 
 ### Version 1.5 (2025-04-16)
 - **Updated OpenRouter Models**: Updated 2 new OpenRouter models:
-  - **Gemini Pro 2.4 Experimental** (free)
+  - **Gemini Pro 2.5 Experimental** (free)
   - **GPT-4.1-mini**
 
 ### Version 1.4 (2025-03-24)
