@@ -16,6 +16,13 @@ This application is a simple yet powerful web tool for translating .srt subtitle
 
 ## Version History
 
+### Version 1.6 (2025-04-27)
+- **Batch Mode for LM Studio**: Added Special Large Context Translation Mode (batch mode) for LM Studio, allowing for translation of 30 lines at once, significantly improving translation quality and speed
+- **Updated OpenRouter Models**: 
+  - Replaced **Gemini Pro 2.5 Experimental** with **Gemini Flash 2.0 Experimental** (free) due to model changes by Google
+  - Added **NVIDIA Llama 3.1 Nemotron Ultra 253B** (free) for high-quality translations
+
+
 ### Version 1.5 (2025-04-16)
 - **Updated OpenRouter Models**: Updated 2 new OpenRouter models:
   - **Gemini Pro 2.5 Experimental** (free)
@@ -68,9 +75,10 @@ The latest update brings exciting new features to enhance your translation exper
 - Visual tracking of the translation process with a progress bar
 - Saving the translated subtitle file with the original timecodes and format
 - **Manual editing of translations** directly in the table
-- **Translation freedom degree (temperature) setting** to control creativity
-- Individual retranslation of lines when needed
-- **Saving and loading work files** to continue the translation process later (.wrk work files)
+- **Translation temperature adjustment** to control creativity
+- Individual retranslation of lines as needed
+- **Save and load work files** to continue translation process later (.wrk work files)
+- **Fill in missing lines and edit content**: Ability to manually enter text into lines that were skipped during translation, and freely edit any already translated lines
 - **Source block saving** for saving the text-only content of source subtitles in numbered block format for external text translation
 - **Loading external numbered translated lines** inserts translated lines with numbers from external sources into the corresponding numbered rows in the translation table (.mmm format text files. Can contain translations from source block saving that the program can insert into the workflow.)
 - **API key storage in encrypted form** This is not perfect security, but much better than storage without encryption. Protects against casual inspection: This method protects the API key from casual inspection (e.g., if someone just looks at the localStorage content), but a determined attacker who has access to the code and localStorage can still decrypt it.
@@ -255,6 +263,8 @@ The application's user interface is available in 30 different languages:
 - The selected language is stored in the browser, so it remains for the next visit
 - All functional labels, button texts, and warning messages are automatically updated according to the selected language
 
+**Best Translation Results**: The best translation results with LM Studio were achieved using the gemma-3-27b-it-Q4_K_M.gguf model (running on NVIDIA GeForce RTX 4060 TI 16GB) with the Special Large Context Translation Mode (available from version 1.6).
+
 ## Troubleshooting
 
 - **Connection error to LM Studio:** Make sure LM Studio is running and the local server is started at http://localhost:1234
@@ -273,6 +283,13 @@ MAGYAR NYELVŰ LEÍRÁS:
 Ez az alkalmazás egy egyszerű, de hatékony webes eszköz .srt formátumú feliratfájlok fordítására. A program a helyi gépen futó LM Studio mesterséges intelligencia modellt vagy a ChatGPT API-t használja a fordításhoz.
 
 ## Verzió történet
+
+### 1.6-os verzió (2025-04-27)
+- **Batch mód az LM Studio számára**: Speciális nagy kontextusú fordítási mód (batch mód) hozzáadása az LM Studio számára, amely lehetővé teszi 30 sor egyszerre történő fordítását, jelentősen javítva a fordítás minőségét és sebességét
+- **Frissített OpenRouter modellek**: 
+  - A **Gemini Pro 2.5 Experimental** helyett **Gemini Flash 2.0 Experimental** (ingyenes) a Google modellváltozásai miatt
+  - Hozzáadva az **NVIDIA Llama 3.1 Nemotron Ultra 253B** (ingyenes) a kiváló minőségű fordításokhoz
+
 
 ### 1.5-es verzió (2025-04-16)
 - **Frissítve az OpenRouter modellek**: 2 új modell frissítve:
@@ -329,6 +346,7 @@ A korábbi frissítés izgalmas új funkciókat kínált a fordítási élmény 
 - **Fordítási szabadságfok (temperature) beállítása** a kreativitás szabályozásához
 - Sorok egyenkénti újrafordítása szükség esetén
 - **Munkafájl mentése és betöltése** a fordítási folyamat későbbi folytatásához (.wrk munkafájlok)
+- **Kimaradt sorok kitöltése és szerkesztése**: Lehetőség van a fordítás során kimaradt sorokba manuálisan beírni szöveget, illetve a már lefordított sorokat is tetszőlegesen szerkeszteni
 - **Forrás blokk mentése** a forrás feliratok csak szöveges tartalmának sorszámozottblokk formátumban történő mentése külső szöveges fordításhoz.
 - **Külső sorszámozott fordított sorok betöltése** külső forrásból származó és sorszámmal ellátott fordított sorokat beilleszt a fordítás táblázat azonos sorszámú soraiba a program (.mmm formátumú szövegfájlok. A forrás blokkmentés fordításait tartalmazhatja, amit a program be tud illeszteni a munkafolyamatba.)
 - **API kulcs titkosított formában tárolása** Ez nem tökéletes biztonság, de sokkal jobb, mint a titkosítás nélküli tárolás. Véd a felületes vizsgálat ellen: Ez a módszer megvédi az API kulcsot a felületes vizsgálattól (pl. ha valaki csak megnézi a localStorage tartalmát), de egy elszánt támadó, aki hozzáfér a kódhoz és localStorage-hoz, még mindig visszafejtheti.
@@ -410,6 +428,7 @@ Nincs szükség további telepítésre vagy függőségekre, mivel minden szüks
    - Végezd el a kívánt módosításokat
    - A módosítások automatikusan mentésre kerülnek, amikor máshova kattintasz
    - A szerkesztett sorok rövid zöld villanással jelzik a sikeres mentést
+   - Üres sorokat is tetszőlegesen szerkesztheted.
 
 10. **Sorok újrafordítása:**
     - Ha egy sort újra szeretnél fordíttatni, kattints a sor mellett található újrafordítás ikonra
@@ -512,6 +531,8 @@ Az alkalmazás felhasználói felülete 30 különböző nyelven érhető el:
 - A jobb felső sarokban található nyelvválasztó gombbal válthatunk a nyelvek között
 - A kiválasztott nyelv szerint az alkalmazás összes funkcionális felirata, nyomógomb szövege és figyelmeztető üzenete automatikusan frissül
 - A nyelvi beállítás a böngésző localStorage-jában tárolódik, így a felhasználó következő látogatásakor is megmarad
+
+ **Legjobb fordítási eredmények**: Az LM Studióval a legjobb fordítási eredményeket a gemma-3-27b-it-Q4_K_M.gguf modell futtatásával (NVIDIA GeForce RTX 4060 TI 16GB-on) és a Speciális nagy kontextusú fordítási mód használatával értem el (1.6-os verziótól elérhető az LM Stúdióhoz is).
 
 ## Hibaelhárítás
 
