@@ -1080,13 +1080,38 @@ document.addEventListener('DOMContentLoaded', function() {
                     finishTranslation();
                 }
             }
-        } else {
-            // LM Studio fordítás - eredeti logika
-            await translateWithLmStudio(currentTranslationIndex, sourceLanguage, targetLanguage, temperature);
-            
-            // Ha végigértünk a feliratokon és nem szüneteltettük a fordítást
+        } else if (selectedMode === 'lm_studio_local') {
+            // LM Studio batch mód támogatás
+            const batchModeCheckbox = document.getElementById('batchModeCheckbox');
+            if (batchModeCheckbox && batchModeCheckbox.checked) {
+                // Kötegelt fordítás LM Studio-val
+                const lastProcessedIndex = await window.translateBatchWithLmStudio(
+                    currentTranslationIndex,
+                    sourceLanguage,
+                    targetLanguage,
+                    temperature,
+                    {
+                        originalSubtitles,
+                        translatedSubtitles,
+                        isTranslationPausedRef,
+                        currentTranslationIndex,
+                        updateProgressBar,
+                        updateTranslatedText,
+                        translationMemory,
+                        saveTranslationBtn,
+                        saveWorkFileBtn,
+                        scrollToRow,
+                        pauseTranslation,
+                        showCurrentRowStopButton
+                    }
+                );
+                currentTranslationIndex = lastProcessedIndex;
+            } else {
+                // Normál LM Studio fordítás
+                await translateWithLmStudio(currentTranslationIndex, sourceLanguage, targetLanguage, temperature);
+            }
+            // Fordítás befejezése, ha végigértünk a feliratokon
             if (currentTranslationIndex >= originalSubtitles.length - 1 && !isTranslationPaused) {
-                // Fordítás befejezése
                 finishTranslation();
             }
         }
@@ -1394,8 +1419,176 @@ if (fileName.toLowerCase().endsWith('.wrk') || fileName.toLowerCase().endsWith('
         }
     }
 
-    
-    
+    // Batch mode translation for LM Studio
+    async function translateBatchWithLmStudio(startIndex, sourceLanguage, targetLanguage, temperature, {
+        originalSubtitles,
+        translatedSubtitles,
+        isTranslationPausedRef,
+        currentTranslationIndex,
+        updateProgressBar,
+        updateTranslatedText,
+        translationMemory,
+        saveTranslationBtn,
+        saveWorkFileBtn,
+        scrollToRow,
+        pauseTranslation,
+        showCurrentRowStopButton
+    }) {
+        console.warn('LM Studio batch mód használata: 30 soronként feldolgozás');
+        
+        // Köteg mérete (egyszerre ennyi sort küldünk fordításra)
+        const BATCH_SIZE = 30;
+        
+        // API kérések közötti késleltetés (ms) - 0.5 másodperc
+        const API_DELAY = 500;
+        
+        // Az utolsó feldolgozott index nyomon követése
+        let lastProcessedIndex = startIndex;
+        
+        // Végigmegyünk a feliratokon kötegekben
+        for (let batchStart = startIndex; batchStart < originalSubtitles.length; batchStart += BATCH_SIZE) {
+            // Ha a fordítás szüneteltetése be van kapcsolva, akkor kilépünk a ciklusból
+            if (isTranslationPausedRef.value) {
+                break;
+            }
+            
+            // Aktuális köteg végének meghatározása
+            const batchEnd = Math.min(batchStart + BATCH_SIZE, originalSubtitles.length);
+            
+            // Folyamatjelző frissítése
+            updateProgressBar(batchStart, originalSubtitles.length);
+            
+            // Megjelenítjük az aktuális sor megállítás gombját
+            if (showCurrentRowStopButton) {
+                showCurrentRowStopButton(batchStart);
+            }
+            
+            // Homokóra animáció megjelenítése többnyelvű üzenettel
+            let batchMessage;
+            if (uiTranslations[currentLangCode] && uiTranslations[currentLangCode].batchTranslationInProgress) {
+                // Helyettesítjük a paramétereket a fordítási szövegben
+                batchMessage = uiTranslations[currentLangCode].batchTranslationInProgress
+                    .replace('{0}', 'sorok')
+                    .replace('{1}', batchStart+1)
+                    .replace('{2}', batchEnd);
+            } else if (uiTranslations['en'] && uiTranslations['en'].batchTranslationInProgress) {
+                // Ha nincs fordítás az aktuális nyelven, használjuk az angol fordítást
+                batchMessage = uiTranslations['en'].batchTranslationInProgress
+                    .replace('{0}', 'lines')
+                    .replace('{1}', batchStart+1)
+                    .replace('{2}', batchEnd);
+            } else {
+                // Alapértelmezett üzenet, ha nincs fordítás
+                batchMessage = `Lines ${batchStart+1}-${batchEnd} translation in progress...`;
+            }
+            window.showLoadingOverlay(batchMessage);
+            
+            // Végigmegyünk a kötegen és lefordítjuk a sorokat
+            for (let i = batchStart; i < batchEnd; i++) {
+                // Ha a fordítás szüneteltetése be van kapcsolva, akkor kilépünk a ciklusból
+                if (isTranslationPausedRef.value) {
+                    break;
+                }
+                
+                // Aktuális fordítási index frissítése
+                lastProcessedIndex = i;
+                
+                // Ellenőrizzük, hogy már le van-e fordítva ez a felirat
+                if (translatedSubtitles[i]) {
+                    continue; // Átugorjuk a már lefordított feliratokat
+                }
+                
+                try {
+                    // Fordítás végrehajtása
+                    const translatedText = await translateTextWithContext(
+                        originalSubtitles,
+                        i,
+                        sourceLanguage,
+                        targetLanguage,
+                        0,
+                        temperature,
+                        { getLanguageName }
+                    );
+                    
+                    // Fordított szöveg mentése
+                    translatedSubtitles[i] = translatedText;
+                    
+                    // Táblázat frissítése
+                    updateTranslatedText(i, translatedText);
+                    
+                    // Újrafordítás gomb megjelenítése
+                    const retranslateBtn = document.getElementById(`retranslate-${i}`);
+                    if (retranslateBtn) {
+                        retranslateBtn.classList.remove('d-none');
+                    }
+                    
+                    // Mentés gomb engedélyezése
+                    saveTranslationBtn.disabled = false;
+                    
+                    // Munkafájl mentés gomb megjelenítése
+                    saveWorkFileBtn.classList.remove('d-none');
+                    
+                } catch (error) {
+                    console.error('Fordítási hiba:', error);
+                    
+                    // Ha sebességkorlát-túllépés (429) hiba, akkor várunk egy ideig és újra próbáljuk
+                    if (error.message.includes('429')) {
+                        console.log('Sebességkorlát-túllépés (429), várakozás 10 másodpercet...');
+                        alert('We wait 10 seconds for the API speed limit to be exceeded and then continue translating.');
+                        
+                        // Várakozás 10 másodpercet
+                        await new Promise(resolve => setTimeout(resolve, 10000));
+                        
+                        // Visszalépünk egy indexet, hogy újra megpróbáljuk ezt a feliratot
+                        i--;
+                        continue;
+                    }
+                    
+                    alert(`An error occurred during translation: ${error.message}`);
+                    pauseTranslation();
+                    window.hideLoadingOverlay();
+                    return lastProcessedIndex;
+                }
+            }
+            
+            // Köteg feldolgozása után elrejtjük a homokóra animációt
+            window.hideLoadingOverlay();
+            
+            // Görgetés az utolsó feldolgozott sorhoz
+            scrollToRow(lastProcessedIndex);
+            
+            // Kis szünet a következő köteg előtt
+            await new Promise(resolve => setTimeout(resolve, API_DELAY));
+        }
+        
+        return lastProcessedIndex;
+    }
+
+    // Globális elérhetőség biztosítása
+    window.translateBatchWithLmStudio = translateBatchWithLmStudio;
+
+    // Sequential LM Studio fallback for translationFunctions.js
+    async function translateSequentiallyWithLMStudio(startIndex, sourceLanguage, targetLanguage, temperature, {
+        originalSubtitles,
+        translatedSubtitles,
+        isTranslationPausedRef,
+        currentTranslationIndex,
+        updateProgressBar,
+        updateTranslatedText,
+        translationMemory,
+        saveTranslationBtn,
+        saveWorkFileBtn,
+        scrollToRow,
+        pauseTranslation,
+        showCurrentRowStopButton
+    }) {
+        console.warn('LM Studio sequential fallback: translateWithLmStudio használata');
+        await translateWithLmStudio(startIndex, sourceLanguage, targetLanguage, temperature);
+        return currentTranslationIndex;
+    }
+    // Globális elérhetőség biztosítása
+    window.translateSequentiallyWithLMStudio = translateSequentiallyWithLMStudio;
+
     // Bootstrap tooltipek inicializálása
     function initTooltips() {
         // Meglévő tooltipek eltávolítása
@@ -1433,7 +1626,8 @@ function handleTranslationModeChange() {
         selectedMode === 'openrouter_gemini_pro' ||
         selectedMode === 'openrouter_deepseek_v3' ||
         selectedMode === 'openrouter_llama_70b' ||
-        selectedMode === 'openrouter_gpt4o_mini') {
+        selectedMode === 'openrouter_gpt4o_mini' ||
+        selectedMode === 'lm_studio_local') {
         batchModeContainer.classList.remove('d-none');
         
         // Tooltip inicializálása a batch mód információs ikonhoz
@@ -1519,73 +1713,6 @@ function toggleApiKeyVisibility() {
 function showApiKeyField() {
     apiKeyInputGroup.classList.remove('d-none');
     showApiKeyFieldBtn.classList.add('d-none');
-}
-
-// Fordítás ChatGPT-vel egyedi rendszerüzenettel
-async function translateWithChatGptCustomPrompt(text, systemPrompt, apiKey, model = 'gpt-4o-mini', temperature = 0.7, retryCount = 0) {
-    // Maximum újrapróbálkozások száma
-    const MAX_RETRIES = 3;
-    // Várakozási idő milliszekundumban (exponenciálisan növekszik)
-    const RETRY_DELAY = 2000 * Math.pow(2, retryCount);
-    
-    console.log('ChatGPT fordítás egyedi prompttal:', text.substring(0, 100) + '...', 'API kulcs:', apiKey);
-    
-    try {
-        // ChatGPT API hívás
-        const response = await fetch('https://api.openai.com/v1/chat/completions', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${apiKey}`
-            },
-            body: JSON.stringify({
-                model: model,
-                messages: [
-                    {
-                        role: "system",
-                        content: systemPrompt
-                    },
-                    {
-                        role: "user",
-                        content: text
-                    }
-                ],
-                temperature: temperature
-            })
-        });
-        
-        // Ha 429-es hiba (túl sok kérés), akkor újrapróbálkozunk
-        if (response.status === 429 && retryCount < MAX_RETRIES) {
-            console.log(`429 hiba, újrapróbálkozás ${retryCount + 1}/${MAX_RETRIES} (várakozás: ${RETRY_DELAY}ms)...`);
-            // Várakozás növekvő idővel
-            await new Promise(resolve => setTimeout(resolve, RETRY_DELAY));
-            // Újrapróbálkozás
-            return translateWithChatGptCustomPrompt(text, systemPrompt, apiKey, model, temperature, retryCount + 1);
-        }
-        
-        if (!response.ok) {
-            throw new Error(`API hiba: ${response.status} ${response.statusText}`);
-        }
-        
-        const data = await response.json();
-        const translatedText = data.choices[0].message.content.trim();
-        console.log('Fordítás eredménye:', translatedText);
-        
-        return translatedText;
-    } catch (error) {
-        console.error('Fordítási hiba:', error);
-        
-        // Ha hálózati hiba vagy egyéb ideiglenes probléma, újrapróbálkozunk
-        if ((error.message.includes('fetch') || error.message.includes('network') || error.message.includes('timeout')) && retryCount < MAX_RETRIES) {
-            console.log(`Hálózati hiba, újrapróbálkozás ${retryCount + 1}/${MAX_RETRIES} (várakozás: ${RETRY_DELAY}ms)...`);
-            // Várakozás növekvő idővel
-            await new Promise(resolve => setTimeout(resolve, RETRY_DELAY));
-            // Újrapróbálkozás
-            return translateWithChatGptCustomPrompt(text, systemPrompt, apiKey, model, temperature, retryCount + 1);
-        }
-        
-        throw error;
-    }
 }
 
 // Forrás blokkmentése gomb létrehozása
