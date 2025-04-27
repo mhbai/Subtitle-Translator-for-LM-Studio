@@ -129,6 +129,8 @@ NE használd a "${uniqueMarker}" vagy "${endMarker}" jelöléseket a válaszodba
                 modelId = 'deepseek/deepseek-chat:free';
             } else if (selectedMode === 'openrouter_llama_70b') {
                 modelId = 'meta-llama/llama-3.1-70b-instruct';
+            } else if (selectedMode === 'openrouter_nemotron_ultra') {
+                modelId = 'nvidia/llama-3.1-nemotron-ultra-253b-v1:free';
             } else if (selectedMode === 'openrouter_gpt4o_mini') {
                 modelId = 'openai/gpt-4.1-mini';
             } else {
@@ -1261,6 +1263,9 @@ async function translateSequentiallyWithOpenRouterUniversal(startIndex, sourceLa
     } else if (modelType === 'openrouter_llama_70b') {
         modelId = 'meta-llama/llama-3.1-70b-instruct';
         modelDisplayName = 'Llama 3.1 70B';
+    } else if (modelType === 'openrouter_nemotron_ultra') {
+        modelId = 'nvidia/llama-3.1-nemotron-ultra-253b-v1:free';
+        modelDisplayName = 'NVIDIA Nemotron Ultra 253B';
     } else if (modelType === 'openrouter_gpt4o_mini') {
         modelId = 'openai/gpt-4.1-mini';
         modelDisplayName = 'GPT-4.1-mini';
@@ -1453,6 +1458,9 @@ async function translateBatchWithOpenRouterUniversal(startIndex, sourceLanguage,
     } else if (modelType === 'openrouter_llama_70b') {
         modelId = 'meta-llama/llama-3.1-70b-instruct';
         modelDisplayName = 'Llama 3.1 70B';
+    } else if (modelType === 'openrouter_nemotron_ultra') {
+        modelId = 'nvidia/llama-3.1-nemotron-ultra-253b-v1:free';
+        modelDisplayName = 'NVIDIA Nemotron Ultra 253B';
     } else if (modelType === 'openrouter_gpt4o_mini') {
         modelId = 'openai/gpt-4.1-mini';
         modelDisplayName = 'GPT-4.1-mini';

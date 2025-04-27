@@ -1008,6 +1008,7 @@ document.addEventListener('DOMContentLoaded', function() {
                   selectedMode === 'openrouter_gemini_pro' || 
                   selectedMode === 'openrouter_deepseek_v3' || 
                   selectedMode === 'openrouter_llama_70b' || 
+                  selectedMode === 'openrouter_nemotron_ultra' ||
                   selectedMode === 'openrouter_gpt4o_mini') {
             // Ellenőrizzük, hogy a kötegelt mód be van-e kapcsolva
             const batchModeCheckbox = document.getElementById('batchModeCheckbox');
@@ -1626,6 +1627,7 @@ function handleTranslationModeChange() {
         selectedMode === 'openrouter_gemini_pro' ||
         selectedMode === 'openrouter_deepseek_v3' ||
         selectedMode === 'openrouter_llama_70b' ||
+        selectedMode === 'openrouter_nemotron_ultra' ||
         selectedMode === 'openrouter_gpt4o_mini' ||
         selectedMode === 'lm_studio_local') {
         batchModeContainer.classList.remove('d-none');
