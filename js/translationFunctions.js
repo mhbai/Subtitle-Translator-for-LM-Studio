@@ -124,7 +124,7 @@ NE használd a "${uniqueMarker}" vagy "${endMarker}" jelöléseket a válaszodba
             } else if (selectedMode === 'openrouter_deepseek_r1') {
                 modelId = 'deepseek/deepseek-r1:free';
             } else if (selectedMode === 'openrouter_gemini_pro') {
-                modelId = 'google/gemini-2.5-pro-exp-03-25:free';
+                modelId = 'google/gemini-2.0-flash-exp:free';
             } else if (selectedMode === 'openrouter_deepseek_v3') {
                 modelId = 'deepseek/deepseek-chat:free';
             } else if (selectedMode === 'openrouter_llama_70b') {
@@ -1253,8 +1253,8 @@ async function translateSequentiallyWithOpenRouterUniversal(startIndex, sourceLa
         modelId = 'deepseek/deepseek-r1:free';
         modelDisplayName = 'DeepSeek R1';
     } else if (modelType === 'openrouter_gemini_pro') {
-        modelId = 'google/gemini-2.5-pro-exp-03-25:free';
-        modelDisplayName = 'Gemini Pro 2.5 Exp';
+        modelId = 'google/gemini-2.0-flash-exp:free';
+        modelDisplayName = 'Gemini flash 2.0 Exp';
     } else if (modelType === 'openrouter_deepseek_v3') {
         modelId = 'deepseek/deepseek-chat:free';
         modelDisplayName = 'DeepSeek V3';
@@ -1445,8 +1445,8 @@ async function translateBatchWithOpenRouterUniversal(startIndex, sourceLanguage,
         modelId = 'deepseek/deepseek-r1:free';
         modelDisplayName = 'DeepSeek R1';
     } else if (modelType === 'openrouter_gemini_pro') {
-        modelId = 'google/gemini-2.5-pro-exp-03-25:free';
-        modelDisplayName = 'Gemini Pro 2.5 Exp';
+        modelId = 'google/gemini-2.0-flash-exp:free';
+        modelDisplayName = 'Gemini 2.0 flash exp';
     } else if (modelType === 'openrouter_deepseek_v3') {
         modelId = 'deepseek/deepseek-chat:free';
         modelDisplayName = 'DeepSeek V3';
