@@ -133,6 +133,8 @@ NE használd a "${uniqueMarker}" vagy "${endMarker}" jelöléseket a válaszodba
                 modelId = 'nvidia/llama-3.1-nemotron-ultra-253b-v1:free';
             } else if (selectedMode === 'openrouter_gpt4o_mini') {
                 modelId = 'openai/gpt-4.1-mini';
+            } else if (selectedMode === 'openrouter_qwen3_235b') {
+                modelId = 'qwen/qwen3-235b-a22b:free';
             } else {
                 // Alapértelmezett esetben Gemma 3 27B
                 modelId = 'google/gemma-3-27b-it:free';
@@ -1208,6 +1210,81 @@ async function translateText(text, sourceLang, targetLang, temperature, { getLan
     );
 }
 
+// ChatGPT API-val történő fordítás egyedi rendszerüzenettel
+async function translateWithChatGptCustomPrompt(text, systemPrompt, apiKey, model = 'gpt-4o-mini', temperature = 0.7) {
+    // Maximum 3 újrapróbálkozás
+    const MAX_RETRIES = 3;
+    let retryCount = 0;
+    let success = false;
+    let result = '';
+    
+    while (!success && retryCount < MAX_RETRIES) {
+        try {
+            // API kérés előkészítése
+            const response = await fetch('https://api.openai.com/v1/chat/completions', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${apiKey}`
+                },
+                body: JSON.stringify({
+                    model: model,
+                    messages: [
+                        {
+                            role: 'system',
+                            content: systemPrompt
+                        },
+                        {
+                            role: 'user',
+                            content: text
+                        }
+                    ],
+                    temperature: temperature
+                })
+            });
+            
+            // Válasz feldolgozása
+            const data = await response.json();
+            
+            // Hiba ellenőrzése
+            if (!response.ok) {
+                const errorMessage = data.error?.message || 'Unknown error';
+                console.error(`ChatGPT API hiba: ${errorMessage}`);
+                
+                // Rate limit hiba esetén hosszabb várakozás
+                if (errorMessage.includes('Rate limit') || response.status === 429) {
+                    await new Promise(resolve => setTimeout(resolve, 5000)); // 5 másodperc várakozás
+                }
+                
+                throw new Error(errorMessage);
+            }
+            
+            // Sikeres válasz feldolgozása
+            if (data.choices && data.choices.length > 0) {
+                result = data.choices[0].message.content.trim();
+                success = true;
+            } else {
+                throw new Error('No translation result returned');
+            }
+        } catch (error) {
+            console.error(`Hiba a ChatGPT fordítás során (${retryCount + 1}/${MAX_RETRIES}):`, error);
+            retryCount++;
+            
+            // Várakozás újrapróbálkozás előtt (exponenciális backoff)
+            if (retryCount < MAX_RETRIES) {
+                const waitTime = Math.pow(2, retryCount) * 1000; // 2^retryCount másodperc
+                await new Promise(resolve => setTimeout(resolve, waitTime));
+            }
+        }
+    }
+    
+    if (!success) {
+        throw new Error('Failed to translate with ChatGPT after multiple retries');
+    }
+    
+    return result;
+}
+
 // Globális névtérben elérhetővé tesszük a függvényeket
 window.retranslateSubtitle = retranslateSubtitle;
 window.translateSequentially = translateSequentially;
@@ -1220,6 +1297,7 @@ window.translateTextWithContext = translateTextWithContext;
 window.translateText = translateText;
 window.showLoadingOverlay = showLoadingOverlay;
 window.hideLoadingOverlay = hideLoadingOverlay;
+window.translateWithChatGptCustomPrompt = translateWithChatGptCustomPrompt;
 
 // Új, univerzális szekvenciális fordítás az OpenRouter API-val
 async function translateSequentiallyWithOpenRouterUniversal(startIndex, sourceLanguage, targetLanguage, apiKey, temperature, modelType, {
@@ -1269,6 +1347,9 @@ async function translateSequentiallyWithOpenRouterUniversal(startIndex, sourceLa
     } else if (modelType === 'openrouter_gpt4o_mini') {
         modelId = 'openai/gpt-4.1-mini';
         modelDisplayName = 'GPT-4.1-mini';
+    } else if (modelType === 'openrouter_qwen3_235b') {
+        modelId = 'qwen/qwen3-235b-a22b:free';
+        modelDisplayName = 'Qwen3 235B A22B';
     } else {
         // Alapértelmezett esetben Gemma 3 27B
         modelId = 'google/gemma-3-27b-it:free';
@@ -1464,6 +1545,9 @@ async function translateBatchWithOpenRouterUniversal(startIndex, sourceLanguage,
     } else if (modelType === 'openrouter_gpt4o_mini') {
         modelId = 'openai/gpt-4.1-mini';
         modelDisplayName = 'GPT-4.1-mini';
+    } else if (modelType === 'openrouter_qwen3_235b') {
+        modelId = 'qwen/qwen3-235b-a22b:free';
+        modelDisplayName = 'Qwen3 235B A22B';
     } else {
         // Alapértelmezett esetben Gemma 3 27B
         modelId = 'google/gemma-3-27b-it:free';

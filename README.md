@@ -16,6 +16,11 @@ This application is a simple yet powerful web tool for translating .srt subtitle
 
 ## Version History
 
+### Version 1.7 (2025-05-22)
+- **New OpenRouter Model**: Added a new OpenRouter model to expand translation options:
+  - **openrouter.ai: Qwen3 235B A22B** (free)
+- **Improved OpenAI Models Usage**: OpenAI ChatGPT-4o mini and ChatGPT-4o models can now be used directly from OpenAI API servers again.
+
 ### Version 1.6 (2025-04-27)
 - **Batch Mode for LM Studio**: Added Special Large Context Translation Mode (batch mode) for LM Studio, allowing for translation of 30 lines at once, significantly improving translation quality and speed
 - **Updated OpenRouter Models**: 
@@ -283,6 +288,11 @@ MAGYAR NYELVŰ LEÍRÁS:
 Ez az alkalmazás egy egyszerű, de hatékony webes eszköz .srt formátumú feliratfájlok fordítására. A program a helyi gépen futó LM Studio mesterséges intelligencia modellt vagy a ChatGPT API-t használja a fordításhoz.
 
 ## Verzió történet
+
+### 1.7-es verzió (2025-05-22)
+ **Új OpenRouter modell**: Egy új OpenRouter modell hozzáadása a fordítási lehetőségek bővítéséhez:
+  - **openrouter.ai: Qwen3 235B A22B** (ingyenes)
+- **Javított OpenAI modellek használata**: Az OpenAI ChatGPT-4o mini és ChatGPT-4o modellek újból használhatóak közvetlenül az OpenAi API szervereiről.
 
 ### 1.6-os verzió (2025-04-27)
 - **Batch mód az LM Studio számára**: Speciális nagy kontextusú fordítási mód (batch mód) hozzáadása az LM Studio számára, amely lehetővé teszi 30 sor egyszerre történő fordítását, jelentősen javítva a fordítás minőségét és sebességét

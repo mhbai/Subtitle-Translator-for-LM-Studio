@@ -178,11 +178,18 @@ document.addEventListener('DOMContentLoaded', function() {
                                savedTranslationMode === 'chatgpt_4o_mini' || 
                                savedTranslationMode === 'chatgpt_4o' || 
                                savedTranslationMode === 'openrouter_gemma_27b' ||
-                               savedTranslationMode === 'openrouter_gemini_flash')) {
+                               savedTranslationMode === 'openrouter_gemini_flash' ||
+                               savedTranslationMode === 'openrouter_gpt4o_mini' ||
+                               savedTranslationMode === 'openrouter_qwen3_235b' ||
+                               savedTranslationMode === 'openrouter_deepseek_r1' ||
+                               savedTranslationMode === 'openrouter_gemini_pro' ||
+                               savedTranslationMode === 'openrouter_deepseek_v3' ||
+                               savedTranslationMode === 'openrouter_llama_70b' ||
+                               savedTranslationMode === 'openrouter_nemotron_ultra' )) {
         translationModeSelect.value = savedTranslationMode;
         
         // Ha a Gemini Flash mód van elmentve, akkor megjelenítjük a batch mód konténert
-        if (savedTranslationMode === 'openrouter_gemini_flash' || savedTranslationMode === 'chatgpt_4o_mini' || savedTranslationMode === 'chatgpt_4o') {
+        if (savedTranslationMode === 'openrouter_gemini_flash' || savedTranslationMode === 'chatgpt_4o_mini' || savedTranslationMode === 'chatgpt_4o' || savedTranslationMode === 'openrouter_qwen3_235b' || savedTranslationMode === 'openrouter_deepseek_r1' || savedTranslationMode === 'openrouter_gemini_pro' || savedTranslationMode === 'openrouter_deepseek_v3' || savedTranslationMode === 'openrouter_llama_70b' || savedTranslationMode === 'openrouter_nemotron_ultra' || savedTranslationMode === 'openrouter_gpt4o_mini' ) {
             const batchModeContainer = document.getElementById('batchModeContainer');
             if (batchModeContainer) {
                 batchModeContainer.classList.remove('d-none');
@@ -212,7 +219,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 apiKeyInputGroup.classList.add('d-none');
                 showApiKeyFieldBtn.classList.remove('d-none');
             }
-        } else if (savedTranslationMode === 'openrouter_gemma_27b' || savedTranslationMode === 'openrouter_gemini_flash') {
+        } else if (savedTranslationMode === 'openrouter_gemma_27b' || savedTranslationMode === 'openrouter_gemini_flash' || savedTranslationMode === 'openrouter_qwen3_235b' || savedTranslationMode === 'openrouter_deepseek_r1' || savedTranslationMode === 'openrouter_gemini_pro' || savedTranslationMode === 'openrouter_deepseek_v3' || savedTranslationMode === 'openrouter_llama_70b' || savedTranslationMode === 'openrouter_nemotron_ultra' || savedTranslationMode === 'openrouter_gpt4o_mini') {
             apiKeyContainer.classList.remove('d-none');
             
             // Mentett OpenRouter API kulcs betöltése
@@ -252,7 +259,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (selectedMode === 'chatgpt_4o_mini' || selectedMode === 'chatgpt_4o') {
                 saveApiKey(apiKeyInput.value);
                 console.log('ChatGPT API kulcs titkosítva elmentve a localStorage-ba');
-            } else if (selectedMode === 'openrouter_gemma_27b' || selectedMode === 'openrouter_gemini_flash') {
+            } else if (selectedMode === 'openrouter_gemma_27b' || selectedMode === 'openrouter_gemini_flash' || selectedMode === 'openrouter_qwen3_235b' || selectedMode === 'openrouter_deepseek_r1' || selectedMode === 'openrouter_gemini_pro' || selectedMode === 'openrouter_deepseek_v3' || selectedMode === 'openrouter_llama_70b' || selectedMode === 'openrouter_nemotron_ultra' || selectedMode === 'openrouter_gpt4o_mini') {
                 saveOpenRouterApiKey(apiKeyInput.value);
                 console.log('OpenRouter API kulcs titkosítva elmentve a localStorage-ba');
             }
@@ -1009,7 +1016,8 @@ document.addEventListener('DOMContentLoaded', function() {
                   selectedMode === 'openrouter_deepseek_v3' || 
                   selectedMode === 'openrouter_llama_70b' || 
                   selectedMode === 'openrouter_nemotron_ultra' ||
-                  selectedMode === 'openrouter_gpt4o_mini') {
+                  selectedMode === 'openrouter_gpt4o_mini' ||
+                  selectedMode === 'openrouter_qwen3_235b') {
             // Ellenőrizzük, hogy a kötegelt mód be van-e kapcsolva
             const batchModeCheckbox = document.getElementById('batchModeCheckbox');
             
@@ -1200,6 +1208,81 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
+    // Segédfüggvény a ChatGPT API-val történő fordításhoz egyedi rendszerüzenettel
+    async function translateWithChatGptCustomPrompt(text, systemPrompt, apiKey, model = 'gpt-4o-mini', temperature = 0.7) {
+        // Maximum 3 újrapróbálkozás
+        const MAX_RETRIES = 3;
+        let retryCount = 0;
+        let success = false;
+        let result = '';
+        
+        while (!success && retryCount < MAX_RETRIES) {
+            try {
+                // API kérés előkészítése
+                const response = await fetch('https://api.openai.com/v1/chat/completions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${apiKey}`
+                    },
+                    body: JSON.stringify({
+                        model: model,
+                        messages: [
+                            {
+                                role: 'system',
+                                content: systemPrompt
+                            },
+                            {
+                                role: 'user',
+                                content: text
+                            }
+                        ],
+                        temperature: temperature
+                    })
+                });
+                
+                // Válasz feldolgozása
+                const data = await response.json();
+                
+                // Hiba ellenőrzése
+                if (!response.ok) {
+                    const errorMessage = data.error?.message || 'Unknown error';
+                    console.error(`ChatGPT API hiba: ${errorMessage}`);
+                    
+                    // Rate limit hiba esetén hosszabb várakozás
+                    if (errorMessage.includes('Rate limit') || response.status === 429) {
+                        await new Promise(resolve => setTimeout(resolve, 5000)); // 5 másodperc várakozás
+                    }
+                    
+                    throw new Error(errorMessage);
+                }
+                
+                // Sikeres válasz feldolgozása
+                if (data.choices && data.choices.length > 0) {
+                    result = data.choices[0].message.content.trim();
+                    success = true;
+                } else {
+                    throw new Error('No translation result returned');
+                }
+            } catch (error) {
+                console.error(`Hiba a ChatGPT fordítás során (${retryCount + 1}/${MAX_RETRIES}):`, error);
+                retryCount++;
+                
+                // Várakozás újrapróbálkozás előtt (exponenciális backoff)
+                if (retryCount < MAX_RETRIES) {
+                    const waitTime = Math.pow(2, retryCount) * 1000; // 2^retryCount másodperc
+                    await new Promise(resolve => setTimeout(resolve, waitTime));
+                }
+            }
+        }
+        
+        if (!success) {
+            throw new Error('Failed to translate with ChatGPT after multiple retries');
+        }
+        
+        return result;
+    }
+    
     // Segédfüggvény a ChatGPT API-val történő fordításhoz
     async function translateWithChatGpt(text, sourceLanguage, targetLanguage, apiKey, model = 'gpt-4o-mini', temperature = 0.7) {
         // A rendszerüzenet összeállítása
@@ -1629,7 +1712,8 @@ function handleTranslationModeChange() {
         selectedMode === 'openrouter_llama_70b' ||
         selectedMode === 'openrouter_nemotron_ultra' ||
         selectedMode === 'openrouter_gpt4o_mini' ||
-        selectedMode === 'lm_studio_local') {
+        selectedMode === 'lm_studio_local' ||
+        selectedMode === 'openrouter_qwen3_235b') {
         batchModeContainer.classList.remove('d-none');
         
         // Tooltip inicializálása a batch mód információs ikonhoz
