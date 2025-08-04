@@ -24,6 +24,10 @@ const hu = {
     sourceLanguage: "Forrásnyelv",
     targetLanguage: "Célnyelv",
     
+    // OpenRouter modellválasztó
+    openrouterModelLabel: "OpenRouter modell választás:",
+    selectModelPlaceholder: "Válasszon egy modellt...",
+    
     // Gombok
     startTranslation: "Fordítás indítása",
     continueTranslation: "Fordítás folytatása",

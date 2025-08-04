@@ -24,6 +24,10 @@ const ru = {
     sourceLanguage: "Исходный язык",
     targetLanguage: "Целевой язык",
     
+    // OpenRouter modellválasztó
+    openrouterModelLabel: "Выбор модели OpenRouter:",
+    selectModelPlaceholder: "Выберите модель...",
+    
     // Buttons
     startTranslation: "Начать перевод",
     continueTranslation: "Продолжить перевод",

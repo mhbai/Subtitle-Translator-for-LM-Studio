@@ -24,6 +24,10 @@ const bg = {
     sourceLanguage: "Изходен език",
     targetLanguage: "Целеви език",
     
+    // OpenRouter modellválasztó
+    openrouterModelLabel: "Избор на модел OpenRouter:",
+    selectModelPlaceholder: "Изберете модел...",
+    
     // Buttons
     startTranslation: "Започни превод",
     continueTranslation: "Продължи превода",

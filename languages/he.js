@@ -24,6 +24,10 @@ const he = {
     sourceLanguage: "שפת מקור",
     targetLanguage: "שפת יעד",
     
+    // OpenRouter modellválasztó
+    openrouterModelLabel: "בחירת מודל OpenRouter:",
+    selectModelPlaceholder: "בחר מודל...",
+    
     // Buttons
     startTranslation: "התחל תרגום",
     continueTranslation: "המשך תרגום",

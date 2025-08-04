@@ -24,6 +24,10 @@ const pt = {
     sourceLanguage: "Idioma de Origem",
     targetLanguage: "Idioma de Destino",
     
+    // OpenRouter modellválasztó
+    openrouterModelLabel: "Seleção de modelo OpenRouter:",
+    selectModelPlaceholder: "Selecione um modelo...",
+    
     // Buttons
     startTranslation: "Iniciar Tradução",
     continueTranslation: "Continuar Tradução",

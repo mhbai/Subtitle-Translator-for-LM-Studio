@@ -24,6 +24,10 @@ const uk = {
     sourceLanguage: "Вихідна мова",
     targetLanguage: "Цільова мова",
     
+    // OpenRouter modellválasztó
+    openrouterModelLabel: "Вибір моделі OpenRouter:",
+    selectModelPlaceholder: "Виберіть модель...",
+    
     // Buttons
     startTranslation: "Почати переклад",
     continueTranslation: "Продовжити переклад",

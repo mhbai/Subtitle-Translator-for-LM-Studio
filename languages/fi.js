@@ -24,6 +24,10 @@ const fi = {
     sourceLanguage: "Lähdekieli",
     targetLanguage: "Kohdekieli",
     
+    // OpenRouter modellválasztó
+    openrouterModelLabel: "OpenRouter-mallin valinta:",
+    selectModelPlaceholder: "Valitse malli...",
+    
     // Buttons
     startTranslation: "Aloita käännös",
     continueTranslation: "Jatka käännöstä",

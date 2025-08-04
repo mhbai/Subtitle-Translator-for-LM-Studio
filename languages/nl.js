@@ -24,6 +24,10 @@ const nl = {
     sourceLanguage: "Brontaal",
     targetLanguage: "Doeltaal",
     
+    // OpenRouter modellválasztó
+    openrouterModelLabel: "OpenRouter modelselectie:",
+    selectModelPlaceholder: "Selecteer een model...",
+    
     // Buttons
     startTranslation: "Vertaling starten",
     continueTranslation: "Vertaling voortzetten",

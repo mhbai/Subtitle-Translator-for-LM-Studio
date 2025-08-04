@@ -68,10 +68,17 @@ async function retranslateSubtitle(index, {
                 model,
                 temperature
             );
-        } else if (selectedMode.startsWith('openrouter_')) {
+        } else if (selectedMode === 'openrouter') {
             // Ellenőrizzük, hogy van-e API kulcs
             if (!apiKey) {
                 alert(uiTranslations[currentLangCode]?.errorNoApiKey || 'Please enter the API key to use OpenRouter API!');
+                return;
+            }
+            
+            // Kiválasztott OpenRouter modell lekérése
+            const selectedModel = document.getElementById('openrouterModel').value;
+            if (!selectedModel) {
+                alert('Please select an OpenRouter model!');
                 return;
             }
             
@@ -114,32 +121,6 @@ A többi szöveg csak kontextus, azt NE fordítsd le.
 A fordításodban KIZÁRÓLAG a lefordított szöveget add vissza, semmilyen jelölést, magyarázatot vagy egyéb szöveget NE adj hozzá.
 NE használd a "${uniqueMarker}" vagy "${endMarker}" jelöléseket a válaszodban.`;
             
-            // Modell azonosító kiválasztása a fordítási mód alapján
-            let modelId;
-            
-            if (selectedMode === 'openrouter_gemini_flash') {
-                modelId = 'google/gemini-2.0-flash-001';
-            } else if (selectedMode === 'openrouter_gemma_27b') {
-                modelId = 'google/gemma-3-27b-it:free';
-            } else if (selectedMode === 'openrouter_deepseek_r1') {
-                modelId = 'deepseek/deepseek-r1:free';
-            } else if (selectedMode === 'openrouter_gemini_pro') {
-                modelId = 'google/gemini-2.0-flash-exp:free';
-            } else if (selectedMode === 'openrouter_deepseek_v3') {
-                modelId = 'deepseek/deepseek-chat:free';
-            } else if (selectedMode === 'openrouter_llama_70b') {
-                modelId = 'meta-llama/llama-3.1-70b-instruct';
-            } else if (selectedMode === 'openrouter_nemotron_ultra') {
-                modelId = 'nvidia/llama-3.1-nemotron-ultra-253b-v1:free';
-            } else if (selectedMode === 'openrouter_gpt4o_mini') {
-                modelId = 'openai/gpt-4.1-mini';
-            } else if (selectedMode === 'openrouter_qwen3_235b') {
-                modelId = 'qwen/qwen3-235b-a22b:free';
-            } else {
-                // Alapértelmezett esetben Gemma 3 27B
-                modelId = 'google/gemma-3-27b-it:free';
-            }
-            
             // Fordítás végrehajtása az OpenRouter API-val a kiválasztott modellel
             const rawTranslatedText = await translateWithOpenRouterApi(
                 contextText,
@@ -147,7 +128,7 @@ NE használd a "${uniqueMarker}" vagy "${endMarker}" jelöléseket a válaszodba
                 apiKey,
                 temperature,
                 0,
-                modelId
+                selectedModel
             );
             
             // Fordítás tisztítása
@@ -1319,10 +1300,20 @@ async function translateSequentiallyWithOpenRouterUniversal(startIndex, sourceLa
     // API kérések közötti késleltetés (ms) - 0.2 másodperc
     const API_DELAY = 200;
     
-    // Modell azonosító kiválasztása
-    let modelId;
-    let modelDisplayName;
+    // Modell azonosító és megjelenítendő név beállítása
+    // Az új rendszerben a modelType közvetlenül a modell azonosítója
+    let modelId = modelType;
     
+    // A modell megjelenítendő nevének kinyerése az azonosítóból
+    // Például: "anthropic/claude-3-5-sonnet" -> "Claude 3.5 Sonnet"
+    let modelDisplayName = modelType;
+    
+    // Ha a modell azonosítója tartalmaz / karaktert, akkor csak az utolsó részt vesszük
+    if (modelId.includes('/')) {
+        modelDisplayName = modelId.split('/').pop();
+    }
+    
+    // Régi kompatibilitás megtartása a korábbi modelltípusokkal
     if (modelType === 'openrouter_gemini_flash') {
         modelId = 'google/gemini-2.0-flash-001';
         modelDisplayName = 'Gemini Flash';
@@ -1350,10 +1341,6 @@ async function translateSequentiallyWithOpenRouterUniversal(startIndex, sourceLa
     } else if (modelType === 'openrouter_qwen3_235b') {
         modelId = 'qwen/qwen3-235b-a22b:free';
         modelDisplayName = 'Qwen3 235B A22B';
-    } else {
-        // Alapértelmezett esetben Gemma 3 27B
-        modelId = 'google/gemma-3-27b-it:free';
-        modelDisplayName = 'Gemma 3 27B';
     }
     
     // Az utolsó feldolgozott index nyomon követése
@@ -1517,10 +1504,20 @@ async function translateBatchWithOpenRouterUniversal(startIndex, sourceLanguage,
     currentLangCode,
     uiTranslations
 }) {
-    // Modell azonosító kiválasztása
-    let modelId;
-    let modelDisplayName;
+    // Modell azonosító és megjelenítendő név beállítása
+    // Az új rendszerben a modelType közvetlenül a modell azonosítója
+    let modelId = modelType;
     
+    // A modell megjelenítendő nevének kinyerése az azonosítóból
+    // Például: "anthropic/claude-3-5-sonnet" -> "Claude 3.5 Sonnet"
+    let modelDisplayName = modelType;
+    
+    // Ha a modell azonosítója tartalmaz / karaktert, akkor csak az utolsó részt vesszük
+    if (modelId.includes('/')) {
+        modelDisplayName = modelId.split('/').pop();
+    }
+    
+    // Régi kompatibilitás megtartása a korábbi modelltípusokkal
     if (modelType === 'openrouter_gemini_flash') {
         modelId = 'google/gemini-2.0-flash-001';
         modelDisplayName = 'Gemini Flash';
@@ -1548,10 +1545,6 @@ async function translateBatchWithOpenRouterUniversal(startIndex, sourceLanguage,
     } else if (modelType === 'openrouter_qwen3_235b') {
         modelId = 'qwen/qwen3-235b-a22b:free';
         modelDisplayName = 'Qwen3 235B A22B';
-    } else {
-        // Alapértelmezett esetben Gemma 3 27B
-        modelId = 'google/gemma-3-27b-it:free';
-        modelDisplayName = 'Gemma 3 27B';
     }
 
     // Batch méret (ennyi feliratot fordítunk egyszerre)
@@ -1824,10 +1817,17 @@ async function translateSubtitleSequentially(startIndex, {
                 showCurrentRowStopButton
             }
         );
-    } else if (selectedMode.startsWith('openrouter_')) {
+    } else if (selectedMode === 'openrouter') {
         // Ellenőrizzük, hogy van-e API kulcs
         if (!apiKey) {
             alert(uiTranslations[currentLangCode]?.errorNoApiKey || 'Please enter the API key to use OpenRouter API!');
+            return startIndex;
+        }
+        
+        // Kiválasztott OpenRouter modell lekérése
+        const selectedModel = document.getElementById('openrouterModel').value;
+        if (!selectedModel) {
+            alert('Please select an OpenRouter model!');
             return startIndex;
         }
         
@@ -1838,7 +1838,7 @@ async function translateSubtitleSequentially(startIndex, {
             targetLanguage,
             apiKey,
             temperature,
-            selectedMode, // modelType paraméterként átadjuk a kiválasztott modellt
+            selectedModel, // A kiválasztott modell ID-t adjuk át
             {
                 originalSubtitles,
                 translatedSubtitles,
@@ -1953,10 +1953,17 @@ async function translateSubtitleBatch(startIndex, {
                 showCurrentRowStopButton
             }
         );
-    } else if (selectedMode.startsWith('openrouter_')) {
+    } else if (selectedMode === 'openrouter') {
         // Ellenőrizzük, hogy van-e API kulcs
         if (!apiKey) {
             alert(uiTranslations[currentLangCode]?.errorNoApiKey || 'Please enter the API key to use OpenRouter API!');
+            return startIndex;
+        }
+        
+        // Kiválasztott OpenRouter modell lekérése
+        const selectedModel = document.getElementById('openrouterModel').value;
+        if (!selectedModel) {
+            alert('Please select an OpenRouter model!');
             return startIndex;
         }
         
@@ -1967,7 +1974,7 @@ async function translateSubtitleBatch(startIndex, {
             targetLanguage,
             apiKey,
             temperature,
-            selectedMode, // modelType paraméterként átadjuk a kiválasztott modellt
+            selectedModel, // A kiválasztott modell ID-t adjuk át
             {
                 originalSubtitles,
                 translatedSubtitles,

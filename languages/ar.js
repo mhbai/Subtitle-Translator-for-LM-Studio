@@ -24,6 +24,10 @@ const ar = {
     sourceLanguage: "اللغة المصدر",
     targetLanguage: "اللغة الهدف",
     
+    // OpenRouter modellválasztó
+    openrouterModelLabel: "اختيار نموذج OpenRouter:",
+    selectModelPlaceholder: "اختر نموذجًا...",
+    
     // Buttons
     startTranslation: "بدء الترجمة",
     continueTranslation: "متابعة الترجمة",

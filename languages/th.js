@@ -24,6 +24,10 @@ const th = {
     sourceLanguage: "ภาษาต้นฉบับ",
     targetLanguage: "ภาษาเป้าหมาย",
     
+    // OpenRouter modellválasztó
+    openrouterModelLabel: "การเลือกโมเดล OpenRouter:",
+    selectModelPlaceholder: "เลือกโมเดล...",
+    
     // Buttons
     startTranslation: "เริ่มการแปล",
     continueTranslation: "ดำเนินการแปลต่อ",

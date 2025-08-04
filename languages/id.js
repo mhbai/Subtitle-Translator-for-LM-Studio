@@ -24,6 +24,10 @@ const id = {
     sourceLanguage: "Bahasa Sumber",
     targetLanguage: "Bahasa Target",
     
+    // OpenRouter modellválasztó
+    openrouterModelLabel: "Pemilihan Model OpenRouter:",
+    selectModelPlaceholder: "Pilih model...",
+    
     // Buttons
     startTranslation: "Mulai Terjemahan",
     continueTranslation: "Lanjutkan Terjemahan",

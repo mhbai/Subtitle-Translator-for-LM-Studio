@@ -24,6 +24,10 @@ const en = {
     sourceLanguage: "Source Language",
     targetLanguage: "Target Language",
     
+    // OpenRouter model selector
+    openrouterModelLabel: "OpenRouter model selection:",
+    selectModelPlaceholder: "Select a model...",
+    
     // Buttons
     startTranslation: "Start Translation",
     continueTranslation: "Continue Translation",

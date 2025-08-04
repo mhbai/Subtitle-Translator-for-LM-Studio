@@ -24,6 +24,10 @@ const el = {
     sourceLanguage: "Γλώσσα προέλευσης",
     targetLanguage: "Γλώσσα στόχου",
     
+    // OpenRouter modellválasztó
+    openrouterModelLabel: "Επιλογή μοντέλου OpenRouter:",
+    selectModelPlaceholder: "Επιλέξτε ένα μοντέλο...",
+    
     // Buttons
     startTranslation: "Έναρξη μετάφρασης",
     continueTranslation: "Συνέχιση μετάφρασης",

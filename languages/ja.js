@@ -24,6 +24,10 @@ const ja = {
     sourceLanguage: "原語",
     targetLanguage: "対象言語",
     
+    // OpenRouter modellválasztó
+    openrouterModelLabel: "OpenRouterモデル選択:",
+    selectModelPlaceholder: "モデルを選択...",
+    
     // Buttons
     startTranslation: "翻訳開始",
     continueTranslation: "翻訳を続ける",

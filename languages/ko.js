@@ -24,6 +24,10 @@ const ko = {
     sourceLanguage: "원본 언어",
     targetLanguage: "대상 언어",
     
+    // OpenRouter modellválasztó
+    openrouterModelLabel: "OpenRouter 모델 선택:",
+    selectModelPlaceholder: "모델을 선택하세요...",
+    
     // Buttons
     startTranslation: "번역 시작",
     continueTranslation: "번역 계속하기",

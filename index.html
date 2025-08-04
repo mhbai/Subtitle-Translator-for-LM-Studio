@@ -14,7 +14,7 @@
     <div class="container py-4">
         <header class="pb-3 mb-4 border-bottom border-secondary">
             <div class="d-flex justify-content-between align-items-center">
-                <h1 class="display-5 fw-bold text-primary"><i class="bi bi-translate me-2"></i>SRT Felirat Fordító <small class="fs-6 text-secondary">version 1.7</small></h1>
+                <h1 class="display-5 fw-bold text-primary"><i class="bi bi-translate me-2"></i>SRT Felirat Fordító <small class="fs-6 text-secondary">version 1.8</small></h1>
                 
                 <!-- Nyelvválasztó gomb -->
                 <div class="dropdown">
@@ -34,6 +34,8 @@
                         <li><a class="dropdown-item" href="#" data-lang="ru">Русский</a></li>
                         <li><a class="dropdown-item" href="#" data-lang="ja">日本語</a></li>
                         <li><a class="dropdown-item" href="#" data-lang="zh">中文</a></li>
+                            <li><a class="dropdown-item" href="#" data-lang="zh_tw">中文 (台灣)</a></li>
+                            <li><a class="dropdown-item" href="#" data-lang="zh_hk">中文 (香港)</a></li>
                         <li><a class="dropdown-item" href="#" data-lang="ar">العربية</a></li>
                         <li><a class="dropdown-item" href="#" data-lang="hi">हिन्दी</a></li>
                         <li><a class="dropdown-item" href="#" data-lang="ko">한국어</a></li>
@@ -100,16 +102,15 @@
                                 <option value="lm_studio_local" selected>LM Studio local</option>
                                 <option value="chatgpt_4o_mini">ChatGPT-4o mini</option>
                                 <option value="chatgpt_4o">ChatGPT-4o</option>
-                                <option value="openrouter_gemma_27b">openrouter.ai: Gemma 3 27B (free)</option>
-                                <option value="openrouter_gemini_flash">openrouter.ai: Gemini Flash 2.0</option>
-                                <option value="openrouter_deepseek_r1">openrouter.ai: DeepSeek R1 (free)</option>
-                                <option value="openrouter_gemini_pro">openrouter.ai: Gemini-2.0-flash-exp (free)</option>
-                                <option value="openrouter_deepseek_v3">openrouter.ai: DeepSeek V3 (free)</option>
-                                <option value="openrouter_llama_70b">openrouter.ai: Llama 3.1 70B Instruct</option>
-                                <option value="openrouter_nemotron_ultra">openrouter.ai: NVIDIA: Llama 3.1 Nemotron Ultra 253B v1 (free)</option>
-                                <option value="openrouter_gpt4o_mini">openrouter.ai: GPT-41-mini</option>
-                                <option value="openrouter_qwen3_235b">openrouter.ai: Qwen3 235B A22B (free)</option>
+                                <option value="openrouter">openrouter.ai (Choose a model from their entire current range!)</option>
                             </select>
+                        </div>
+                        <div class="mb-3 d-none" id="openrouterModelContainer">
+                            <label for="openrouterModel" class="form-label">OpenRouter modell választás:</label>
+                            <select class="form-select bg-dark text-light border-secondary" id="openrouterModel">
+                                <option value="" disabled selected>Modellek betöltése...</option>
+                            </select>
+                            <small class="form-text text-muted mt-1">A modellek listája automatikusan frissül az OpenRouter API-ból</small>
                         </div>
                         <div class="form-check form-switch d-none mb-3 d-flex justify-content-start align-items-center" id="batchModeContainer">
                             <input class="form-check-input me-2" type="checkbox" id="batchModeCheckbox" style="width: 2rem; height: 1.2rem; margin-right: 0.5rem;">
@@ -154,6 +155,8 @@
                                     <option value="ru">Русский</option>
                                     <option value="ja">日本語</option>
                                     <option value="zh">中文</option>
+                                     <option value="zh_tw">中文 (台灣)</option>
+                                     <option value="zh_hk">中文 (香港)</option>
                                     <option value="ar">العربية</option>
                                     <option value="hi">हिन्दी</option>
                                     <option value="ko">한국어</option>
@@ -189,6 +192,8 @@
                                     <option value="ru">Русский</option>
                                     <option value="ja">日本語</option>
                                     <option value="zh">中文</option>
+                                     <option value="zh_tw">中文 (台灣)</option>
+                                     <option value="zh_hk">中文 (香港)</option>
                                     <option value="ar">العربية</option>
                                     <option value="hi">हिन्दी</option>
                                     <option value="ko">한국어</option>

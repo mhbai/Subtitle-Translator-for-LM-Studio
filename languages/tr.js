@@ -24,6 +24,10 @@ const tr = {
     sourceLanguage: "Kaynak Dil",
     targetLanguage: "Hedef Dil",
     
+    // OpenRouter modellválasztó
+    openrouterModelLabel: "OpenRouter model seçimi:",
+    selectModelPlaceholder: "Bir model seçin...",
+    
     // Buttons
     startTranslation: "Çeviriyi Başlat",
     continueTranslation: "Çeviriye Devam Et",

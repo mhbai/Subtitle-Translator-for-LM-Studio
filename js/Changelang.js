@@ -46,6 +46,8 @@ function changeUiLanguage(lang) {
         'ru': 'Русский',
         'ja': '日本語',
         'zh': '中文',
+        'zh_tw': '中文 (台灣)',
+        'zh_hk': '中文 (香港)',
         'ar': 'العربية',
         'hi': 'हिन्दी',
         'ko': '한국어',
@@ -121,7 +123,7 @@ function updateUiTexts(translations) {
         // Főcím
         const mainTitle = document.querySelector('h1.display-5');
         if (mainTitle) {
-            mainTitle.innerHTML = `<i class="bi bi-translate me-2"></i>${translations.appTitle} <small class="fs-6 text-secondary">version 1.7</small>`;
+            mainTitle.innerHTML = `<i class="bi bi-translate me-2"></i>${translations.appTitle} <small class="fs-6 text-secondary">version 1.8</small>`;
         }
         
         // Kártya címek
@@ -165,6 +167,15 @@ function updateUiTexts(translations) {
         
         const targetLabel = document.querySelector('label[for="targetLanguage"]');
         if (targetLabel) targetLabel.textContent = translations.targetLanguage + ':';
+        
+        // OpenRouter modellválasztó címke és placeholder frissítése
+        const openrouterModelLabel = document.querySelector('label[for="openrouterModel"]');
+        if (openrouterModelLabel) openrouterModelLabel.textContent = translations.openrouterModelLabel || "OpenRouter modell választás:";
+        
+        const openrouterModelSelect = document.getElementById('openrouterModel');
+        if (openrouterModelSelect && openrouterModelSelect.options.length > 0 && openrouterModelSelect.options[0].disabled) {
+            openrouterModelSelect.options[0].text = translations.selectModelPlaceholder || "Modellek betöltése...";
+        }
         
         // Gombok - ezeket globális változókkal érjük el
         if (startTranslationBtn) {

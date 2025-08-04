@@ -24,6 +24,10 @@ const zh = {
     sourceLanguage: "源语言",
     targetLanguage: "目标语言",
     
+    // OpenRouter modellválasztó
+    openrouterModelLabel: "OpenRouter模型选择:",
+    selectModelPlaceholder: "选择一个模型...",
+    
     // Buttons
     startTranslation: "开始翻译",
     continueTranslation: "继续翻译",

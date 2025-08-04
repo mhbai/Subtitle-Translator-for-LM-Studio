@@ -24,6 +24,10 @@ const sv = {
     sourceLanguage: "Källspråk",
     targetLanguage: "Målspråk",
     
+    // OpenRouter modellválasztó
+    openrouterModelLabel: "OpenRouter modellval:",
+    selectModelPlaceholder: "Välj en modell...",
+    
     // Buttons
     startTranslation: "Starta översättning",
     continueTranslation: "Fortsätt översättning",

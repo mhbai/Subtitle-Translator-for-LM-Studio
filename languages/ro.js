@@ -24,6 +24,10 @@ const ro = {
     sourceLanguage: "Limba sursă",
     targetLanguage: "Limba țintă",
     
+    // OpenRouter modellválasztó
+    openrouterModelLabel: "Selectarea modelului OpenRouter:",
+    selectModelPlaceholder: "Selectați un model...",
+    
     // Buttons
     startTranslation: "Începe traducerea",
     continueTranslation: "Continuă traducerea",

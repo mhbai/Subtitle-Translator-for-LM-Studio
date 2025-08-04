@@ -914,9 +914,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 alert('Please enter the API key to use ChatGPT!');
                 return;
             }
-        } else if (selectedMode.startsWith('openrouter_')) {
+        } else if (selectedMode === 'openrouter') {
             if (!apiKey) {
                 alert('Please enter the OpenRouter API key to use the selected model!');
+                return;
+            }
+            
+            // OpenRouter modell ellenőrzése
+            const selectedModel = document.getElementById('openrouterModel').value;
+            if (!selectedModel) {
+                alert('Please select an OpenRouter model!');
                 return;
             }
         }
@@ -1009,15 +1016,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     finishTranslation();
                 }
             }
-        } else if (selectedMode === 'openrouter_gemma_27b' || 
-                  selectedMode === 'openrouter_gemini_flash' || 
-                  selectedMode === 'openrouter_deepseek_r1' || 
-                  selectedMode === 'openrouter_gemini_pro' || 
-                  selectedMode === 'openrouter_deepseek_v3' || 
-                  selectedMode === 'openrouter_llama_70b' || 
-                  selectedMode === 'openrouter_nemotron_ultra' ||
-                  selectedMode === 'openrouter_gpt4o_mini' ||
-                  selectedMode === 'openrouter_qwen3_235b') {
+        } else if (selectedMode === 'openrouter') {
             // Ellenőrizzük, hogy a kötegelt mód be van-e kapcsolva
             const batchModeCheckbox = document.getElementById('batchModeCheckbox');
             
@@ -1700,20 +1699,22 @@ if (fileName.toLowerCase().endsWith('.wrk') || fileName.toLowerCase().endsWith('
 function handleTranslationModeChange() {
     const selectedMode = translationModeSelect.value;
     
+    // OpenRouter modell konténer kezelése
+    const openrouterModelContainer = document.getElementById('openrouterModelContainer');
+    if (selectedMode === 'openrouter') {
+        openrouterModelContainer.classList.remove('d-none');
+        // OpenRouter modellek betöltése
+        loadOpenRouterModels();
+    } else {
+        openrouterModelContainer.classList.add('d-none');
+    }
+    
     // Batch mód konténer kezelése
     const batchModeContainer = document.getElementById('batchModeContainer');
-    if (selectedMode === 'openrouter_gemini_flash' || 
-        selectedMode === 'chatgpt_4o_mini' || 
+    if (selectedMode === 'chatgpt_4o_mini' || 
         selectedMode === 'chatgpt_4o' || 
-        selectedMode === 'openrouter_gemma_27b' ||
-        selectedMode === 'openrouter_deepseek_r1' ||
-        selectedMode === 'openrouter_gemini_pro' ||
-        selectedMode === 'openrouter_deepseek_v3' ||
-        selectedMode === 'openrouter_llama_70b' ||
-        selectedMode === 'openrouter_nemotron_ultra' ||
-        selectedMode === 'openrouter_gpt4o_mini' ||
-        selectedMode === 'lm_studio_local' ||
-        selectedMode === 'openrouter_qwen3_235b') {
+        selectedMode === 'openrouter' ||
+        selectedMode === 'lm_studio_local') {
         batchModeContainer.classList.remove('d-none');
         
         // Tooltip inicializálása a batch mód információs ikonhoz
@@ -1726,7 +1727,7 @@ function handleTranslationModeChange() {
         }
     } else {
         batchModeContainer.classList.add('d-none');
-        // Ha nem Gemini Flash, ChatGPT-4o mini vagy ChatGPT-4o, akkor kikapcsoljuk a batch módot
+        // Ha nem támogatott mód, akkor kikapcsoljuk a batch módot
         const batchModeCheckbox = document.getElementById('batchModeCheckbox');
         if (batchModeCheckbox) {
             batchModeCheckbox.checked = false;
@@ -1753,7 +1754,7 @@ function handleTranslationModeChange() {
         
         // API kulcs címke frissítése
         document.querySelector('label[for="apiKey"]').textContent = 'API kulcs:';
-    } else if (selectedMode.startsWith('openrouter_')) {
+    } else if (selectedMode === 'openrouter') {
         apiKeyContainer.classList.remove('d-none');
         
         // Ha van mentett OpenRouter API kulcs, csak a megjelenítés gombot mutatjuk
@@ -1892,6 +1893,84 @@ function hideCurrentRowStopButton() {
     allRowStopBtns.forEach(btn => {
         btn.classList.add('d-none');
     });
+}
+
+// OpenRouter modellek lekérdezése és betöltése
+async function loadOpenRouterModels() {
+    const openrouterModelSelect = document.getElementById('openrouterModel');
+    const apiKey = apiKeyInput.value || loadOpenRouterApiKey();
+    
+    if (!apiKey) {
+        openrouterModelSelect.innerHTML = '<option value="" disabled selected>Adja meg először az OpenRouter API kulcsot</option>';
+        return;
+    }
+    
+    try {
+        openrouterModelSelect.innerHTML = '<option value="" disabled selected>Modellek betöltése...</option>';
+        
+        const response = await fetch('https://openrouter.ai/api/v1/models', {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${apiKey}`,
+                'HTTP-Referer': window.location.href,
+                'X-Title': 'SRT Subtitle Translator'
+            }
+        });
+        
+        if (!response.ok) {
+            throw new Error(`API hiba: ${response.status} ${response.statusText}`);
+        }
+        
+        const data = await response.json();
+        const models = data.data || [];
+        
+        // Modellek rendezése név szerint
+        models.sort((a, b) => a.name.localeCompare(b.name));
+        
+        // Legördülő menü feltöltése
+        // A kiválasztott nyelv alapján meghatározzuk a placeholder szöveget
+        let placeholderText = "Select a model...";
+        
+        // Betöltjük a megfelelő fordítást a kiválasztott nyelv alapján
+        if (typeof loadLanguage === 'function' && currentLangCode) {
+            try {
+                // Aszinkron művelet, de itt szinkron módon használjuk
+                const translations = window[currentLangCode];
+                if (translations && translations.selectModelPlaceholder) {
+                    placeholderText = translations.selectModelPlaceholder;
+                }
+            } catch (error) {
+                console.error('Hiba a fordítás betöltésekor:', error);
+            }
+        }
+        
+        openrouterModelSelect.innerHTML = `<option value="" disabled selected>${placeholderText}</option>`;
+        
+        models.forEach(model => {
+            const option = document.createElement('option');
+            option.value = model.id;
+            
+            // Modell név és ár információ megjelenítése
+            let displayName = model.name;
+            if (model.pricing && model.pricing.prompt) {
+                const promptPrice = parseFloat(model.pricing.prompt);
+                if (promptPrice === 0) {
+                    displayName += ' (free)';
+                } else {
+                    displayName += ` ($${promptPrice}/1M tokens)`;
+                }
+            }
+            
+            option.textContent = displayName;
+            openrouterModelSelect.appendChild(option);
+        });
+        
+        console.log(`${models.length} OpenRouter modell betöltve`);
+        
+    } catch (error) {
+        console.error('Hiba az OpenRouter modellek betöltésekor:', error);
+        openrouterModelSelect.innerHTML = '<option value="" disabled selected>Hiba a modellek betöltésekor</option>';
+    }
 }
 
 window.addEventListener('DOMContentLoaded', function() {

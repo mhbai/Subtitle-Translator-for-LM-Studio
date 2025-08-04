@@ -24,6 +24,10 @@ const cs = {
     sourceLanguage: "Zdrojový jazyk",
     targetLanguage: "Cílový jazyk",
     
+    // OpenRouter modellválasztó
+    openrouterModelLabel: "Výběr modelu OpenRouter:",
+    selectModelPlaceholder: "Vyberte model...",
+    
     // Buttons
     startTranslation: "Zahájit překlad",
     continueTranslation: "Pokračovat v překladu",

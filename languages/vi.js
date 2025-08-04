@@ -24,6 +24,10 @@ const vi = {
     sourceLanguage: "Ngôn ngữ nguồn",
     targetLanguage: "Ngôn ngữ đích",
     
+    // OpenRouter modellválasztó
+    openrouterModelLabel: "Lựa chọn mô hình OpenRouter:",
+    selectModelPlaceholder: "Chọn một mô hình...",
+    
     // Buttons
     startTranslation: "Bắt đầu dịch",
     continueTranslation: "Tiếp tục dịch",

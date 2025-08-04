@@ -16,6 +16,12 @@ This application is a simple yet powerful web tool for translating .srt subtitle
 
 ## Version History
 
+### Version 1.8 (2025-08-05)
+- **Enhanced OpenRouter Model Selection**: Now you can choose from all current models available at OpenRouter.ai. The model selector dynamically uses the selected model ID, API endpoints, and applies them when using the chosen model. This ensures the program always provides the current range of AI models available from the provider.
+- **Expanded Language Support**: Added two new Chinese language variants:
+  - **Taiwan-style Chinese** - zh_tw
+  - **Hong Kong-style Chinese** - zh_hk
+
 ### Version 1.7 (2025-05-22)
 - **New OpenRouter Model**: Added a new OpenRouter model to expand translation options:
   - **openrouter.ai: Qwen3 235B A22B** (free)
@@ -288,6 +294,12 @@ MAGYAR NYELVŰ LEÍRÁS:
 Ez az alkalmazás egy egyszerű, de hatékony webes eszköz .srt formátumú feliratfájlok fordítására. A program a helyi gépen futó LM Studio mesterséges intelligencia modellt vagy a ChatGPT API-t használja a fordításhoz.
 
 ## Verzió történet
+
+### 1.8-as verzió (2025-08-05)
+- **Továbbfejlesztett OpenRouter modellválasztás**: Mostantól az OpenRouter.ai szolgáltató összes aktuális modelljéből lehet választani. A modellválasztó már dinamikusan használja a kiválasztott modell azonosítóját, API eléréseit és ezeket használja fel a kiválasztott modell használatakor. Ezáltal a program midig biztosítja a szolgáltatónál elérhető AI modellek aktuális kínálatát.
+- **Bővített nyelvi támogatás**: Két új kínai nyelvváltozat hozzáadása:
+  - **Hagyományos kínai (Tajvan)** - zh_tw
+  - **Hagyományos kínai (Hongkong)** - zh_hk
 
 ### 1.7-es verzió (2025-05-22)
  **Új OpenRouter modell**: Egy új OpenRouter modell hozzáadása a fordítási lehetőségek bővítéséhez:

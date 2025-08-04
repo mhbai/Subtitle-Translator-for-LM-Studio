@@ -24,6 +24,10 @@ const hi = {
     sourceLanguage: "स्रोत भाषा",
     targetLanguage: "लक्षित भाषा",
     
+    // OpenRouter modellválasztó
+    openrouterModelLabel: "OpenRouter मॉडल चयन:",
+    selectModelPlaceholder: "एक मॉडल चुनें...",
+    
     // Buttons
     startTranslation: "अनुवाद शुरू करें",
     continueTranslation: "अनुवाद जारी रखें",
