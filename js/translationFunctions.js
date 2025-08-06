@@ -1157,6 +1157,20 @@ async function translateTextWithContext(subtitles, currentIndex, sourceLanguage,
             throw new Error('Nem sikerült kinyerni a fordított szöveget a válaszból: ' + JSON.stringify(data));
         }
         
+        // Speciális kezelés az openai/gpt-oss-20b modell válaszformátumához
+        // Ha a válasz tartalmazza a "final<|message|>" mintát, akkor csak az utána következő szöveget használjuk
+        if (translatedText.includes('final<|message|>')) {
+            const finalMessageIndex = translatedText.indexOf('final<|message|>');
+            if (finalMessageIndex !== -1) {
+                // A "final<|message|>" után következő szöveg kinyerése
+                const afterFinalMessage = translatedText.substring(finalMessageIndex + 'final<|message|>'.length).trim();
+                if (afterFinalMessage) {
+                    translatedText = afterFinalMessage;
+                    console.log('Speciális openai/gpt-oss-20b formátum felismerve, kinyert fordítás:', translatedText);
+                }
+            }
+        }
+        
         console.log('Fordítás eredménye:', translatedText);
         
         return translatedText;

@@ -16,6 +16,9 @@ This application is a simple yet powerful web tool for translating .srt subtitle
 
 ## Version History
 
+### Version 1.81 (2025-08-07)
+- **Enhanced LM Studio Model Support**: Added support for the new "openai/gpt-oss-20b" model, which uses a special response format. The program now automatically detects and extracts the translation from responses containing the "final<|message|>" pattern, ensuring proper functionality with this model while maintaining compatibility with all other models.
+
 ### Version 1.8 (2025-08-05)
 - **Enhanced OpenRouter Model Selection**: Now you can choose from all current models available at OpenRouter.ai. The model selector dynamically uses the selected model ID, API endpoints, and applies them when using the chosen model. This ensures the program always provides the current range of AI models available from the provider.
 - **Expanded Language Support**: Added two new Chinese language variants:
@@ -294,6 +297,9 @@ MAGYAR NYELVŰ LEÍRÁS:
 Ez az alkalmazás egy egyszerű, de hatékony webes eszköz .srt formátumú feliratfájlok fordítására. A program a helyi gépen futó LM Studio mesterséges intelligencia modellt vagy a ChatGPT API-t használja a fordításhoz.
 
 ## Verzió történet
+
+### 1.81-es verzió (2025-08-07)
+- **Továbbfejlesztett LM Studio modell támogatás**: Hozzáadva az új "openai/gpt-oss-20b" modell támogatása, amely speciális válaszformátumot használ. A program most automatikusan felismeri és kinyeri a fordítást a "final<|message|>" mintát tartalmazó válaszokból, biztosítva a megfelelő működést ezzel a modellel, miközben fenntartja a kompatibilitást az összes többi modellel.
 
 ### 1.8-as verzió (2025-08-05)
 - **Továbbfejlesztett OpenRouter modellválasztás**: Mostantól az OpenRouter.ai szolgáltató összes aktuális modelljéből lehet választani. A modellválasztó már dinamikusan használja a kiválasztott modell azonosítóját, API eléréseit és ezeket használja fel a kiválasztott modell használatakor. Ezáltal a program midig biztosítja a szolgáltatónál elérhető AI modellek aktuális kínálatát.
