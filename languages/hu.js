@@ -36,6 +36,9 @@ const hu = {
     saveTranslation: "Fordítás mentése",
     saveWorkFile: "Munkafájl mentése",
     saveSourceBlock: "Forrás blokkmentése",
+    exportFormatLabel: "Export formátuma",
+    exportFormatTranslatedOnly: "Csak fordítás",
+    exportFormatBilingual: "Kétnyelvű (eredeti + fordítás)",
     
     // Táblázat
     originalSubtitle: "Eredeti felirat",
