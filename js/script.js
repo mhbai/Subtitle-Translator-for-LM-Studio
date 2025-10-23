@@ -44,6 +44,8 @@ let showApiKeyFieldBtn; // API kulcs mező megjelenítő gomb
 let saveSourceBlockBtn; // Forrás blokkmentése gomb
 let toggleApiKeyVisibilityBtn; // API kulcs láthatóság kapcsoló gomb
 let apiKeyVisibilityIcon; // API kulcs láthatóság ikon
+let exportFormatSelect; // Export formátum választó
+let exportFormatLabel; // Export formátum címke
 
 // API kulcs titkosítási funkciók
 // Titkosító kulcs (alkalmazás-specifikus konstans)
@@ -141,6 +143,20 @@ document.addEventListener('DOMContentLoaded', function() {
     lineCountSpan = document.getElementById('lineCount');
     sourceLanguageSelect = document.getElementById('sourceLanguage');
     targetLanguageSelect = document.getElementById('targetLanguage');
+
+    if (sourceLanguageSelect) {
+        const savedSourceLanguage = localStorage.getItem('subtitleSourceLanguage');
+        if (savedSourceLanguage && sourceLanguageSelect.querySelector(`option[value="${savedSourceLanguage}"]`)) {
+            sourceLanguageSelect.value = savedSourceLanguage;
+        }
+    }
+
+    if (targetLanguageSelect) {
+        const savedTargetLanguage = localStorage.getItem('subtitleTargetLanguage');
+        if (savedTargetLanguage && targetLanguageSelect.querySelector(`option[value="${savedTargetLanguage}"]`)) {
+            targetLanguageSelect.value = savedTargetLanguage;
+        }
+    }
     progressContainer = document.getElementById('progressContainer');
     progressBar = document.getElementById('progressBar');
     temperatureSlider = document.getElementById('temperatureSlider');
@@ -160,6 +176,8 @@ document.addEventListener('DOMContentLoaded', function() {
     saveSourceBlockBtn = document.getElementById('saveSourceBlockBtn'); // Forrás blokkmentése gomb
     toggleApiKeyVisibilityBtn = document.getElementById('toggleApiKeyVisibility'); // API kulcs láthatóság kapcsoló gomb
     apiKeyVisibilityIcon = document.getElementById('apiKeyVisibilityIcon'); // API kulcs láthatóság ikon
+    exportFormatSelect = document.getElementById('exportFormat');
+    exportFormatLabel = document.getElementById('exportFormatLabel');
     
     console.log("DOM elemek betöltve:", {
         startTranslationBtn: !!startTranslationBtn,
@@ -245,6 +263,18 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Fordítás módjának eseménykezelője
     translationModeSelect.addEventListener('change', handleTranslationModeChange);
+
+    if (sourceLanguageSelect) {
+        sourceLanguageSelect.addEventListener('change', () => {
+            localStorage.setItem('subtitleSourceLanguage', sourceLanguageSelect.value);
+        });
+    }
+
+    if (targetLanguageSelect) {
+        targetLanguageSelect.addEventListener('change', () => {
+            localStorage.setItem('subtitleTargetLanguage', targetLanguageSelect.value);
+        });
+    }
     
     // Fordítási mód kezelése inicializáláskor - hogy a batch mód konténer megfelelően jelenjen meg
     handleTranslationModeChange();
@@ -513,9 +543,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Nyelvek beállítása
                 if (workData.sourceLanguage) {
                     sourceLanguageSelect.value = workData.sourceLanguage;
+                    localStorage.setItem('subtitleSourceLanguage', workData.sourceLanguage);
                 }
                 if (workData.targetLanguage) {
                     targetLanguageSelect.value = workData.targetLanguage;
+                    localStorage.setItem('subtitleTargetLanguage', workData.targetLanguage);
                 }
                 
                 // Fájl információk megjelenítése
@@ -1359,37 +1391,74 @@ Csak a fordítást add vissza, semmi mást. Ne adj hozzá magyarázatot vagy meg
             return;
         }
         
-        // SRT formátumú tartalom létrehozása
-        let srtContent = '';
-        
-        // Fordított feliratok összegyűjtése
-        originalSubtitles.forEach((subtitle, index) => {
-            // Ha a felhasználó éppen szerkeszt egy sort, akkor frissítjük a fordítást
+        const exportFormat = exportFormatSelect ? exportFormatSelect.value : 'translated-only';
+        const sanitizedTranslations = originalSubtitles.map((subtitle, index) => {
             const editableTextarea = document.querySelector(`#translated-${index} textarea`);
             if (editableTextarea) {
-                // Frissítjük a translatedSubtitles tömböt a legfrissebb szerkesztett szöveggel
                 translatedSubtitles[index] = editableTextarea.value.trim();
             }
-            
-            srtContent += `${subtitle.number}\n`;
-            srtContent += `${subtitle.timecode}\n`;
-            srtContent += `${translatedSubtitles[index] || ''}\n\n`;
+
+            const currentValue = translatedSubtitles[index];
+            if (typeof currentValue === 'string') {
+                return currentValue;
+            }
+            if (currentValue === undefined || currentValue === null) {
+                return '';
+            }
+            return String(currentValue);
         });
-        
+
+        let srtContent;
+        if (typeof buildSrtContent === 'function') {
+            srtContent = buildSrtContent({
+                subtitles: originalSubtitles,
+                translations: sanitizedTranslations,
+                exportFormat,
+            });
+        } else {
+            srtContent = '';
+
+            originalSubtitles.forEach((subtitle, index) => {
+                const number = subtitle && subtitle.number !== undefined ? subtitle.number : index + 1;
+                const timecode = subtitle && subtitle.timecode ? subtitle.timecode : '';
+                const originalText = subtitle && typeof subtitle.text === 'string' ? subtitle.text : '';
+                const translatedText = sanitizedTranslations[index] || '';
+
+                srtContent += `${number}\n`;
+                srtContent += `${timecode}\n`;
+                if (exportFormat === 'bilingual' && originalText.trim().length > 0) {
+                    srtContent += `${originalText}\n`;
+                }
+                srtContent += `${translatedText}\n\n`;
+            });
+        }
+
         // Fájl létrehozása és letöltése
         const targetLangCode = targetLanguageSelect.value;
-let newFileName;
+        const sourceLangCode = sourceLanguageSelect.value || 'src';
+        const lowerFileName = (fileName || '').toLowerCase();
+        const isWorkOrMmmFile = lowerFileName.endsWith('.wrk') || lowerFileName.endsWith('.mmm');
+        const baseFileName = (() => {
+            if (!fileName) {
+                return 'subtitles';
+            }
 
-// EllenĹ‘rizzĂĽk a fĂˇjl kiterjesztĂ©sĂ©t
-if (fileName.toLowerCase().endsWith('.wrk') || fileName.toLowerCase().endsWith('.mmm')) {
-    // .wrk vagy .mmm fĂˇjlok esetĂ©n: "Translated subtitles" + cĂ©lnyelv kĂłdja + .srt
-    newFileName = `Translated subtitles-${targetLangCode}.srt`;
-} else {
-    // .srt fĂˇjlok esetĂ©n marad az eredeti logika: Eredeti fĂˇjlnĂ©v + cĂ©lnyelv kĂłdja + .srt
-    newFileName = fileName.replace('.srt', `-${targetLangCode}.srt`);
-}
-        
-        // Blob lĂ©trehozĂˇsa Ă©s letĂ¶ltĂ©se
+            if (isWorkOrMmmFile) {
+                return 'Translated subtitles';
+            }
+
+            const withoutExtension = fileName.replace(/\.[^/.]+$/, '');
+            return withoutExtension || 'subtitles';
+        })();
+
+        let newFileName;
+        if (exportFormat === 'bilingual') {
+            newFileName = `${baseFileName}-${sourceLangCode}-${targetLangCode}-bilingual.srt`;
+        } else {
+            newFileName = `${baseFileName}-${targetLangCode}.srt`;
+        }
+
+        // Blob létrehozása és letöltése
         const blob = new Blob([srtContent], { type: 'text/plain;charset=utf-8' });
         saveAs(blob, newFileName);
     }

@@ -202,7 +202,16 @@ function updateUiTexts(translations) {
             saveWorkFileBtn.innerHTML = `<i class="bi bi-file-earmark-text me-2"></i>${translations.saveWorkFile}`;
             console.log("Save workfile gomb szövege frissítve:", translations.saveWorkFile);
         }
-        
+
+        if (exportFormatLabel) {
+            exportFormatLabel.textContent = translations.exportFormatLabel || 'Export format';
+        }
+
+        if (exportFormatSelect && exportFormatSelect.options.length >= 2) {
+            exportFormatSelect.options[0].text = translations.exportFormatTranslatedOnly || 'Translation only';
+            exportFormatSelect.options[1].text = translations.exportFormatBilingual || 'Bilingual (original + translation)';
+        }
+
         // Forrás blokkmentése gomb frissítése
         const saveSourceBlockBtn = document.getElementById('saveSourceBlockBtn');
         if (saveSourceBlockBtn) {

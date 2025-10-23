@@ -10,3 +10,18 @@
 #  from = "/*"
 #  to = "/index.html"
 #  status = 200
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    Content-Security-Policy = """
+      default-src 'self';
+      script-src 'self' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com;
+      style-src 'self' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com;
+      img-src 'self' data:;
+      font-src 'self' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com data:;
+      connect-src 'self' https://api.openai.com https://openrouter.ai https://api.openrouter.ai https://*.openrouter.ai wss://openrouter.ai wss://api.openrouter.ai wss://*.openrouter.ai http://localhost:* http://127.0.0.1:* https://localhost:* https://127.0.0.1:* ws://localhost:* ws://127.0.0.1:* wss://localhost:* wss://127.0.0.1:*;
+      frame-ancestors 'none';
+      base-uri 'self';
+      form-action 'self'
+    """
