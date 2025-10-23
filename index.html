@@ -113,7 +113,7 @@
                             <small class="form-text text-muted mt-1">A modellek listája automatikusan frissül az OpenRouter API-ból</small>
                         </div>
                         <div class="form-check form-switch d-none mb-3 d-flex justify-content-start align-items-center" id="batchModeContainer">
-                            <input class="form-check-input me-2" type="checkbox" id="batchModeCheckbox" style="width: 2rem; height: 1.2rem; margin-right: 0.5rem;">
+                            <input class="form-check-input me-2 batch-mode-toggle" type="checkbox" id="batchModeCheckbox">
                             <label class="form-check-label fw-bold text-warning me-2" for="batchModeCheckbox" id="batchModeLabel">Speciális nagy kontextusú fordítási mód</label>
                             <i class="bi bi-info-circle text-warning" id="batchModeInfo" data-bs-toggle="tooltip" data-bs-placement="top"></i>
                         </div>
@@ -228,18 +228,27 @@
                                     <i class="bi bi-arrow-counterclockwise me-2"></i>Reset
                                 </button>
                             </div>
-                            <div>
-                                <button class="btn btn-info d-none" id="saveWorkFile">
-                                    <i class="bi bi-file-earmark-text me-2"></i>Munkafájl mentése
-                                </button>
-                                <button class="btn btn-success" id="saveTranslation" disabled>
-                                    <i class="bi bi-download me-2"></i>Mentés
-                                </button>
+                            <div class="d-flex flex-column align-items-end gap-2">
+                                <div class="d-flex align-items-center gap-2">
+                                    <label for="exportFormat" id="exportFormatLabel" class="form-label text-white mb-0 small">Export formátuma</label>
+                                    <select class="form-select form-select-sm w-auto" id="exportFormat">
+                                        <option value="translated-only">Csak fordítás</option>
+                                        <option value="bilingual">Kétnyelvű (eredeti + fordítás)</option>
+                                    </select>
+                                </div>
+                                <div class="d-flex gap-2">
+                                    <button class="btn btn-info d-none" id="saveWorkFile">
+                                        <i class="bi bi-file-earmark-text me-2"></i>Munkafájl mentése
+                                    </button>
+                                    <button class="btn btn-success" id="saveTranslation" disabled>
+                                        <i class="bi bi-download me-2"></i>Mentés
+                                    </button>
+                                </div>
                             </div>
                         </div>
                         
                         <div class="progress mb-4 d-none" id="progressContainer">
-                            <div class="progress-bar progress-bar-striped progress-bar-animated" id="progressBar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%"></div>
+                            <div class="progress-bar progress-bar-striped progress-bar-animated" id="progressBar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
                         </div>
 
                         <div class="table-responsive">
@@ -285,6 +294,8 @@
     <script src="js/translationFunctions.js"></script>
     <!-- Aztán a Changelang.js fájlt -->
     <script src="js/Changelang.js"></script>
+    <!-- Export segédfüggvények -->
+    <script src="js/exportUtils.js"></script>
     <!-- Végül a script.js fájlt -->
     <script src="js/script.js"></script>
 </body>
