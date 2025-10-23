@@ -228,13 +228,22 @@
                                     <i class="bi bi-arrow-counterclockwise me-2"></i>Reset
                                 </button>
                             </div>
-                            <div>
-                                <button class="btn btn-info d-none" id="saveWorkFile">
-                                    <i class="bi bi-file-earmark-text me-2"></i>Munkafájl mentése
-                                </button>
-                                <button class="btn btn-success" id="saveTranslation" disabled>
-                                    <i class="bi bi-download me-2"></i>Mentés
-                                </button>
+                            <div class="d-flex flex-column align-items-end gap-2">
+                                <div class="d-flex align-items-center gap-2">
+                                    <label for="exportFormat" id="exportFormatLabel" class="form-label text-white mb-0 small">Export formátuma</label>
+                                    <select class="form-select form-select-sm w-auto" id="exportFormat">
+                                        <option value="translated-only">Csak fordítás</option>
+                                        <option value="bilingual">Kétnyelvű (eredeti + fordítás)</option>
+                                    </select>
+                                </div>
+                                <div class="d-flex gap-2">
+                                    <button class="btn btn-info d-none" id="saveWorkFile">
+                                        <i class="bi bi-file-earmark-text me-2"></i>Munkafájl mentése
+                                    </button>
+                                    <button class="btn btn-success" id="saveTranslation" disabled>
+                                        <i class="bi bi-download me-2"></i>Mentés
+                                    </button>
+                                </div>
                             </div>
                         </div>
                         
@@ -285,6 +294,8 @@
     <script src="js/translationFunctions.js"></script>
     <!-- Aztán a Changelang.js fájlt -->
     <script src="js/Changelang.js"></script>
+    <!-- Export segédfüggvények -->
+    <script src="js/exportUtils.js"></script>
     <!-- Végül a script.js fájlt -->
     <script src="js/script.js"></script>
 </body>
