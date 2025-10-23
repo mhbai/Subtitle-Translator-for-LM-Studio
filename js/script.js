@@ -143,6 +143,20 @@ document.addEventListener('DOMContentLoaded', function() {
     lineCountSpan = document.getElementById('lineCount');
     sourceLanguageSelect = document.getElementById('sourceLanguage');
     targetLanguageSelect = document.getElementById('targetLanguage');
+
+    if (sourceLanguageSelect) {
+        const savedSourceLanguage = localStorage.getItem('subtitleSourceLanguage');
+        if (savedSourceLanguage && sourceLanguageSelect.querySelector(`option[value="${savedSourceLanguage}"]`)) {
+            sourceLanguageSelect.value = savedSourceLanguage;
+        }
+    }
+
+    if (targetLanguageSelect) {
+        const savedTargetLanguage = localStorage.getItem('subtitleTargetLanguage');
+        if (savedTargetLanguage && targetLanguageSelect.querySelector(`option[value="${savedTargetLanguage}"]`)) {
+            targetLanguageSelect.value = savedTargetLanguage;
+        }
+    }
     progressContainer = document.getElementById('progressContainer');
     progressBar = document.getElementById('progressBar');
     temperatureSlider = document.getElementById('temperatureSlider');
@@ -249,6 +263,18 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Fordítás módjának eseménykezelője
     translationModeSelect.addEventListener('change', handleTranslationModeChange);
+
+    if (sourceLanguageSelect) {
+        sourceLanguageSelect.addEventListener('change', () => {
+            localStorage.setItem('subtitleSourceLanguage', sourceLanguageSelect.value);
+        });
+    }
+
+    if (targetLanguageSelect) {
+        targetLanguageSelect.addEventListener('change', () => {
+            localStorage.setItem('subtitleTargetLanguage', targetLanguageSelect.value);
+        });
+    }
     
     // Fordítási mód kezelése inicializáláskor - hogy a batch mód konténer megfelelően jelenjen meg
     handleTranslationModeChange();
@@ -517,9 +543,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Nyelvek beállítása
                 if (workData.sourceLanguage) {
                     sourceLanguageSelect.value = workData.sourceLanguage;
+                    localStorage.setItem('subtitleSourceLanguage', workData.sourceLanguage);
                 }
                 if (workData.targetLanguage) {
                     targetLanguageSelect.value = workData.targetLanguage;
+                    localStorage.setItem('subtitleTargetLanguage', workData.targetLanguage);
                 }
                 
                 // Fájl információk megjelenítése
