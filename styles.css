@@ -108,6 +108,10 @@ body {
   background-color: var(--primary-color);
 }
 
+#progressBar {
+  width: 0%;
+}
+
 /* Egyéb elemek */
 #fileInfo {
   font-size: 0.9rem;
@@ -122,6 +126,11 @@ body {
 .tooltip-warning .tooltip-arrow::before {
     border-top-color: #ffc107 !important;
     border-bottom-color: #ffc107 !important;
+}
+
+.batch-mode-toggle {
+  width: 2rem;
+  height: 1.2rem;
 }
 
 /* Fordítási szabadságfok csúszka */

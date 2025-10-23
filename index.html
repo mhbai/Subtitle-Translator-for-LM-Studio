@@ -113,7 +113,7 @@
                             <small class="form-text text-muted mt-1">A modellek listája automatikusan frissül az OpenRouter API-ból</small>
                         </div>
                         <div class="form-check form-switch d-none mb-3 d-flex justify-content-start align-items-center" id="batchModeContainer">
-                            <input class="form-check-input me-2" type="checkbox" id="batchModeCheckbox" style="width: 2rem; height: 1.2rem; margin-right: 0.5rem;">
+                            <input class="form-check-input me-2 batch-mode-toggle" type="checkbox" id="batchModeCheckbox">
                             <label class="form-check-label fw-bold text-warning me-2" for="batchModeCheckbox" id="batchModeLabel">Speciális nagy kontextusú fordítási mód</label>
                             <i class="bi bi-info-circle text-warning" id="batchModeInfo" data-bs-toggle="tooltip" data-bs-placement="top"></i>
                         </div>
@@ -248,7 +248,7 @@
                         </div>
                         
                         <div class="progress mb-4 d-none" id="progressContainer">
-                            <div class="progress-bar progress-bar-striped progress-bar-animated" id="progressBar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%"></div>
+                            <div class="progress-bar progress-bar-striped progress-bar-animated" id="progressBar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
                         </div>
 
                         <div class="table-responsive">
