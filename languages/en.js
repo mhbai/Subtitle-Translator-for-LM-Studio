@@ -36,6 +36,9 @@ const en = {
     saveTranslation: "Save Translation",
     saveWorkFile: "Save Work File",
     saveSourceBlock: "Save Source Block",
+    exportFormatLabel: "Export format",
+    exportFormatTranslatedOnly: "Translation only",
+    exportFormatBilingual: "Bilingual (original + translation)",
     
     // Table
     originalSubtitle: "Original Subtitle",
